@@ -1,5 +1,6 @@
 'use client';
 
+import Navbar from "@/components/navbar";
 import {
   createNetworkConfig,
   lightTheme,
@@ -21,13 +22,16 @@ const main = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-        <WalletProvider theme={lightTheme}>
-          {children}
-        </WalletProvider>
-      </SuiClientProvider>
-    </QueryClientProvider>
+    <>
+      <QueryClientProvider client={queryClient}>
+        <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
+          <WalletProvider theme={lightTheme}>
+            <Navbar></Navbar>
+            <div className="pt-24">{children}</div>
+          </WalletProvider>
+        </SuiClientProvider>
+      </QueryClientProvider>
+    </>
   );
 };
 

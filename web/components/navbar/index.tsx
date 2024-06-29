@@ -7,10 +7,10 @@ import { Input } from "../ui/input";
 
 const Navbar = () => {
   return (
-    <nav className="flex my-12 justify-between items-center gap-10">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex py-6 justify-between items-center gap-10 shadow-md">
       <Image
         className="flex-shrink-0 ml-5"
-        src="/images/Pump.png"
+        src="https://svgshare.com/i/17jL.svg"
         alt="logo"
         width={260}
         height={1}
