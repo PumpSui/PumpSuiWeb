@@ -9,6 +9,7 @@ interface Project {
   startDate: string;
   endDate: string;
   description: string;
+  imgUrl?: string;
 }
 
 const ProjectCard: React.FC<Project> = ({
@@ -18,19 +19,20 @@ const ProjectCard: React.FC<Project> = ({
   startDate,
   endDate,
   description,
+  imgUrl,
 }) => {
   return (
-    <Card className="p-4 h-full bg-secondary rounded-2xl">
+    <Card className="p-4 max-w-sm bg-secondary rounded-2xl">
       <div className="flex flex-col h-full">
-        <div className="">
+        {imgUrl&&<div className="">
           <Image
-            src="/images/DemoProject.png"
+            src={imgUrl}
             alt="Project Image"
             width={500}
             height={1}
             className="rounded-2xl"
           />
-        </div>
+        </div>}
         <div className="flex-grow">
           <CardHeader>
             <CardTitle className="text-lg font-semibold">

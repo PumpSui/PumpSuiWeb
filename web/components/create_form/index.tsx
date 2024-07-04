@@ -1,14 +1,16 @@
 // components/ProjectForm.tsx
 import React, { useState } from "react";
 import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import DatePicker from "react-datepicker";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import "react-datepicker/dist/react-datepicker.css";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../ui/accordion";
 
 interface ProjectFormData {
   name: string;
@@ -42,6 +44,8 @@ const ProjectForm: React.FC = () => {
     website: "",
     github: "",
   });
+
+  const [startDate, setStartDate] = useState<Date | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -83,26 +87,29 @@ const ProjectForm: React.FC = () => {
           name="minValue"
           value={form.minValue}
           onChange={handleChange}
-          placeholder="min_value"
+          placeholder="Min_value"
         />
-        <span className="ml-2">SUI</span>
+        <span className="text-cyan-400 ml-2">SUI</span>
       </div>
       <div className="flex items-center">
         <Input
           name="maxValue"
           value={form.maxValue}
           onChange={handleChange}
-          placeholder="max_value"
+          placeholder="Max_value"
         />
-        <span className="ml-2">SUI</span>
+        <span className="text-cyan-400 ml-2">SUI</span>
       </div>
 
       <div>
-        <p>start time (for funding)</p>
-        <div className="flex items-center space-x-4">
-          <Button>Calendly</Button>
-          <Button>Clock</Button>
-        </div>
+        <span className="mr-2">Project Start Time:</span>
+        <DatePicker
+          selected={startDate}
+          onChange={(date: Date | null) => setStartDate(date)}
+          showTimeSelect
+          dateFormat="Pp"
+          className="min-full bg-primary-foreground border rounded px-3 py-2"
+        />
       </div>
 
       <Input
@@ -119,45 +126,49 @@ const ProjectForm: React.FC = () => {
         placeholder="Description"
         rows={3}
       />
+      <Accordion type="single" collapsible>
+        <AccordionItem value="Optional">
+          <AccordionTrigger>Some more options ?</AccordionTrigger>
+          <AccordionContent>
+            <Input
+              name="imageUrl"
+              value={form.imageUrl}
+              onChange={handleChange}
+              placeholder="Image_url (Optional)"
+            />
+            <Input
+              name="xLink"
+              value={form.xLink}
+              onChange={handleChange}
+              placeholder="X Link (Optional)"
+            />
+            <Input
+              name="telegramLink"
+              value={form.telegramLink}
+              onChange={handleChange}
+              placeholder="Telegram link (Optional)"
+            />
+            <Input
+              name="website"
+              value={form.website}
+              onChange={handleChange}
+              placeholder="Website (Optional)"
+            />
+            <Input
+              name="github"
+              value={form.github}
+              onChange={handleChange}
+              placeholder="Github (Optional)"
+            />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
-      <Input
-        name="imageUrl"
-        value={form.imageUrl}
-        onChange={handleChange}
-        placeholder="Image_url (Optional)"
-      />
+      <Button className="min-w-full" type="submit">
+        Create Project
+      </Button>
 
-      <Input
-        name="xLink"
-        value={form.xLink}
-        onChange={handleChange}
-        placeholder="x link (Optional)"
-      />
-
-      <Input
-        name="telegramLink"
-        value={form.telegramLink}
-        onChange={handleChange}
-        placeholder="telegram link (Optional)"
-      />
-
-      <Input
-        name="website"
-        value={form.website}
-        onChange={handleChange}
-        placeholder="website (Optional)"
-      />
-
-      <Input
-        name="github"
-        value={form.github}
-        onChange={handleChange}
-        placeholder="Github (Optional)"
-      />
-
-      <Button type="submit">Create Project</Button>
-
-      <p>deploy fee: (max(20, TDL * Ratio * 1%))</p>
+      <p className="text-cyan-400">Deploy Fee: (max(20, TDL * Ratio * 1%))</p>
     </form>
   );
 };

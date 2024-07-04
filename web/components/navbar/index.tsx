@@ -7,7 +7,7 @@ import { Input } from "../ui/input";
 
 const Navbar = () => {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex py-6 justify-between items-center gap-10 shadow-md">
+    <nav className="fixed bg-background top-0 left-0 right-0 z-50 flex py-6 justify-between items-center gap-10 shadow-md">
       <Image
         className="flex-shrink-0 ml-5"
         src="https://svgshare.com/i/17jL.svg"
@@ -28,7 +28,7 @@ const Navbar = () => {
         <div className="bg-secondary flex items-center min-h-14 px-3 rounded-3xl">
           <Button variant="link">Home</Button>
           <Button variant="link">Create</Button>
-          <Button variant="link">Profile</Button>
+          <Button variant="link">Assets</Button>
         </div>
         <div className="bg-secondary flex justify-end items-center min-h-14 pl-3 rounded-l-3xl">
           <Button variant="link">Connect Wallet</Button>
