@@ -1,16 +1,8 @@
 import { Progress } from "../ui/progress";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Project } from "@/type";
 
-interface Project {
-  creator: string;
-  name: string;
-  progress: number;
-  startDate: string;
-  endDate: string;
-  description: string;
-  imgUrl?: string;
-}
 
 const ProjectCard: React.FC<Project> = ({
   creator,
