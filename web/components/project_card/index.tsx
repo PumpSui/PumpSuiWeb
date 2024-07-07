@@ -13,21 +13,26 @@ const ProjectCard: React.FC<Project> = ({
   description,
   imgUrl,
 }) => {
+  const getRealDate = (date: string) => {
+    return new Date(parseInt(date)).toLocaleString();
+  }
   return (
     <Card className="p-4 max-w-sm bg-secondary rounded-2xl">
       <div className="flex flex-col h-full">
-        {imgUrl&&<div className="">
-          <Image
-            src={imgUrl}
-            alt="Project Image"
-            width={500}
-            height={1}
-            className="rounded-2xl"
-          />
-        </div>}
+        {imgUrl && (
+          <div className="">
+            <Image
+              src={imgUrl}
+              alt="Project Image"
+              width={500}
+              height={1}
+              className="rounded-2xl"
+            />
+          </div>
+        )}
         <div className="flex-grow">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">
+            <CardTitle className="truncate text-lg  font-semibold">
               Created by @{creator}
             </CardTitle>
             <CardTitle className="text-xl">Name: {name}</CardTitle>
@@ -38,8 +43,8 @@ const ProjectCard: React.FC<Project> = ({
               <Progress value={progress} className="w-full" />
             </div>
             <div className="text-sm text-cyan-400">
-              <p>start: {startDate}</p>
-              <p>end: {endDate}</p>
+              <p>start: {getRealDate(startDate)}</p>
+              <p>end: {getRealDate(endDate)}</p>
             </div>
             <div className="mt-4">
               <p className="font-semibold">Description:</p>

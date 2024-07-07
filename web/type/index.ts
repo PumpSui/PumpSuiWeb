@@ -50,6 +50,35 @@ export interface Project {
         minted_per_user: Table<address, u64>,
         thread: TableVec<Comment>,
     }*/
+export interface ProjectRecord {
+    object_id: string;
+    id:string;
+    creator: string;
+    name: string;
+    description: string;
+    image_url: string;
+    x: string;
+    telegram: string;
+    discord: string;
+    website: string;
+    github: string;
+    cancel: boolean;
+    balance: number;
+    ratio: number;
+    start_time_ms: number;
+    end_time_ms: number;
+    total_supply: number;
+    amount_per_sui: number;
+    remain: number;
+    current_supply: number;
+    total_transactions: number;
+    min_value_sui: number;
+    max_value_sui: number;
+    participants: string[];
+    minted_per_user: Record<string, number>;
+    thread: Comment[];
+    
+}
 
 /*     public struct Comment has key, store {
         id: UID,
@@ -60,3 +89,12 @@ export interface Project {
         timestamp: u64,
         likes: VecSet<address>,
     } */
+export interface Comment {
+    id: string;
+    reply?: string;
+    creator: string;
+    media_link: string;
+    content: string;
+    timestamp: number;
+    likes: string[];
+}

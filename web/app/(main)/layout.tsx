@@ -22,7 +22,7 @@ const main = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <>
+
       <QueryClientProvider client={queryClient}>
         <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
           <WalletProvider theme={customTheme}>
@@ -31,7 +31,7 @@ const main = ({
           </WalletProvider>
         </SuiClientProvider>
       </QueryClientProvider>
-    </>
+    
   );
 };
 
