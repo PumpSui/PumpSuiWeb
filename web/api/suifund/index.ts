@@ -6,7 +6,7 @@ import {
   SuiObjectResponse,
   SuiParsedData,
 } from "@mysten/sui/client";
-import { isValidSuiObjectId } from "@mysten/sui/utils";
+import { isValidSuiObjectId, isValidSuiAddress } from "@mysten/sui/utils";
 import { Transaction } from "@mysten/sui/transactions";
 import { bcs } from '@mysten/sui/bcs';
 
@@ -49,6 +49,9 @@ const deploy = (
     max_value_sui: number,
     sender: string
 ) => {
+    if (!isValidSuiAddress(sender)) {
+        throw new Error("Invalid tx sender");
+    }
     let deploy_fee = get_deploy_fee(total_deposit_sui, ratio);
     const tx = new Transaction();
     const [coin] = tx.splitCoins(tx.gas, [deploy_fee]);
@@ -102,7 +105,39 @@ const get_deploy_fee = (
         clk: &Clock,
         ctx: &mut TxContext
     ): Coin<SUI> */
-const do_claim = () => {};
+const do_claim = (
+    project_record: string,
+    project_admin_cap: string,
+    sender: string
+) => {
+    if (!isValidSuiAddress(sender)) {
+        throw new Error("Invalid tx sender");
+    }
+    if (!isValidSuiObjectId(project_record)) {
+        throw new Error("Invalid project record id");
+    }
+    if (!isValidSuiObjectId(project_admin_cap)) {
+        throw new Error("Invalid project admin cap id");
+    }
+    const tx = new Transaction();
+    const [coin] = tx.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: "do_claim",
+        arguments: [
+            tx.object(
+                project_record,
+            ),
+            tx.object(
+                project_admin_cap,
+            ),
+            tx.object(
+                "0x6",
+            ),
+        ],
+    });
+    tx.transferObjects([coin], tx.pure(bcs.Address.serialize(sender)));
+};
 
 /*     public fun do_mint(
         project_record: &mut ProjectRecord,
@@ -110,24 +145,109 @@ const do_claim = () => {};
         clk: &Clock,
         ctx: &mut TxContext
     ): SupporterReward  */
-const do_mint = () => {};
+const do_mint = (
+    project_record: string,
+    value: number,
+    sender: string,
+    recipient: string
+) => {
+    if (!isValidSuiAddress(sender)) {
+        throw new Error("Invalid tx sender");
+    }
+    if (!isValidSuiObjectId(project_record)) {
+        throw new Error("Invalid project record id");
+    }
+    const tx = new Transaction();
+    const [coin] = tx.splitCoins(tx.gas, [value]);
+    const [sp_rwd] = tx.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: "do_mint",
+        arguments: [
+            tx.object(
+                project_record,
+            ),
+            coin,
+            tx.object(
+                "0x6",
+            ),
+        ],
+    });
+    tx.transferObjects([coin, sp_rwd], tx.pure(bcs.Address.serialize(sender)));
+    if (isValidSuiAddress(recipient)) {
+        const ref_value = value * 5 / 100;
+        const [ref_coin] = tx.splitCoins(tx.gas, [ref_value]);
+        tx.moveCall({
+            package: process.env.NEXT_PUBLIC_PACKAGE!,
+            module: "suifund",
+            function: "reference_reward",
+            arguments: [
+                ref_coin,
+                tx.pure(bcs.Address.serialize(sender)),
+                tx.pure(bcs.Address.serialize(recipient)),
+            ],
+        });
+    }
+};
 
 /*  public fun reference_reward
 (reward: Coin<SUI>, sender: address, recipient: address) */
-const reference_reward = () => {};
+// const reference_reward = () => {};
 
 /* public fun do_merge(
         sp_rwd_1: &mut SupporterReward,
         sp_rwd_2: SupporterReward
     ) */
-const do_merge = () => {};
+const do_merge = (
+    sp_rwd_1: string,
+    sp_rwd_2: string
+) => {
+    if (!isValidSuiObjectId(sp_rwd_1) || !isValidSuiObjectId(sp_rwd_2)) {
+        throw new Error("Invalid supporter ticket id");
+    }
+    const tx = new Transaction();
+    tx.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: "do_merge",
+        arguments: [
+            tx.object(
+                sp_rwd_1,
+            ),
+            tx.object(
+                sp_rwd_2,
+            ),
+        ],
+    });
+};
 
 /* public fun do_split(
         sp_rwd: &mut SupporterReward,
         amount: u64,
         ctx: &mut TxContext
     ): SupporterReward */
-const do_split = () => {};
+const do_split = (
+    sp_rwd: string,
+    amount: number,
+    sender: string
+) => {
+    if (!isValidSuiObjectId(sp_rwd)) {
+        throw new Error("Invalid supporter ticket id");
+    }
+    const tx = new Transaction();
+    const [sp_rwd_new] = tx.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: "do_split",
+        arguments: [
+            tx.object(
+                sp_rwd,
+            ),
+            tx.pure(bcs.u64().serialize(amount).toBytes()),
+        ],
+    });
+    tx.transferObjects([sp_rwd_new], tx.pure(bcs.Address.serialize(sender)));
+};
 
 /* public fun do_burn(
         project_record: &mut ProjectRecord,
@@ -135,7 +255,39 @@ const do_split = () => {};
         clk: &Clock,
         ctx: &mut TxContext
     ): Coin<SUI> */
-const do_burn = () => {};
+const do_burn = (
+    project_record: string,
+    sp_rwd: string,
+    sender: string
+) => {
+    if (!isValidSuiAddress(sender)) {
+        throw new Error("Invalid tx sender");
+    }
+    if (!isValidSuiObjectId(project_record)) {
+        throw new Error("Invalid project record id");
+    }
+    if (!isValidSuiObjectId(sp_rwd)) {
+        throw new Error("Invalid supporter ticket id");
+    }
+    const tx = new Transaction();
+    const [coin] = tx.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: "do_burn",
+        arguments: [
+            tx.object(
+                project_record,
+            ),
+            tx.object(
+                sp_rwd,
+            ),
+            tx.object(
+                "0x6",
+            ),
+        ],
+    });
+    tx.transferObjects([coin], tx.pure(bcs.Address.serialize(sender)));
+};
 
 /*     public entry fun native_stake(
         wrapper: &mut SuiSystemState,
@@ -160,21 +312,88 @@ const native_unstake = () => {};
         clk: &Clock,
         ctx: &mut TxContext
     )  */
-const add_comment = () => {};
+const add_comment = (
+    project_record: string,
+    reply: string,
+    media_link: string,
+    content: string
+) => {
+    if (!isValidSuiObjectId(project_record)) {
+        throw new Error("Invalid project record id");
+    }
+    const tx = new Transaction();
+    const reply_to = isValidSuiObjectId(reply)
+        ? tx.pure(bcs.option(bcs.Address).serialize(reply).toBytes())
+        : tx.pure(bcs.option(bcs.Address).serialize(null).toBytes());
+    tx.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: "add_comment",
+        arguments: [
+            tx.object(
+                project_record,
+            ),
+            reply_to,
+            tx.pure(bcs.string().serialize(media_link).toBytes()),
+            tx.pure(bcs.string().serialize(content).toBytes()),
+            tx.object(
+                "0x6",
+            ),
+        ],
+    });
+};
 
 /*     public entry fun like_comment(
         project_record: &mut ProjectRecord,
         idx: u64,
         ctx: &TxContext
     ) */
-const like_comment = () => {};
+const like_comment = (
+    project_record: string,
+    idx: number
+) => {
+    if (!isValidSuiObjectId(project_record)) {
+        throw new Error("Invalid project record id");
+    }
+    const tx = new Transaction();
+    tx.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: "like_comment",
+        arguments: [
+            tx.object(
+                project_record,
+            ),
+            tx.pure(bcs.u64().serialize(idx).toBytes()),
+        ],
+    });
+};
 
 /*     public entry fun unlike_comment(
         project_record: &mut ProjectRecord,
         idx: u64,
         ctx: &TxContext
     ) */
-const unlike_comment = () => {};
+const unlike_comment = (
+    project_record: string,
+    idx: number
+) => {
+    if (!isValidSuiObjectId(project_record)) {
+        throw new Error("Invalid project record id");
+    }
+    const tx = new Transaction();
+    tx.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: "unlike_comment",
+        arguments: [
+            tx.object(
+                project_record,
+            ),
+            tx.pure(bcs.u64().serialize(idx).toBytes()),
+        ],
+    });
+};
 
 const getAllDeployRecords = async (
   client: SuiClient
@@ -254,7 +473,7 @@ export {
   deploy,
   do_claim,
   do_mint,
-  reference_reward,
+//   reference_reward,
   do_merge,
   do_split,
   do_burn,
