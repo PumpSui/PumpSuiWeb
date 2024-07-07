@@ -7,6 +7,8 @@ import {
   SuiParsedData,
 } from "@mysten/sui/client";
 import { isValidSuiObjectId } from "@mysten/sui/utils";
+import { Transaction } from "@mysten/sui/transactions";
+import { bcs } from '@mysten/sui/bcs';
 
 /*    public entry fun deploy(
     deploy_record: &mut DeployRecord,
@@ -29,7 +31,70 @@ import { isValidSuiObjectId } from "@mysten/sui/utils";
     clk: &Clock,
     ctx: &mut TxContext
 )*/
-const deploy = () => {};
+const deploy = (
+    name: string, 
+    description: string,
+    image_url: string,
+    x: string,
+    telegram: string,
+    discord: string,
+    website: string,
+    github: string,
+    start_time_ms: number,
+    time_interval: number,
+    total_deposit_sui: number,
+    ratio: number,
+    amount_per_sui: number,
+    min_value_sui: number,
+    max_value_sui: number,
+    sender: string
+) => {
+    let deploy_fee = get_deploy_fee(total_deposit_sui, ratio);
+    const tx = new Transaction();
+    const [coin] = tx.splitCoins(tx.gas, [deploy_fee]);
+    tx.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: "deploy",
+        arguments: [
+            tx.object(
+                process.env.NEXT_PUBLIC_DEPLOY_RECORD!,
+            ),
+            tx.pure(bcs.string().serialize(name).toBytes()),
+            tx.pure(bcs.string().serialize(description).toBytes()),
+            tx.pure(bcs.string().serialize(image_url).toBytes()),
+            tx.pure(bcs.string().serialize(x).toBytes()),
+            tx.pure(bcs.string().serialize(telegram).toBytes()),
+            tx.pure(bcs.string().serialize(discord).toBytes()),
+            tx.pure(bcs.string().serialize(website).toBytes()),
+            tx.pure(bcs.string().serialize(github).toBytes()),
+            tx.pure(bcs.u64().serialize(start_time_ms).toBytes()),
+            tx.pure(bcs.u64().serialize(time_interval).toBytes()),
+            tx.pure(bcs.u64().serialize(total_deposit_sui).toBytes()),
+            tx.pure(bcs.u64().serialize(ratio).toBytes()),
+            tx.pure(bcs.u64().serialize(amount_per_sui).toBytes()),
+            tx.pure(bcs.u64().serialize(min_value_sui).toBytes()),
+            tx.pure(bcs.u64().serialize(max_value_sui).toBytes()),
+            coin,
+            tx.object(
+                "0x6",
+            ),
+        ],
+    });
+    tx.transferObjects([coin], tx.pure(bcs.Address.serialize(sender)));
+};
+
+const get_deploy_fee = (
+    total_deposit_sui: number, 
+    ratio: number
+): number => {
+    const base_fee: number = 20_000_000_000;
+    let deploy_fee: number = total_deposit_sui * ratio / 10000;
+    if (deploy_fee <= base_fee) {
+        deploy_fee = base_fee;
+    }
+    return deploy_fee
+}
 
 /* public fun do_claim(
         project_record: &mut ProjectRecord,
