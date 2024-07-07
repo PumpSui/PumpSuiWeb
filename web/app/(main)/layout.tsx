@@ -1,9 +1,9 @@
 'use client';
 
+import { customTheme } from "@/components/customTheme";
 import Navbar from "@/components/navbar";
 import {
   createNetworkConfig,
-  lightTheme,
   SuiClientProvider,
   WalletProvider,
 } from "@mysten/dapp-kit";
@@ -25,7 +25,7 @@ const main = ({
     <>
       <QueryClientProvider client={queryClient}>
         <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-          <WalletProvider theme={lightTheme}>
+          <WalletProvider theme={customTheme}>
             <Navbar></Navbar>
             <div className="pt-24">{children}</div>
           </WalletProvider>

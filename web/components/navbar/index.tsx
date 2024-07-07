@@ -4,8 +4,14 @@ import { Button } from "../ui/button";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import { Input } from "../ui/input";
+import {
+  ConnectButton,
+  useCurrentAccount,
+  useSignAndExecuteTransaction,
+} from "@mysten/dapp-kit";
 
 const Navbar = () => {
+
   return (
     <nav className="fixed bg-background top-0 left-0 right-0 z-50 flex py-6 justify-between items-center gap-10 shadow-md">
       <Image
@@ -31,7 +37,7 @@ const Navbar = () => {
           <Button variant="link">Assets</Button>
         </div>
         <div className="bg-secondary flex justify-end items-center min-h-14 pl-3 rounded-l-3xl">
-          <Button variant="link">Connect Wallet</Button>
+            <ConnectButton/>
         </div>
       </div>
     </nav>
