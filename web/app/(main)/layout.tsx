@@ -2,6 +2,7 @@
 
 import { customTheme } from "@/components/customTheme";
 import Navbar from "@/components/navbar";
+import { ProjectProvider } from "@/components/providers/ProjectContext";
 import {
   createNetworkConfig,
   SuiClientProvider,
@@ -22,16 +23,18 @@ const main = ({
   children: React.ReactNode;
 }>) => {
   return (
-
+    <>
       <QueryClientProvider client={queryClient}>
         <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
           <WalletProvider theme={customTheme}>
             <Navbar></Navbar>
-            <div className="pt-24">{children}</div>
+            <ProjectProvider>
+              <div className="pt-24">{children}</div>
+            </ProjectProvider>
           </WalletProvider>
         </SuiClientProvider>
       </QueryClientProvider>
-    
+    </>
   );
 };
 

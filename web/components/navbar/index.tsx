@@ -9,16 +9,18 @@ import {
   useCurrentAccount,
   useSignAndExecuteTransaction,
 } from "@mysten/dapp-kit";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
-
+  const router = useRouter();
   return (
     <nav className="fixed bg-background top-0 left-0 right-0 z-50 flex py-6 justify-between items-center gap-10 shadow-md">
       <Image
-        className="flex-shrink-0 ml-5"
-        src="https://svgshare.com/i/17jL.svg"
+        onClick={() => {router.push("/");}}
+        className="flex-shrink-0 ml-5 max-h-14 hover:cursor-pointer"
+        src="/images/pumpSuiLogo.png"
         alt="logo"
-        width={260}
+        width={200}
         height={1}
         quality={80}
       />
@@ -32,12 +34,12 @@ const Navbar = () => {
       </div>
       <div className="flex ml-auto items-center gap-10">
         <div className="bg-secondary flex items-center min-h-14 px-3 rounded-3xl">
-          <Button variant="link">Home</Button>
-          <Button variant="link">Create</Button>
-          <Button variant="link">Assets</Button>
+          <Button variant="link" onClick={()=>{router.push("/")}}>Home</Button>
+          <Button variant="link" onClick={()=>{router.push("/create")}}>Create</Button>
+          <Button variant="link" onClick={()=>{router.push("/assets")}}>Assets</Button>
         </div>
         <div className="bg-secondary flex justify-end items-center min-h-14 pl-3 rounded-l-3xl">
-            <ConnectButton/>
+          <ConnectButton />
         </div>
       </div>
     </nav>

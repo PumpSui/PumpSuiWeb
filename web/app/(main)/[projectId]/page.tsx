@@ -1,17 +1,21 @@
+'use client';
 import ProjectCard from "@/components/project_card";
 import Comment from "@/components/comment";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProjectRecord } from "@/type";
+import { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useProject } from "@/components/providers/ProjectContext";
 
-const Page = ({ params }: { params: { projectId: string } }) => {
-  const project = {
-    creator: "alice",
-    name: "Project 01",
-    progress: 50,
-    startDate: "2024/06/05 12:00:00",
-    endDate: "2024/08/08 12:00:00",
-    description: "This project is to do something",
-  };
+const Page = ({ params }: { params: string }) => {
+  const router = useRouter();
+  const { selectedProject } = useProject();
+  useEffect(() => {
+    if (!selectedProject) {
+      router.push("/");
+    }
+  }, [selectedProject, router]);
   const comments = [
     {
       author: "bob",
@@ -43,13 +47,12 @@ const Page = ({ params }: { params: { projectId: string } }) => {
   ];
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <div className="rounded-lg overflow-hidden max-h-64">
+      <div className="relative w-full rounded-lg overflow-hidden max-h-64 h-64">
         <Image
-          src={"/images/DemoProject.png"}
+          src={selectedProject?.image_url!}
           alt="image"
-          width={0}
-          height={0}
-          layout="responsive"
+          fill={true}
+          objectFit="cover"
         ></Image>
       </div>
 
@@ -59,17 +62,10 @@ const Page = ({ params }: { params: { projectId: string } }) => {
             <CardHeader>
               <CardTitle className="text-2xl">Description</CardTitle>
             </CardHeader>
-            <CardContent></CardContent>
+            <CardContent>{selectedProject?.description}</CardContent>
           </Card>
           <div className="min-w-96">
-            <ProjectCard
-              creator={project.creator}
-              name={project.name}
-              progress={project.progress}
-              startDate={project.startDate}
-              endDate={project.endDate}
-              description={project.description}
-            ></ProjectCard>
+            <ProjectCard isDetail {...selectedProject!}></ProjectCard>
           </div>
         </div>
       </div>

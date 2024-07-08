@@ -147,8 +147,6 @@ const getAllDeployRecords = async (
         options: { showContent: true },
       });
 
-      console.log(response);
-      
       const data = response.data?.content as any;
       const project: ProjectRecord = {
         object_id: id.fields.value,
