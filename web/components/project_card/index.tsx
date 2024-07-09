@@ -16,22 +16,17 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
 
   const handleCardOnClick = () => {
     setSelectedProject(project);
-    
+
     !project.isDetail && router.push(`/${project.id}`);
   };
 
   return (
-    <div
-      onClick={handleCardOnClick}
-      className={`select-none ${
-        !project.isDetail
-          ? "hover:outline hover:outline-2 hover:rounded-2xl hover:cursor-pointer"
-          : ""
-      }`}
-    >
       <Card
+        onClick={handleCardOnClick}
         className={`${
-          !project.isDetail ? "active:bg-primary-foreground" : ""
+          !project.isDetail
+            ? "hover:outline hover:outline-2 hover:rounded-2xl hover:cursor-pointer active:bg-primary-foreground"
+            : ""
         } p-4 max-w-sm bg-secondary rounded-2xl`}
       >
         <div className="flex flex-col h-full">
@@ -79,7 +74,6 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           </div>
         </div>
       </Card>
-    </div>
   );
 };
 
