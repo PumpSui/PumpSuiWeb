@@ -29,7 +29,11 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           : ""
       }`}
     >
-      <Card className={`${!project.isDetail?"active:bg-primary-foreground":""} p-4 max-w-sm bg-secondary rounded-2xl`}>
+      <Card
+        className={`${
+          !project.isDetail ? "active:bg-primary-foreground" : ""
+        } p-4 max-w-sm bg-secondary rounded-2xl`}
+      >
         <div className="flex flex-col h-full">
           {!project.isDetail && project.image_url && (
             <div className="">
@@ -50,16 +54,22 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
               <CardTitle className="text-xl">Name: {project.name}</CardTitle>
             </CardHeader>
             <CardContent className="mt-2">
-              <div className="mb-2">
+              <div className="flex justify-center gap-5 mb-4">
                 <p className="font-semibold">Progress:</p>
                 <Progress
                   value={(1 - project.remain / project.total_supply) * 100}
-                  className="w-full"
+                  className="w-full self-center min-h-4 bg-primary-foreground rounded-lg"
                 />
               </div>
               <div className="text-sm text-cyan-400">
-                <p>start: {getRealDate(project.start_time_ms)}</p>
-                <p>end: {getRealDate(project.end_time_ms)}</p>
+                <div className="flex justify-between">
+                  <p>START:</p>
+                  <p>{getRealDate(project.start_time_ms)}</p>
+                </div>
+                <div className="flex justify-between">
+                  <p>END:</p>
+                  <p>{getRealDate(project.end_time_ms)}</p>
+                </div>
               </div>
               <div className="mt-4">
                 <p className="font-semibold">Description:</p>

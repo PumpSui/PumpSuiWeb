@@ -76,7 +76,7 @@ export interface ProjectRecord {
     max_value_sui: number;
     participants: string[];
     minted_per_user: Record<string, number>;
-    thread: Comment[];
+    thread: string;
     
 }
 
@@ -89,12 +89,21 @@ export interface ProjectRecord {
         timestamp: u64,
         likes: VecSet<address>,
     } */
-export interface Comment {
+export interface CommentType {
     id: string;
+    index: number;
     reply?: string;
     creator: string;
     media_link: string;
     content: string;
     timestamp: number;
     likes: string[];
+}
+
+export interface CommentProps {
+  author: string;
+  date: string;
+  content: string;
+  replies?: CommentProps[];
+  isRelpy?: boolean;
 }

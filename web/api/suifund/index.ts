@@ -1,12 +1,13 @@
-import { ProjectRecord } from "@/type";
+import { CommentType, ProjectRecord } from "@/type";
 import {
   DynamicFieldInfo,
   GetObjectParams,
   SuiClient,
-  SuiObjectResponse,
   SuiParsedData,
 } from "@mysten/sui/client";
 import { isValidSuiObjectId } from "@mysten/sui/utils";
+import { SuiGraphQLClient } from "@mysten/sui/graphql";
+import { getAllCommentsQL } from "./graphqlContext";
 
 /*    public entry fun deploy(
     deploy_record: &mut DeployRecord,
@@ -148,6 +149,7 @@ const getAllDeployRecords = async (
       });
 
       const data = response.data?.content as any;
+
       const project: ProjectRecord = {
         object_id: id.fields.value,
         id: data.fields.id.id,
@@ -182,8 +184,39 @@ const getAllDeployRecords = async (
   return projects;
 };
 
+const getAllCommentsGraphQl = async (address: string) => {
+  const client = new SuiGraphQLClient({
+    url: "https://sui-testnet.mystenlabs.com/graphql",
+  });
+  const response = await client.query({
+    query: getAllCommentsQL,
+    variables: {
+      id: address,
+    },
+  });
+  const result: CommentType[] = response
+    .data!.owner!.dynamicFields.nodes.map((node: any) => {
+      return {
+        index: node.name.json,
+        creator: node.value.json.creator,
+        timestamp: node.value.json.timestamp,
+        content: node.value.json.content,
+        media_link: node.value.json.media_link,
+        likes: node.value.json.likes,
+        id: node.value.json.id,
+        reply: node.value.json.reply,
+      };
+    })
+    .sort((a: CommentType, b: CommentType) => {
+      return a.index - b.index;
+    });
+
+  return result;
+};
+
 export {
   getAllDeployRecords,
+  getAllCommentsGraphQl,
   deploy,
   do_claim,
   do_mint,
