@@ -1,4 +1,4 @@
-// components/ProjectForm.tsx
+"use client";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
 import DatePicker from "react-datepicker";
@@ -11,164 +11,248 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-
-interface ProjectFormData {
-  name: string;
-  totalDeposit: string;
-  ratioToBuilders: string;
-  minValue: string;
-  maxValue: string;
-  startTime: string;
-  projectDuration: string;
-  description: string;
-  imageUrl: string;
-  xLink: string;
-  telegramLink: string;
-  website: string;
-  github: string;
-}
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { formSchema, FormSchema } from "./formValidation";
 
 const ProjectForm: React.FC = () => {
-  const [form, setForm] = useState<ProjectFormData>({
-    name: "",
-    totalDeposit: "",
-    ratioToBuilders: "",
-    minValue: "",
-    maxValue: "",
-    startTime: "",
-    projectDuration: "",
-    description: "",
-    imageUrl: "",
-    xLink: "",
-    telegramLink: "",
-    website: "",
-    github: "",
+  const {
+    register,
+    handleSubmit,
+    setError,
+    clearErrors,
+    control,
+    formState: { errors, isSubmitting },
+    trigger,
+    watch,
+  } = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
   });
 
-  const [startDate, setStartDate] = useState<Date | null>(null);
+  const TDL = watch("totalDeposit", 0);
+  const ratio = watch("ratioToBuilders", 0);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const getDeployFee = () => {
+    return Number.isNaN(Math.max(20, TDL * ratio * 0.01))? 20 : Math.max(20, TDL * ratio * 0.01);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // 提交表单处理逻辑
-    console.log(form);
+  const onSubmit = (values: FormSchema) => {
+    console.log(values);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <Input
-        name="name"
-        value={form.name}
-        onChange={handleChange}
-        placeholder="Name"
-      />
-
-      <Input
-        name="totalDeposit"
-        value={form.totalDeposit}
-        onChange={handleChange}
-        placeholder="Total Deposit Value"
-      />
-
-      <Input
-        name="ratioToBuilders"
-        value={form.ratioToBuilders}
-        onChange={handleChange}
-        placeholder="Ratio to Builders (TDL * Ratio = CrowdFund for Builders)"
-      />
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-md">
+      <div className="flex items-center">
+        <span className="mr-2 w-1/3">Name:</span>
+        <div className="w-2/3">
+          <Input
+            {...register("name")}
+            placeholder="Name"
+            onBlur={() => trigger("name")}
+          />
+        </div>
+      </div>
+      {errors.name && <p className="text-red-500">{errors.name.message}</p>}
 
       <div className="flex items-center">
-        <Input
-          name="minValue"
-          value={form.minValue}
-          onChange={handleChange}
-          placeholder="Min_value"
-        />
-        <span className="text-cyan-400 ml-2">SUI</span>
+        <span className="mr-2 w-1/3">TDL:</span>
+        <div className="flex items-center w-2/3">
+          <Input
+            {...register("totalDeposit", {
+              required: "Total Deposit Value is required",
+              valueAsNumber: true,
+            })}
+            placeholder="Total Deposit Value"
+            onBlur={() => trigger("totalDeposit")}
+          />
+          <span className="text-cyan-400 ml-2">SUI</span>
+        </div>
       </div>
+      {errors.totalDeposit && (
+        <p className="text-red-500">{errors.totalDeposit.message}</p>
+      )}
+
       <div className="flex items-center">
-        <Input
-          name="maxValue"
-          value={form.maxValue}
-          onChange={handleChange}
-          placeholder="Max_value"
-        />
-        <span className="text-cyan-400 ml-2">SUI</span>
+        <span className="mr-2 w-1/3">Ratio:</span>
+        <div className="w-2/3">
+          <Input
+            {...register("ratioToBuilders", {
+              valueAsNumber: true,
+            })}
+            placeholder="TDL * Ratio = CrowdFund for Builders"
+            onBlur={() => trigger("ratioToBuilders")}
+          />
+        </div>
       </div>
+      {errors.ratioToBuilders && (
+        <p className="text-red-500">{errors.ratioToBuilders.message}</p>
+      )}
 
-      <div>
-        <span className="mr-2">Project Start Time:</span>
-        <DatePicker
-          selected={startDate}
-          onChange={(date: Date | null) => setStartDate(date)}
-          showTimeSelect
-          dateFormat="Pp"
-          className="min-full bg-primary-foreground border rounded px-3 py-2"
-        />
+      <div className="flex items-center">
+        <span className="mr-2 w-1/3">Min Value:</span>
+        <div className="w-2/3 flex items-center">
+          <Input
+            {...register("minValue", {
+              valueAsNumber: true,
+            })}
+            placeholder="Min Value"
+            onBlur={() => trigger("minValue")}
+          />
+          <span className="text-cyan-400 ml-2">SUI</span>
+        </div>
       </div>
+      {errors.minValue && (
+        <p className="text-red-500">{errors.minValue.message}</p>
+      )}
 
-      <Input
-        name="projectDuration"
-        value={form.projectDuration}
-        onChange={handleChange}
-        placeholder="Project Development Time (days)"
-      />
+      <div className="flex items-center">
+        <span className="mr-2 w-1/3">Max Value:</span>
+        <div className="w-2/3 flex items-center">
+          <Input
+            {...register("maxValue", {
+              valueAsNumber: true,
+            })}
+            placeholder="Max Value"
+            onBlur={() => trigger("maxValue")}
+          />
+          <span className="text-cyan-400 ml-2">SUI</span>
+        </div>
+      </div>
+      {errors.maxValue && (
+        <p className="text-red-500">{errors.maxValue.message}</p>
+      )}
 
-      <Textarea
-        name="description"
-        value={form.description}
-        onChange={handleChange}
-        placeholder="Description"
-        rows={3}
-      />
+      <div className="flex items-center">
+        <span className="mr-2 w-1/3">Start Time:</span>
+        <div className="w-2/3">
+          <Controller
+            control={control}
+            name="startTime"
+            render={({ field }) => (
+              <DatePicker
+                selected={field.value}
+                onChange={(date: Date | null) => {
+                  field.onChange(date);
+                  trigger("startTime");
+                }}
+                showTimeSelect
+                dateFormat="Pp"
+                className="min-full bg-primary-foreground border rounded px-3 py-2"
+              />
+            )}
+          />
+        </div>
+      </div>
+      {errors.startTime && (
+        <p className="text-red-500">{errors.startTime.message}</p>
+      )}
+
+      <div className="flex items-center">
+        <span className="mr-2 w-1/3">Duration:</span>
+        <div className="w-2/3">
+          <Input
+            {...register("projectDuration", {
+              valueAsNumber: true,
+            })}
+            placeholder="Development Time (days)"
+            onBlur={() => trigger("projectDuration")}
+          />
+        </div>
+      </div>
+      {errors.projectDuration && (
+        <p className="text-red-500">{errors.projectDuration.message}</p>
+      )}
+
+      <div className="flex">
+        <span className="mr-2 w-1/3">Description:</span>
+        <div className="w-2/3">
+          <Textarea
+            {...register("description")}
+            placeholder="Description"
+            rows={3}
+            onBlur={() => trigger("description")}
+          />
+        </div>
+      </div>
+      {errors.description && (
+        <p className="text-red-500">{errors.description.message}</p>
+      )}
+
       <Accordion type="single" collapsible>
         <AccordionItem value="Optional">
           <AccordionTrigger>Some more options ?</AccordionTrigger>
           <AccordionContent>
-            <Input
-              name="imageUrl"
-              value={form.imageUrl}
-              onChange={handleChange}
-              placeholder="Image_url (Optional)"
-            />
-            <Input
-              name="xLink"
-              value={form.xLink}
-              onChange={handleChange}
-              placeholder="X Link (Optional)"
-            />
-            <Input
-              name="telegramLink"
-              value={form.telegramLink}
-              onChange={handleChange}
-              placeholder="Telegram link (Optional)"
-            />
-            <Input
-              name="website"
-              value={form.website}
-              onChange={handleChange}
-              placeholder="Website (Optional)"
-            />
-            <Input
-              name="github"
-              value={form.github}
-              onChange={handleChange}
-              placeholder="Github (Optional)"
-            />
+            <div className="flex items-center">
+              <span className="mr-2 w-1/3">Image URL:</span>
+              <div className="w-2/3">
+                <Input
+                  {...register("imageUrl")}
+                  placeholder="Image URL (Optional)"
+                />
+                {errors.imageUrl && (
+                  <p className="text-red-500">{errors.imageUrl.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <span className="mr-2 w-1/3">X Link:</span>
+              <div className="w-2/3">
+                <Input {...register("xLink")} placeholder="X Link (Optional)" />
+                {errors.xLink && (
+                  <p className="text-red-500">{errors.xLink.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <span className="mr-2 w-1/3">Telegram Link:</span>
+              <div className="w-2/3">
+                <Input
+                  {...register("telegramLink")}
+                  placeholder="Telegram Link (Optional)"
+                />
+                {errors.telegramLink && (
+                  <p className="text-red-500">{errors.telegramLink.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <span className="mr-2 w-1/3">Website:</span>
+              <div className="w-2/3">
+                <Input
+                  {...register("website")}
+                  placeholder="Website (Optional)"
+                />
+                {errors.website && (
+                  <p className="text-red-500">{errors.website.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <span className="mr-2 w-1/3">Github:</span>
+              <div className="w-2/3">
+                <Input
+                  {...register("github")}
+                  type="url"
+                  placeholder="Github (Optional)"
+                />
+                {errors.github && (
+                  <p className="text-red-500">{errors.github.message}</p>
+                )}
+              </div>
+            </div>
           </AccordionContent>
         </AccordionItem>
       </Accordion>
 
-      <Button className="min-w-full" type="submit">
+      <Button className="min-w-full" type="submit" disabled={isSubmitting}>
         Create Project
       </Button>
 
-      <p className="text-cyan-400">Deploy Fee: (max(20, TDL * Ratio * 1%))</p>
+      <p className="text-cyan-400">Deploy Fee: {getDeployFee()} SUI</p>
     </form>
   );
 };

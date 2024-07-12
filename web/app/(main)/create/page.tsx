@@ -18,12 +18,12 @@ const Page = () => {
             </CardHeader>
             <CardContent></CardContent>
           </Card>
-          <Card className="p-4 shadow-md">
+          <Card className="p-4 shadow-md w-[450px]">
             <CardHeader>
               <CardTitle className="text-2xl">Create a New Project</CardTitle>
             </CardHeader>
             <CardContent>
-              <ProjectForm />
+              <ProjectForm/>
             </CardContent>
           </Card>
         </div>
