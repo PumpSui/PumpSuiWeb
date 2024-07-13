@@ -65,7 +65,7 @@ export const formatedDeployParams = (
     github: values.github!,
     totalDeposit: MIST_PER_SUI * values.totalDeposit,
     minValue: MIST_PER_SUI * values.minValue,
-    maxValue: MIST_PER_SUI * values.maxValue,
+    maxValue: Number.isNaN(BigInt(values.maxValue))? BigInt(0):MIST_PER_SUI * values.maxValue,
     startTime: values.startTime.getTime(),
     sender: address,
     imageUrl: values.imageUrl!,
