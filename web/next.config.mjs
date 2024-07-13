@@ -9,6 +9,10 @@ const nextConfig = {
             {
                 protocol:'https',
                 hostname:'images.contentstack.io'
+            },
+            {
+                protocol:'https',
+                hostname:'imgur.com'
             }
         ]
     }
