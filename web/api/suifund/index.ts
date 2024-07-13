@@ -1,4 +1,4 @@
-import { CommentType, ProjectRecord } from "@/type";
+import { CommentType, IformatedDeployParams, ProjectRecord } from "@/type";
 import {
   DynamicFieldInfo,
   GetObjectParams,
@@ -10,6 +10,8 @@ import { Transaction } from "@mysten/sui/transactions";
 import { bcs } from '@mysten/sui/bcs';
 import { SuiGraphQLClient } from "@mysten/sui/graphql";
 import { getAllCommentsQL } from "./graphqlContext";
+import { z } from "zod";
+import { formSchema } from "@/components/create_form/formValidation";
 
 
 /*    public entry fun deploy(
@@ -33,68 +35,50 @@ import { getAllCommentsQL } from "./graphqlContext";
     clk: &Clock,
     ctx: &mut TxContext
 )*/
-const deploy = (
-    name: string, 
-    description: string,
-    image_url: string,
-    x: string,
-    telegram: string,
-    discord: string,
-    website: string,
-    github: string,
-    start_time_ms: number,
-    time_interval: number,
-    total_deposit_sui: number,
-    ratio: number,
-    amount_per_sui: number,
-    min_value_sui: number,
-    max_value_sui: number,
-    sender: string
-) => {
-    if (!isValidSuiAddress(sender)) {
-        throw new Error("Invalid tx sender");
-    }
-    let deploy_fee = get_deploy_fee(total_deposit_sui, ratio);
-    const tx = new Transaction();
-    const [coin] = tx.splitCoins(tx.gas, [deploy_fee]);
-    tx.moveCall({
-        package: process.env.NEXT_PUBLIC_PACKAGE!,
-        module: "suifund",
-        function: "deploy",
-        arguments: [
-            tx.object(
-                process.env.NEXT_PUBLIC_DEPLOY_RECORD!,
-            ),
-            tx.pure(bcs.string().serialize(name).toBytes()),
-            tx.pure(bcs.string().serialize(description).toBytes()),
-            tx.pure(bcs.string().serialize(image_url).toBytes()),
-            tx.pure(bcs.string().serialize(x).toBytes()),
-            tx.pure(bcs.string().serialize(telegram).toBytes()),
-            tx.pure(bcs.string().serialize(discord).toBytes()),
-            tx.pure(bcs.string().serialize(website).toBytes()),
-            tx.pure(bcs.string().serialize(github).toBytes()),
-            tx.pure(bcs.u64().serialize(start_time_ms).toBytes()),
-            tx.pure(bcs.u64().serialize(time_interval).toBytes()),
-            tx.pure(bcs.u64().serialize(total_deposit_sui).toBytes()),
-            tx.pure(bcs.u64().serialize(ratio).toBytes()),
-            tx.pure(bcs.u64().serialize(amount_per_sui).toBytes()),
-            tx.pure(bcs.u64().serialize(min_value_sui).toBytes()),
-            tx.pure(bcs.u64().serialize(max_value_sui).toBytes()),
-            coin,
-            tx.object(
-                "0x6",
-            ),
-        ],
-    });
-    tx.transferObjects([coin], tx.pure(bcs.Address.serialize(sender)));
+const deploy = (params: IformatedDeployParams) => {
+    console.log(params);
+  if (!isValidSuiAddress(params.sender)) {
+    throw new Error("Invalid tx sender");
+  }
+  let deploy_fee = get_deploy_fee(params.totalDeposit, params.ratioToBuilders);
+  const tx = new Transaction();
+  const [coin] = tx.splitCoins(tx.gas, [deploy_fee]);
+  tx.moveCall({
+    package: process.env.NEXT_PUBLIC_PACKAGE!,
+    module: "suifund",
+    function: "deploy",
+    arguments: [
+      tx.object(process.env.NEXT_PUBLIC_DEPLOY_RECORD!),
+      tx.pure(bcs.string().serialize(params.name).toBytes()),
+      tx.pure(bcs.string().serialize(params.description).toBytes()),
+      tx.pure(bcs.string().serialize(params.imageUrl).toBytes()),
+      tx.pure(bcs.string().serialize(params.linktree).toBytes()),
+      tx.pure(bcs.string().serialize(params.xLink).toBytes()),
+      tx.pure(bcs.string().serialize(params.telegramLink).toBytes()),
+      tx.pure(bcs.string().serialize(params.discord).toBytes()),
+      tx.pure(bcs.string().serialize(params.website).toBytes()),
+      tx.pure(bcs.string().serialize(params.github).toBytes()),
+      tx.pure(bcs.u64().serialize(params.startTime).toBytes()),
+      tx.pure(bcs.u64().serialize(params.projectDuration).toBytes()),
+      tx.pure(bcs.u64().serialize(params.totalDeposit).toBytes()),
+      tx.pure(bcs.u64().serialize(params.ratioToBuilders).toBytes()),
+      tx.pure(bcs.u64().serialize(params.amount_per_sui).toBytes()),
+      tx.pure(bcs.u64().serialize(params.minValue).toBytes()),
+      tx.pure(bcs.u64().serialize(params.maxValue).toBytes()),
+      coin,
+      tx.object("0x6"),
+    ],
+  });
+  tx.transferObjects([coin], tx.pure(bcs.Address.serialize(params.sender)));
+  return tx;
 };
 
 const get_deploy_fee = (
-    total_deposit_sui: number, 
+    total_deposit_sui: bigint, 
     ratio: number
-): number => {
-    const base_fee: number = 20_000_000_000;
-    let deploy_fee: number = total_deposit_sui * ratio / 10000;
+): bigint => {
+    const base_fee: bigint = BigInt(20_000_000_000);
+    let deploy_fee: bigint = total_deposit_sui * BigInt(ratio) / BigInt(1000);
     if (deploy_fee <= base_fee) {
         deploy_fee = base_fee;
     }

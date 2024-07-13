@@ -28,7 +28,6 @@ const Page = () => {
           author:comment.creator
         };
       });
-
       setComments(comments);
     });
   }, [selectedProject, router]);

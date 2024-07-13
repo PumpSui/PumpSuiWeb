@@ -107,3 +107,23 @@ export interface CommentProps {
   replies?: CommentProps[];
   isRelpy?: boolean;
 }
+
+export interface IformatedDeployParams {
+  name: string;
+  totalDeposit: bigint;
+  ratioToBuilders: number;
+  minValue: bigint;
+  maxValue: bigint;
+  amount_per_sui: number;
+  startTime: number;
+  projectDuration: number;
+  description: string;
+  imageUrl: string;
+  linktree: string;
+  xLink: string;
+  telegramLink: string;
+  discord: string;
+  website: string;
+  github: string;
+  sender: string;
+}

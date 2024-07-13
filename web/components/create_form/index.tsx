@@ -13,9 +13,19 @@ import {
 } from "../ui/accordion";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formSchema, FormSchema } from "./formValidation";
+import { formatedDeployParams, formSchema, FormSchema } from "./formValidation";
+import { MIST_PER_SUI } from "@mysten/sui/utils";
+import {
+  useCurrentAccount,
+  useSignAndExecuteTransaction,
+} from "@mysten/dapp-kit";
+import { deploy } from "@/api/suifund";
+import { useRouter } from "next/navigation";
 
 const ProjectForm: React.FC = () => {
+  const currentUser = useCurrentAccount();
+  const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -27,17 +37,41 @@ const ProjectForm: React.FC = () => {
     watch,
   } = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      linktree: "",
+      discord: "",
+      imageUrl: "",
+      xLink: "",
+      telegramLink: "",
+      website: "",
+      github: "",
+    },
   });
 
-  const TDL = watch("totalDeposit", 0);
-  const ratio = watch("ratioToBuilders", 0);
-
   const getDeployFee = () => {
-    return Number.isNaN(Math.max(20, TDL * ratio * 0.01))? 20 : Math.max(20, TDL * ratio * 0.01);
+    const TDL = Number(watch("totalDeposit", BigInt(0)));
+    const fee = Math.max(20, TDL) * watch("ratioToBuilders", 0) * 0.01;
+    return Number.isNaN(fee) || fee < 20 ? 20 : fee;
   };
 
-  const onSubmit = (values: FormSchema) => {
-    console.log(values);
+  const onSubmit = async (values: FormSchema) => {
+    const formattedValues = formatedDeployParams(values, currentUser?.address!);
+    console.log("formattedValues", formattedValues);
+    const txb = await deploy(formattedValues);
+    signAndExecuteTransaction(
+      {
+        transaction: txb,
+        chain:"sui::testnet",
+      },
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: (error) => {
+          console.log("error", error);
+        },
+      }
+    );
   };
 
   return (
@@ -123,6 +157,22 @@ const ProjectForm: React.FC = () => {
       )}
 
       <div className="flex items-center">
+        <span className="mr-2">Amount Per Sui:</span>
+        <div className="flex items-center">
+          <Input
+            {...register("amount_per_sui", {
+              valueAsNumber: true,
+            })}
+            placeholder="Amount Per Sui"
+            onBlur={() => trigger("amount_per_sui")}
+          />
+        </div>
+      </div>
+      {errors.amount_per_sui && (
+        <p className="text-red-500">{errors.amount_per_sui.message}</p>
+      )}
+
+      <div className="flex items-center">
         <span className="mr-2 w-1/3">Start Time:</span>
         <div className="w-2/3">
           <Controller
@@ -196,6 +246,20 @@ const ProjectForm: React.FC = () => {
             </div>
 
             <div className="flex items-center">
+              <span className="mr-2 w-1/3">LinkTree:</span>
+              <div className="w-2/3">
+                <Input
+                  {...register("github")}
+                  type="url"
+                  placeholder="LinkTree (Optional)"
+                />
+                {errors.linktree && (
+                  <p className="text-red-500">{errors.linktree.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center">
               <span className="mr-2 w-1/3">X Link:</span>
               <div className="w-2/3">
                 <Input {...register("xLink")} placeholder="X Link (Optional)" />
@@ -214,6 +278,20 @@ const ProjectForm: React.FC = () => {
                 />
                 {errors.telegramLink && (
                   <p className="text-red-500">{errors.telegramLink.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <span className="mr-2 w-1/3">Discord:</span>
+              <div className="w-2/3">
+                <Input
+                  {...register("discord")}
+                  type="url"
+                  placeholder="Discord (Optional)"
+                />
+                {errors.discord && (
+                  <p className="text-red-500">{errors.discord.message}</p>
                 )}
               </div>
             </div>
