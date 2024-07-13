@@ -78,26 +78,26 @@ const ProjectForm: React.FC = () => {
         <FormField name="name" label="Name" placeholder="Name" />
         <FormField
           name="totalDeposit"
-          label="TDL"
+          label="TDL(SUI)"
           placeholder="Total Deposit Value"
           valueAsNumber
         />
         <FormField
           name="ratioToBuilders"
-          label="Ratio"
+          label="Ratio(%)"
           placeholder="TDL * Ratio = CrowdFund for Builders"
           valueAsNumber
         />
         <FormField
           name="minValue"
-          label="Min Value"
+          label="Min Value(SUI)"
           placeholder="Min Value"
           valueAsNumber
         />
         <FormField
           name="maxValue"
-          label="Max Value"
-          placeholder="Max Value"
+          label="Max Value(SUI)"
+          placeholder="∞"
           valueAsNumber
         />
         <FormField
