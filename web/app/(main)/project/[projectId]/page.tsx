@@ -11,6 +11,8 @@ import { getAllCommentsGraphQl } from "@/api/suifund";
 import { useSuiClient } from "@mysten/dapp-kit";
 import { getRealDate } from "@/lib/utils";
 import ProjectImage from "@/components/project_card/components/ProjectImage";
+import { Button } from "@/components/ui/button";
+import { Ghost } from "lucide-react";
 
 const Page = () => {
   const router = useRouter();
@@ -57,6 +59,9 @@ const Page = () => {
         {comments.map((comment, index) => (
           <Comment key={index} {...comment} />
         ))}
+        <div>
+          <Button className="w-full h-20" variant={"ghost"}>New Comment</Button>
+        </div>
       </div>
     </div>
   );

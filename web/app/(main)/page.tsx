@@ -2,6 +2,7 @@
 
 import { getAllDeployRecords } from "@/api/suifund";
 import ProjectCard from "@/components/project_card";
+import { Button } from "@/components/ui/button";
 import { ProjectRecord } from "@/type";
 import { useSuiClient } from "@mysten/dapp-kit";
 import "@mysten/dapp-kit/dist/index.css";
