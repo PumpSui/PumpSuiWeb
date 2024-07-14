@@ -490,7 +490,7 @@ export {
   getAllDeployRecords,
   getAllCommentsGraphQl,
   deploy,
-  do_claim,
+  claim,
   do_mint,
   do_merge,
   do_split,
