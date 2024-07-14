@@ -3,6 +3,11 @@ import { IformatedDeployParams } from "@/type";
 import { MIST_PER_SUI } from "@mysten/sui/utils";
 import { z } from "zod";
 
+const parseValue = (value:any) => {
+  if(Number.isNaN(value)) return BigInt(0);
+  return value;
+};
+
 export const formSchema = z
   .object({
     name: z.string().min(3).max(50),
@@ -19,11 +24,10 @@ export const formSchema = z
       .default(1)
       .transform((val) => BigInt(val)),
     maxValue: z
-      .number()
-      .int()
-      .min(0)
-      .default(0)
-      .transform((val) => BigInt(val)),
+      .any()
+      .optional()
+      .transform(parseValue)
+      .transform((val) => (val !== undefined ? BigInt(val) : BigInt(0))),
     amount_per_sui: z.number().int().min(1).max(1844674407369).default(1),
     startTime: z.date().min(new Date()),
     projectDuration: z.number().gt(3),
