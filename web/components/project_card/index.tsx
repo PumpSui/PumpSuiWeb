@@ -17,7 +17,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
   const handleCardOnClick = () => {
     setSelectedProject(project);
 
-    !project.isDetail && router.push(`/${project.id}`);
+    !project.isDetail && router.push(`/project/${project.id}`);
   };
 
   return (
