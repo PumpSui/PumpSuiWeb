@@ -10,6 +10,7 @@ import { useProject } from "@/components/providers/ProjectContext";
 import { getAllCommentsGraphQl } from "@/api/suifund";
 import { useSuiClient } from "@mysten/dapp-kit";
 import { getRealDate } from "@/lib/utils";
+import ProjectImage from "@/components/project_card/components/ProjectImage";
 
 const Page = () => {
   const router = useRouter();
@@ -35,12 +36,7 @@ const Page = () => {
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className="relative w-full rounded-lg overflow-hidden max-h-64 h-64">
-        <Image
-          src={selectedProject?.image_url!}
-          alt="image"
-          fill={true}
-          objectFit="cover"
-        ></Image>
+        <ProjectImage imageUrl={selectedProject?.image_url!} height={320} />
       </div>
 
       <div className="flex flex-col">

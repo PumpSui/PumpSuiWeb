@@ -3,9 +3,13 @@ import Image from "next/image";
 
 interface ProjectImageProps {
   imageUrl: string;
+  height?: number;
 }
 
-const ProjectImage: React.FC<ProjectImageProps> = ({ imageUrl }) => {
+const ProjectImage: React.FC<ProjectImageProps> = ({
+  imageUrl,
+  height = 160,
+}) => {
   imageUrl = imageUrl === "" ? "/images/DemoProject.png" : imageUrl;
   const [src, setSrc] = useState<string>(imageUrl);
 
@@ -18,12 +22,12 @@ const ProjectImage: React.FC<ProjectImageProps> = ({ imageUrl }) => {
   };
 
   return (
-    <div className="relative min-w-min h-40" >
+    <div className={`relative min-w-min h-`} style={{ height: `${height}px` }}>
       <Image
         src={src}
         alt="Project Image"
         layout="fill"
-        objectFit="cover" 
+        objectFit="cover"
         className="rounded-2xl"
         onError={handleError}
       />
