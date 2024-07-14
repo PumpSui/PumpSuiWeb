@@ -5,7 +5,7 @@ import { ProjectRecord } from "@/type";
 import { useRouter } from "next/navigation";
 import { getRealDate } from "@/lib/utils";
 import { useProject } from "../providers/ProjectContext";
-
+import ProjectImage from "./components/ProjectImage";
 interface ProjectCardProps extends ProjectRecord {
   isDetail?: boolean;
 }
@@ -30,15 +30,9 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
         } p-4 max-w-sm bg-secondary rounded-2xl`}
       >
         <div className="flex flex-col h-full">
-          {!project.isDetail && project.image_url && (
+          {!project.isDetail  && (
             <div className="">
-              <Image
-                src={project.image_url}
-                alt="Project Image"
-                width={500}
-                height={1}
-                className="rounded-2xl"
-              />
+              <ProjectImage imageUrl={project.image_url}/>
             </div>
           )}
           <div className="flex-grow">
