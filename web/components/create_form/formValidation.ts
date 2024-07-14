@@ -15,8 +15,8 @@ export const formSchema = z
     minValue: z
       .number()
       .int()
-      .min(0)
-      .default(0)
+      .min(1)
+      .default(1)
       .transform((val) => BigInt(val)),
     maxValue: z
       .number()

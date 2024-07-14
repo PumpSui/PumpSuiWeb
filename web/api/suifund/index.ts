@@ -82,23 +82,19 @@ const get_deploy_fee = (
     if (deploy_fee <= base_fee) {
         deploy_fee = base_fee;
     }
-    return deploy_fee
+    return deploy_fee;
 }
 
-/* public fun do_claim(
+/* public fun claim(
         project_record: &mut ProjectRecord,
         project_admin_cap: &ProjectAdminCap,
         clk: &Clock,
         ctx: &mut TxContext
-    ): Coin<SUI> */
-const do_claim = (
+    ) */
+const claim = (
     project_record: string,
-    project_admin_cap: string,
-    sender: string
+    project_admin_cap: string
 ) => {
-    if (!isValidSuiAddress(sender)) {
-        throw new Error("Invalid tx sender");
-    }
     if (!isValidSuiObjectId(project_record)) {
         throw new Error("Invalid project record id");
     }
@@ -106,10 +102,10 @@ const do_claim = (
         throw new Error("Invalid project admin cap id");
     }
     const tx = new Transaction();
-    const [coin] = tx.moveCall({
+    tx.moveCall({
         package: process.env.NEXT_PUBLIC_PACKAGE!,
         module: "suifund",
-        function: "do_claim",
+        function: "claim",
         arguments: [
             tx.object(
                 project_record,
@@ -122,7 +118,7 @@ const do_claim = (
             ),
         ],
     });
-    tx.transferObjects([coin], tx.pure(bcs.Address.serialize(sender)));
+    return tx;
 };
 
 /*     public fun do_mint(
@@ -174,6 +170,7 @@ const do_mint = (
             ],
         });
     }
+    return tx;
 };
 
 /*  public fun reference_reward
@@ -205,6 +202,7 @@ const do_merge = (
             ),
         ],
     });
+    return tx;
 };
 
 /* public fun do_split(
@@ -233,6 +231,7 @@ const do_split = (
         ],
     });
     tx.transferObjects([sp_rwd_new], tx.pure(bcs.Address.serialize(sender)));
+    return tx;
 };
 
 /* public fun do_burn(
@@ -273,6 +272,7 @@ const do_burn = (
         ],
     });
     tx.transferObjects([coin], tx.pure(bcs.Address.serialize(sender)));
+    return tx;
 };
 
 /*     public entry fun native_stake(
@@ -327,6 +327,7 @@ const add_comment = (
             ),
         ],
     });
+    return tx;
 };
 
 /*     public entry fun like_comment(
@@ -353,6 +354,7 @@ const like_comment = (
             tx.pure(bcs.u64().serialize(idx).toBytes()),
         ],
     });
+    return tx;
 };
 
 /*     public entry fun unlike_comment(
@@ -379,6 +381,7 @@ const unlike_comment = (
             tx.pure(bcs.u64().serialize(idx).toBytes()),
         ],
     });
+    return tx;
 };
 
 const getAllDeployRecords = async (
@@ -489,7 +492,6 @@ export {
   deploy,
   do_claim,
   do_mint,
-//   reference_reward,
   do_merge,
   do_split,
   do_burn,
