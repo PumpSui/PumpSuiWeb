@@ -100,13 +100,16 @@ export interface CommentType {
     likes: string[];
 }
 
+// types/index.ts
 export interface CommentProps {
   author: string;
   date: string;
   content: string;
   replies?: CommentProps[];
-  isRelpy?: boolean;
+  isReply?: boolean;
+  onReplySubmit?: (content: string) => void; 
 }
+
 
 export interface IformatedDeployParams {
   name: string;

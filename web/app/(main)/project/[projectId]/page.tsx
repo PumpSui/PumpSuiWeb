@@ -1,23 +1,22 @@
+// pages/index.tsx
 "use client";
 import ProjectCard from "@/components/project_card";
-import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Comment from "@/components/comment";
-import { CommentProps} from "@/type";
-import { use, useEffect, useState } from "react";
+import { CommentProps } from "@/type";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useProject } from "@/components/providers/ProjectContext";
 import { getAllCommentsGraphQl } from "@/api/suifund";
-import { useSuiClient } from "@mysten/dapp-kit";
 import { getRealDate } from "@/lib/utils";
 import ProjectImage from "@/components/project_card/components/ProjectImage";
-import { Button } from "@/components/ui/button";
-import { Ghost } from "lucide-react";
+import NewComment from "@/components/new_comment";
 
 const Page = () => {
   const router = useRouter();
   const { selectedProject } = useProject();
   const [comments, setComments] = useState<CommentProps[]>([]);
+
   useEffect(() => {
     if (!selectedProject) {
       router.push("/");
@@ -27,13 +26,30 @@ const Page = () => {
         return {
           content: comment.content,
           date: getRealDate(comment.timestamp),
-          isRelpy:comment.reply?true:false,
-          author:comment.creator
+          isReply: comment.reply ? true : false,
+          author: comment.creator,
+          replies: [], // Assumed the data structure
         };
       });
       setComments(comments);
     });
   }, [selectedProject, router]);
+
+  const handleNewCommentSubmit = (content: string) => {
+    const newComment: CommentProps = {
+      content,
+      date: new Date().toLocaleString(),
+      isReply: false,
+      author: "current user", // replace with actual user info
+      replies: [],
+    };
+    setComments([newComment, ...comments]);
+  };
+
+  const handleReplySubmit = (content: string) => {
+    // 这里应该根据你的具体需求来处理回复逻辑
+    console.log("Reply submitted:", content);
+  };
 
   return (
     <div className="container mx-auto p-4 space-y-6">
@@ -57,11 +73,9 @@ const Page = () => {
 
       <div className="space-y-4">
         {comments.map((comment, index) => (
-          <Comment key={index} {...comment} />
+          <Comment key={index} {...comment} onReplySubmit={handleReplySubmit} />
         ))}
-        <div>
-          <Button className="w-full h-20" variant={"ghost"}>New Comment</Button>
-        </div>
+        <NewComment onSubmit={handleNewCommentSubmit} />
       </div>
     </div>
   );
