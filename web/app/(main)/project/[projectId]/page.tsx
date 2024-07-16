@@ -76,6 +76,10 @@ const Page = () => {
         onSuccess: async () => {
           console.log("Comment added");
           await getAllComments_inner();
+          toast({
+            title: "Success",
+            description: "Comment added successfully",
+          });
         },
         onError: (error) => {
           toast({
