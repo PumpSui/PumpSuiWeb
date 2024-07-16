@@ -3,6 +3,7 @@ import {
   DynamicFieldInfo,
   GetObjectParams,
   SuiClient,
+  SuiObjectResponse,
   SuiParsedData,
 } from "@mysten/sui/client";
 import { isValidSuiObjectId, isValidSuiAddress } from "@mysten/sui/utils";
@@ -391,6 +392,43 @@ const getAllDeployRecords = async (
   return projects;
 };
 
+const getAllComments = async (client: SuiClient, address: string) => {
+  const response = await client.getDynamicFields({
+    parentId: address,
+  });
+  const responses = await Promise.all(
+    response.data.map(async (record: DynamicFieldInfo) => {
+      const result = await client.getObject({
+        id: record.objectId,
+        options: { showContent: true },
+      }) as unknown as any
+      const returnData: CommentType = {
+          index: result.data.content.fields.name,
+          id: result.data.content.fields.id.id,
+          creator: result.data.content.fields.value.fields.creator,
+          media_link: result.data.content.fields.value.fields.media_link,
+          content: result.data.content.fields.value.fields.content,
+          timestamp: result.data.content.fields.value.fields.timestamp,
+          likes: result.data.content.fields.value.fields.likes.fields.contents,
+      };
+      return returnData;
+    })
+  );
+
+  //   const comments_data = await Promise.all(
+  //     comments.map(async (comment: any) => {
+  //       const response = await client.getObject({
+  //         id: comment,
+  //         options: { showContent: true },
+  //       });
+  //       return response.data?.content as any;
+  //     })
+  //   );
+  return responses.sort((a: CommentType, b: CommentType) => {
+    return a.index - b.index;
+  });
+};
+
 const getAllCommentsGraphQl = async (address: string) => {
   const client = new SuiGraphQLClient({
     url: "https://sui-testnet.mystenlabs.com/graphql",
@@ -425,6 +463,7 @@ const getAllCommentsGraphQl = async (address: string) => {
 };
 
 export {
+  getAllComments,
   getAllDeployRecords,
   getAllCommentsGraphQl,
   deploy,

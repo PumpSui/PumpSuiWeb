@@ -7,11 +7,11 @@ import { CommentProps } from "@/type";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useProject } from "@/components/providers/ProjectContext";
-import { add_comment, getAllCommentsGraphQl } from "@/api/suifund";
+import { add_comment, getAllComments, getAllCommentsGraphQl } from "@/api/suifund";
 import { getRealDate } from "@/lib/utils";
 import ProjectImage from "@/components/project_card/components/ProjectImage";
 import NewComment from "@/components/new_comment";
-import { useCurrentAccount, useCurrentWallet, useSignAndExecuteTransaction } from "@mysten/dapp-kit";
+import { useCurrentAccount, useCurrentWallet, useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { useToast } from "@/components/ui/use-toast";
 
 const Page = () => {
@@ -21,10 +21,11 @@ const Page = () => {
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const { connectionStatus } = useCurrentWallet();
   const { toast } = useToast();
+  const client = useSuiClient();
 
-   const getAllComments = useCallback(async () => {
-     if (selectedProject?.thread) {
-       const result = await getAllCommentsGraphQl(selectedProject.thread);
+   const getAllComments_inner = useCallback(async () => {
+     if (selectedProject && selectedProject?.thread) {
+       const result = await getAllComments(client, selectedProject.thread);
        console.log(result);
        const comments: CommentProps[] = result.map((comment) => ({
          id: comment.id,
@@ -36,15 +37,15 @@ const Page = () => {
        }));
        setComments(comments);
      }
-   }, [selectedProject?.thread]);
+   }, [client, selectedProject]);
 
   useEffect(() => {
     if (!selectedProject) {
       router.push("/");
-    }else{
-      getAllComments();
+    } else {
+      getAllComments_inner();
     }
-  }, [selectedProject, router, getAllComments]);
+  }, [selectedProject, router, getAllComments_inner]);
 
   const handleNewCommentSubmit = async (content: string) => {
     if (connectionStatus !== "connected") {
@@ -74,7 +75,7 @@ const Page = () => {
       {
         onSuccess: async () => {
           console.log("Comment added");
-          await getAllComments();
+          await getAllComments_inner();
         },
         onError: (error) => {
           toast({
