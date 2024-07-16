@@ -63,6 +63,7 @@ const Comment: React.FC<CommentProps> = ({
             onClick={handleReplySubmit}
             className="absolute bottom-4 right-4"
             variant={"secondary"}
+            disabled={!replyContent}
           >
             Submit
           </Button>
