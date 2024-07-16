@@ -25,6 +25,7 @@ const NewComment: React.FC<{ onSubmit: (content: string) => void }> = ({
         onClick={handleSubmit}
         className="absolute bottom-4 right-4"
         variant={"secondary"}
+        disabled={!content}
       >
         Submit
       </Button>

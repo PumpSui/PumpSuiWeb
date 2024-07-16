@@ -122,7 +122,7 @@ const Page = () => {
         {comments.map((comment, index) => (
           <Comment key={index} {...comment} onReplySubmit={handleReplySubmit} />
         ))}
-        <NewComment onSubmit={handleNewCommentSubmit} />
+        <NewComment onSubmit={handleNewCommentSubmit}/>
       </div>
     </div>
   );
