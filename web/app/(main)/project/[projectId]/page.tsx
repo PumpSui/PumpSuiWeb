@@ -4,51 +4,93 @@ import ProjectCard from "@/components/project_card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Comment from "@/components/comment";
 import { CommentProps } from "@/type";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useProject } from "@/components/providers/ProjectContext";
-import { getAllCommentsGraphQl } from "@/api/suifund";
+import { add_comment, getAllCommentsGraphQl } from "@/api/suifund";
 import { getRealDate } from "@/lib/utils";
 import ProjectImage from "@/components/project_card/components/ProjectImage";
 import NewComment from "@/components/new_comment";
+import { useCurrentAccount, useCurrentWallet, useSignAndExecuteTransaction } from "@mysten/dapp-kit";
+import { useToast } from "@/components/ui/use-toast";
 
 const Page = () => {
   const router = useRouter();
   const { selectedProject } = useProject();
   const [comments, setComments] = useState<CommentProps[]>([]);
+  const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
+  const { connectionStatus } = useCurrentWallet();
+  const { toast } = useToast();
+
+   const getAllComments = useCallback(async () => {
+     if (selectedProject?.thread) {
+       const result = await getAllCommentsGraphQl(selectedProject.thread);
+       console.log(result);
+       const comments: CommentProps[] = result.map((comment) => ({
+         id: comment.id,
+         content: comment.content,
+         date: getRealDate(comment.timestamp),
+         isReply: comment.reply ? true : false,
+         author: comment.creator,
+         replies: [], // Assumed the data structure
+       }));
+       setComments(comments);
+     }
+   }, [selectedProject?.thread]);
 
   useEffect(() => {
     if (!selectedProject) {
       router.push("/");
+    }else{
+      getAllComments();
     }
-    getAllCommentsGraphQl(selectedProject?.thread!).then((result) => {
-      const comments: CommentProps[] = result.map((comment) => {
-        return {
-          content: comment.content,
-          date: getRealDate(comment.timestamp),
-          isReply: comment.reply ? true : false,
-          author: comment.creator,
-          replies: [], // Assumed the data structure
-        };
-      });
-      setComments(comments);
-    });
-  }, [selectedProject, router]);
+  }, [selectedProject, router, getAllComments]);
 
-  const handleNewCommentSubmit = (content: string) => {
-    const newComment: CommentProps = {
+  const handleNewCommentSubmit = async (content: string) => {
+    if (connectionStatus !== "connected") {
+      toast({
+        title: "Error",
+        description: "Please connect your wallet",
+      });
+      return;
+    }
+    const newCommentParams = {
+      project_record: selectedProject?.id,
+      reply: "",
+      media_link: "",
       content,
-      date: new Date().toLocaleString(),
-      isReply: false,
-      author: "current user", // replace with actual user info
-      replies: [],
     };
-    setComments([newComment, ...comments]);
+    const txb = add_comment(
+      newCommentParams.project_record!,
+      newCommentParams.reply,
+      newCommentParams.media_link,
+      newCommentParams.content
+    );
+    await signAndExecuteTransaction(
+      {
+        transaction: txb,
+        chain: "sui::testnet",
+      },
+      {
+        onSuccess: async () => {
+          console.log("Comment added");
+          await getAllComments();
+        },
+        onError: (error) => {
+          toast({
+            variant:"destructive",
+            title: "Error",
+            content: error.message.toString(),
+          });
+        },
+      }
+    );
+    console.log(newCommentParams);
   };
 
-  const handleReplySubmit = (content: string) => {
+  const handleReplySubmit = (comment: string, id: string) => {
     // 这里应该根据你的具体需求来处理回复逻辑
-    console.log("Reply submitted:", content);
+    console.log("Reply submitted:", comment, id);
   };
 
   return (
@@ -82,3 +124,12 @@ const Page = () => {
 };
 
 export default Page;
+function signAndExecuteTransaction(
+  arg0: {
+    transaction: import("@mysten/sui/transactions").Transaction;
+    chain: string;
+  },
+  arg1: { onSuccess: () => void; onError: (error: any) => void }
+) {
+  throw new Error("Function not implemented.");
+}

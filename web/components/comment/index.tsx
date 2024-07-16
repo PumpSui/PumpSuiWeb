@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { FaHeart } from "react-icons/fa";
 
 const Comment: React.FC<CommentProps> = ({
+  id,
   author,
   date,
   content,
@@ -25,8 +26,8 @@ const Comment: React.FC<CommentProps> = ({
   }
 
   function handleReplySubmit(): void {
-    if (onReplySubmit) {
-      onReplySubmit(replyContent);
+    if (onReplySubmit && id) {
+      onReplySubmit(replyContent,id);
       setReplyContent("");
       setShowReplyInput(false);
     }

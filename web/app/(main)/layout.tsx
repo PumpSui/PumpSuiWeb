@@ -10,6 +10,7 @@ import {
 } from "@mysten/dapp-kit";
 import { getFullnodeUrl } from "@mysten/sui/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
 
 const { networkConfig } = createNetworkConfig({
   testnet: { url: getFullnodeUrl("testnet") },
@@ -30,6 +31,7 @@ const main = ({
             <Navbar></Navbar>
             <ProjectProvider>
               <div className="pt-24">{children}</div>
+              <Toaster></Toaster>
             </ProjectProvider>
           </WalletProvider>
         </SuiClientProvider>

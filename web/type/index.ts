@@ -102,12 +102,13 @@ export interface CommentType {
 
 // types/index.ts
 export interface CommentProps {
+  id?:string;
   author: string;
   date: string;
   content: string;
   replies?: CommentProps[];
   isReply?: boolean;
-  onReplySubmit?: (content: string) => void; 
+  onReplySubmit?: (comment: string,id:string) => void; 
 }
 
 
