@@ -26,8 +26,8 @@ const main = ({
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-          <WalletProvider theme={customTheme}>
+        <SuiClientProvider networks={networkConfig} defaultNetwork="testnet" >
+          <WalletProvider theme={customTheme} autoConnect>
             <Navbar></Navbar>
             <ProjectProvider>
               <div className="pt-24">{children}</div>

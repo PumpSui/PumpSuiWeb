@@ -108,6 +108,7 @@ export interface CommentProps {
   content: string;
   replies?: CommentProps[];
   isReply?: boolean;
+  reply?: string;
   onReplySubmit?: (comment: string,id:string) => void; 
 }
 
