@@ -64,7 +64,7 @@ const Comment: React.FC<CommentProps> = ({
           </Button>
         )}
       </div>
-      <p>{content}</p>
+      <p className="break-words">{content}</p>
       {showReplyInput && (
         <div className="mt-2 relative">
           <textarea
