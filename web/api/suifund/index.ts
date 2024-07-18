@@ -117,9 +117,9 @@ const claim = (project_record: string, project_admin_cap: string) => {
     ): SupporterReward  */
 const do_mint = (
   project_record: string,
-  value: number,
+  value: bigint,
   sender: string,
-  recipient: string
+  recipient?: string
 ) => {
   if (!isValidSuiAddress(sender)) {
     throw new Error("Invalid tx sender");
@@ -136,8 +136,8 @@ const do_mint = (
     arguments: [tx.object(project_record), coin, tx.object("0x6")],
   });
   tx.transferObjects([coin, sp_rwd], tx.pure(bcs.Address.serialize(sender)));
-  if (isValidSuiAddress(recipient)) {
-    const ref_value = (value * 5) / 100;
+  if (recipient&&isValidSuiAddress(recipient)) {
+    const ref_value = (value * BigInt(5)) / BigInt(100);
     const [ref_coin] = tx.splitCoins(tx.gas, [ref_value]);
     tx.moveCall({
       package: process.env.NEXT_PUBLIC_PACKAGE!,
