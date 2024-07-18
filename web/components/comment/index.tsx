@@ -2,7 +2,7 @@
 import { CommentProps } from "@/type";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
-import { FaHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 const Comment: React.FC<CommentProps> = ({
   id,
@@ -11,14 +11,18 @@ const Comment: React.FC<CommentProps> = ({
   content,
   replies,
   isReply,
+  islike,
+  likeCount,
+  index,
   onReplySubmit,
+  onLikeSubmit,
 }) => {
-  const [likeCount, setLikeCount] = useState(0);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyContent, setReplyContent] = useState("");
-
   function handleLikeClick(): void {
-    setLikeCount(likeCount + 1);
+    if (onLikeSubmit) {
+      onLikeSubmit(islike, index);
+    }
   }
 
   function handleReplyClick(): void {
@@ -27,7 +31,7 @@ const Comment: React.FC<CommentProps> = ({
 
   function handleReplySubmit(): void {
     if (onReplySubmit && id) {
-      onReplySubmit(replyContent,id);
+      onReplySubmit(replyContent, id);
       setReplyContent("");
       setShowReplyInput(false);
     }
@@ -38,13 +42,24 @@ const Comment: React.FC<CommentProps> = ({
       <div className="flex items-center">
         <p className="truncate max-w-36 font-bold text-cyan-300">@{author}</p>
         <span className="ml-2 text-gray-500">{date}</span>
-        <FaHeart
-          onClick={handleLikeClick}
-          className="hover:scale-150 hover:cursor-pointer ml-4 text-red-400"
-        />
+        {!islike ? (
+          <FaRegHeart
+            onClick={handleLikeClick}
+            className="hover:scale-150 hover:cursor-pointer ml-4 text-red-400"
+          />
+        ) : (
+          <FaHeart
+            onClick={handleLikeClick}
+            className="hover:scale-150 hover:cursor-pointer ml-4 text-red-400"
+          />
+        )}
         <p className="ml-2 text-red-400">{likeCount}</p>
         {!isReply && (
-          <Button onClick={handleReplyClick} className="text-cyan-300" variant={"link"}>
+          <Button
+            onClick={handleReplyClick}
+            className="text-cyan-300"
+            variant={"link"}
+          >
             [ Reply ]
           </Button>
         )}
@@ -57,7 +72,7 @@ const Comment: React.FC<CommentProps> = ({
             onChange={(e) => setReplyContent(e.target.value)}
             className="w-full p-2 border rounded-md"
             placeholder="Write your reply..."
-            style={{ minHeight: '80px' }} // Optional: to ensure sufficient height for textarea
+            style={{ minHeight: "80px" }} // Optional: to ensure sufficient height for textarea
           />
           <Button
             onClick={handleReplySubmit}
@@ -72,7 +87,13 @@ const Comment: React.FC<CommentProps> = ({
       {replies && replies.length > 0 && (
         <div className="mt-1 ml-4">
           {replies.map((reply, index) => (
-            <Comment key={index} {...reply} isReply={true} onReplySubmit={onReplySubmit} />
+            <Comment
+              key={index}
+              {...reply}
+              isReply={true}
+              onReplySubmit={onReplySubmit}
+              onLikeSubmit={onLikeSubmit}
+            />
           ))}
         </div>
       )}

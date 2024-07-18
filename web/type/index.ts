@@ -98,18 +98,23 @@ export interface CommentType {
     content: string;
     timestamp: number;
     likes: string[];
+
 }
 
 // types/index.ts
 export interface CommentProps {
-  id?:string;
+  id: string;
   author: string;
   date: string;
   content: string;
   replies?: CommentProps[];
   isReply?: boolean;
   reply?: string;
-  onReplySubmit?: (comment: string,id:string) => void; 
+  islike: boolean;
+  likeCount?: number;
+  index: number;
+  onReplySubmit?: (comment: string, id: string) => void;
+  onLikeSubmit?: (islike:boolean,index:number) => void;
 }
 
 

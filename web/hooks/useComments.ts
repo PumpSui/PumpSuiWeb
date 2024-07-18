@@ -2,18 +2,19 @@
 import { useCallback, useEffect, useState } from "react";
 import { getAllComments } from "@/api/suifund";
 import { getRealDate } from "@/lib/utils";
-import { useSuiClient } from "@mysten/dapp-kit";
+import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 import { CommentProps } from "@/type";
 
 const useComments = (threadId: string | undefined) => {
   const [comments, setComments] = useState<CommentProps[]>([]);
   const client = useSuiClient();
+  const currentAccount = useCurrentAccount();
 
   const fetchComments = useCallback(async () => {
     if (threadId) {
       const result = await getAllComments(client, threadId);
       const commentsMap: { [key: string]: CommentProps } = {};
-
+      console.log("raw data",result);
       result.forEach((comment) => {
         commentsMap[comment.id] = {
           id: comment.id,
@@ -23,6 +24,9 @@ const useComments = (threadId: string | undefined) => {
           author: comment.creator,
           reply: comment.reply ? comment.reply : "",
           replies: [],
+          likeCount: comment.likes.length,
+          islike: comment.likes.includes(currentAccount?.address!),
+          index: comment.index,
         };
       });
 
@@ -35,10 +39,11 @@ const useComments = (threadId: string | undefined) => {
         } else {
           rootComments.push(commentsMap[comment.id]);
         }
-      });
+      });      
+      console.log("rootComments",rootComments);
       setComments(rootComments);
     }
-  }, [client, threadId]);
+  }, [client, currentAccount?.address, threadId]);
 
   useEffect(() => {
     fetchComments();

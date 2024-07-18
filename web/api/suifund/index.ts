@@ -396,7 +396,6 @@ const getAllComments = async (client: SuiClient, address: string) => {
   const response = await client.getDynamicFields({
     parentId: address,
   });
-  console.log(response);
   const responses = await Promise.all(
     response.data.map(async (record: DynamicFieldInfo) => {
       const result = (await client.getObject({
@@ -416,7 +415,6 @@ const getAllComments = async (client: SuiClient, address: string) => {
       return returnData;
     })
   );
-  console.log(response);
   return responses.sort((a: CommentType, b: CommentType) => {
     return a.index - b.index;
   });

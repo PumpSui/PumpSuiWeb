@@ -11,6 +11,7 @@ import { useCurrentWallet } from "@mysten/dapp-kit";
 import { useToast } from "@/components/ui/use-toast";
 import useComments from "@/hooks/useComments";
 import useSubmitComment from "@/hooks/useSubmitComment";
+import useSubmitCommentLike from "@/hooks/useSubmitCommentLike";
 
 const Page = () => {
   const router = useRouter();
@@ -19,6 +20,7 @@ const Page = () => {
   const { toast } = useToast();
   const { comments, fetchComments } = useComments(selectedProject?.thread);
   const { submitComment } = useSubmitComment();
+  const { submitCommentLike } = useSubmitCommentLike(selectedProject?.id);
 
   if (!selectedProject) {
     router.push("/");
@@ -85,6 +87,33 @@ const Page = () => {
     );
   };
 
+  const handleLikeClick = async (islike:boolean,index:number) => {
+    if (connectionStatus !== "connected") {
+      toast({
+        title: "Error",
+        description: "Please connect your wallet",
+      });
+    }
+    await submitCommentLike(
+      index,
+      islike,
+      async () => {
+        await fetchComments();
+        toast({
+          title: "Success",
+          description: "Like added successfully",
+        });
+      },
+      (error) => {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message.toString(),
+        });
+      }
+    );
+  }
+
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className="relative w-full rounded-lg overflow-hidden max-h-64 h-64">
@@ -107,7 +136,12 @@ const Page = () => {
 
       <div className="space-y-4">
         {comments.map((comment, index) => (
-          <Comment key={index} {...comment} onReplySubmit={handleReplySubmit} />
+          <Comment
+            key={index}
+            {...comment}
+            onReplySubmit={handleReplySubmit}
+            onLikeSubmit={handleLikeClick}
+          />
         ))}
         <NewComment onSubmit={handleNewCommentSubmit} />
       </div>
