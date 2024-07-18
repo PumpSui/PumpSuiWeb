@@ -173,7 +173,7 @@ const Page = () => {
             <MintCard
               {...selectedProject}
               onSubmitMint={handleMintSubmit}
-              isStartMint={selectedProject.start_time_ms > Date.now()}
+              isStartMint={selectedProject.start_time_ms > Date.now() || selectedProject.end_time_ms < Date.now()}
             />
           </div>
         </div>
