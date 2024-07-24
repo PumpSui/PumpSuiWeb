@@ -147,6 +147,7 @@ const do_mint = (
         ref_coin,
         tx.pure(bcs.Address.serialize(sender)),
         tx.pure(bcs.Address.serialize(recipient)),
+        tx.object(project_record),
       ],
     });
   }
