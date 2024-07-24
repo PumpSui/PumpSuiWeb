@@ -1,5 +1,5 @@
 // context/ProjectContext.tsx
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 import { ProjectRecord } from "@/type";
 
 interface ProjectContextType {
@@ -17,11 +17,13 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedProject, setSelectedProject] = useState<ProjectRecord | null>(
     null
   );
+  const value = useMemo(
+    () => ({ selectedProject, setSelectedProject }),
+    [selectedProject]
+  );
 
   return (
-    <ProjectContext.Provider value={{ selectedProject, setSelectedProject }}>
-      {children}
-    </ProjectContext.Provider>
+    <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
   );
 };
 

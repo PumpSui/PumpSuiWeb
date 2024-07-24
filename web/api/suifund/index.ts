@@ -320,6 +320,44 @@ const unlike_comment = (project_record: string, idx: number) => {
   return tx;
 };
 
+const getProjectRecord = async (projectId:string, client:SuiClient) => {
+  console.log(projectId);
+  const response = await client.getObject({
+    id: projectId,
+    options: { showContent: true },
+  });
+  const data = response.data?.content as any;
+  const project: ProjectRecord = {
+    object_id: projectId,
+    id: data.fields.id.id,
+    creator: data.fields.creator,
+    name: data.fields.name,
+    description: data.fields.description,
+    image_url: data.fields.image_url,
+    x: data.fields.x,
+    telegram: data.fields.telegram,
+    discord: data.fields.discord,
+    website: data.fields.website,
+    github: data.fields.github,
+    cancel: data.fields.cancel,
+    balance: data.fields.balance,
+    ratio: data.fields.ratio,
+    start_time_ms: data.fields.start_time_ms,
+    end_time_ms: data.fields.end_time_ms,
+    total_supply: data.fields.total_supply,
+    amount_per_sui: data.fields.amount_per_sui,
+    remain: data.fields.remain,
+    current_supply: data.fields.current_supply,
+    total_transactions: data.fields.total_transactions,
+    min_value_sui: data.fields.min_value_sui,
+    max_value_sui: data.fields.max_value_sui,
+    participants: data.fields.participants.fields.contents.fields.id.id,
+    minted_per_user: data.fields.minted_per_user.fields.id.id,
+    thread: data.fields.thread.fields.contents.fields.id.id,
+  };
+  return project;
+}
+
 const getAllDeployRecords = async (
   client: SuiClient
 ): Promise<ProjectRecord[]> => {
@@ -351,42 +389,9 @@ const getAllDeployRecords = async (
       if (!isValidSuiObjectId(id.fields.value)) {
         throw new Error("Invalid record id");
       }
-      const response = await client.getObject({
-        id: id.fields.value,
-        options: { showContent: true },
-      });
-
-      const data = response.data?.content as any;
-
-      const project: ProjectRecord = {
-        object_id: id.fields.value,
-        id: data.fields.id.id,
-        creator: data.fields.creator,
-        name: data.fields.name,
-        description: data.fields.description,
-        image_url: data.fields.image_url,
-        x: data.fields.x,
-        telegram: data.fields.telegram,
-        discord: data.fields.discord,
-        website: data.fields.website,
-        github: data.fields.github,
-        cancel: data.fields.cancel,
-        balance: data.fields.balance,
-        ratio: data.fields.ratio,
-        start_time_ms: data.fields.start_time_ms,
-        end_time_ms: data.fields.end_time_ms,
-        total_supply: data.fields.total_supply,
-        amount_per_sui: data.fields.amount_per_sui,
-        remain: data.fields.remain,
-        current_supply: data.fields.current_supply,
-        total_transactions: data.fields.total_transactions,
-        min_value_sui: data.fields.min_value_sui,
-        max_value_sui: data.fields.max_value_sui,
-        participants: data.fields.participants.fields.contents.fields.id.id,
-        minted_per_user: data.fields.minted_per_user.fields.id.id,
-        thread: data.fields.thread.fields.contents.fields.id.id,
-      };
-      return project;
+      const response = await getProjectRecord(id.fields.value, client);
+      
+      return response;
     })
   );
   return projects;
@@ -455,6 +460,7 @@ const getAllCommentsGraphQl = async (address: string) => {
 
 export {
   getAllComments,
+  getProjectRecord,
   getAllDeployRecords,
   getAllCommentsGraphQl,
   deploy,
