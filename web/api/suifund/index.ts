@@ -321,7 +321,6 @@ const unlike_comment = (project_record: string, idx: number) => {
 };
 
 const getProjectRecord = async (projectId:string, client:SuiClient) => {
-  console.log(projectId);
   const response = await client.getObject({
     id: projectId,
     options: { showContent: true },

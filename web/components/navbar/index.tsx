@@ -8,6 +8,8 @@ import { Input } from "../ui/input";
 import { ConnectButton } from "@mysten/dapp-kit";
 import { useRouter } from "next/navigation";
 
+import "@mysten/dapp-kit/dist/index.css";
+
 const Navbar = () => {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);

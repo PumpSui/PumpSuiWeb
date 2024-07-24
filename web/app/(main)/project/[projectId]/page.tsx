@@ -1,10 +1,8 @@
 // pages/index.tsx
 "use client";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import ProjectCard from "@/components/project_card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Comment from "@/components/comment";
-import { useRouter } from "next/navigation";
 import { useProject } from "@/components/providers/ProjectContext";
 import ProjectImage from "@/components/project_card/components/ProjectImage";
 import NewComment from "@/components/new_comment";
@@ -43,14 +41,11 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
   const client = useSuiClient();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-   const shouldFetch = !selectedProject;
-   const { data, error: swrError } = useSWR(
-     shouldFetch ? [params.projectId, client] : null,
-     ([id, client]) => getProjectRecord(id, client)
-   );
-
+  const { data, error: swrError } = useSWR(
+    !selectedProject ? [params.projectId, client] : null,
+    ([id, client]) => getProjectRecord(id, client)
+  );
 
   useEffect(() => {
     if (selectedProject) {
@@ -61,11 +56,13 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
       setSelectedProject(data);
       setIsLoading(false);
     } else if (swrError) {
-      // 处理 SWR 错误
+      toast({
+        title: "Error",
+        description: swrError.toString(),
+      });
       setIsLoading(false);
     }
-  }, [selectedProject, data, swrError, setSelectedProject]);
-
+  }, [selectedProject, data, swrError, setSelectedProject, toast]);
 
   const handleNewCommentSubmit = useCallback(
     async (content: string) => {
@@ -219,10 +216,6 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
 
   if (isLoading) {
     return <ProjectSkeleton />;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
   }
 
   if (!selectedProject) {
