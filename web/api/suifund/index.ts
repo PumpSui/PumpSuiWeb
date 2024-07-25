@@ -360,12 +360,7 @@ const getProjectRecord = async (projectId:string, client:SuiClient) => {
 const getAllDeployRecords = async (
   client: SuiClient,
   cursor: string | null
-): Promise<{
-  data: ProjectRecord[];
-  hasNextPage: boolean;
-  nextCursor: string | null;
-}> => {
-  console.log("cursor", cursor);
+): Promise<ProjectRecordResponse> => {
   const params: GetObjectParams = {
     id: process.env.NEXT_PUBLIC_DEPLOY_RECORD!,
     options: { showContent: true },
@@ -380,7 +375,7 @@ const getAllDeployRecords = async (
 
   const { data, hasNextPage, nextCursor } = await client.getDynamicFields({
     parentId: record_id,
-    limit:16,
+    limit: 32,
     cursor,
   });
 

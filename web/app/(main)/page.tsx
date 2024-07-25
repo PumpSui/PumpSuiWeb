@@ -1,9 +1,9 @@
 "use client";
 import { getAllDeployRecords } from "@/api/suifund";
 import ProjectCard from "@/components/project_card";
-import { ProjectRecord } from "@/type";
+import { ProjectRecord, ProjectRecordResponse } from "@/type";
 import { useSuiClient } from "@mysten/dapp-kit";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import useSWRInfinite from "swr/infinite";
 import {
   Pagination,
@@ -22,8 +22,12 @@ const Page: React.FC = () => {
   const [records, setRecords] = useState<ProjectRecord[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(true);
+  const loadingRef = useRef(false);
 
-  const getKey = (pageIndex: number, previousPageData: any) => {
+  const getKey = (
+    pageIndex: number,
+    previousPageData: ProjectRecordResponse
+  ) => {
     if (previousPageData && !previousPageData.hasNextPage) return null;
     return [client, pageIndex === 0 ? null : previousPageData.nextCursor];
   };
@@ -46,22 +50,28 @@ const Page: React.FC = () => {
     }
   }, [data]);
 
-  const loadMoreIfNeeded = useCallback(() => {
-    const currentRecordCount = records.length;
-    const displayedRecordCount = currentPage * ITEMS_PER_PAGE;
+  const loadMoreIfNeeded = useCallback(async () => {
+    if (loadingRef.current || !hasNextPage || isValidating) return;
 
-    if (
-      displayedRecordCount >= currentRecordCount &&
-      hasNextPage &&
-      !isValidating
-    ) {
-      setSize(size + 1);
+    loadingRef.current = true;
+    try {
+      await setSize(size + 1);
+    } finally {
+      loadingRef.current = false;
     }
-  }, [currentPage, records.length, hasNextPage, isValidating, setSize, size]);
+  }, [hasNextPage, isValidating, setSize, size]);
 
   useEffect(() => {
-    loadMoreIfNeeded();
-  }, [loadMoreIfNeeded]);
+    const intervalId = setInterval(() => {
+      if (hasNextPage && !loadingRef.current) {
+        loadMoreIfNeeded();
+      } else if (!hasNextPage) {
+        clearInterval(intervalId);
+      }
+    }, 2000); // 每2秒检查一次
+
+    return () => clearInterval(intervalId);
+  }, [loadMoreIfNeeded, hasNextPage]);
 
   const displayedRecords = useMemo(() => {
     return records.slice(
@@ -73,6 +83,9 @@ const Page: React.FC = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
+
+  if (error) return <div>Failed to load</div>;
+  if (!data) return <div>Loading...</div>;
 
   return (
     <main>
@@ -87,21 +100,29 @@ const Page: React.FC = () => {
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                isActive={currentPage === 1} href={"#"}              />
+                isActive={currentPage === 1}
+                href={"#"}
+              />
             </PaginationItem>
             {[...Array(totalPages)].map((_, i) => (
               <PaginationItem key={i}>
                 <PaginationLink
                   onClick={() => handlePageChange(i + 1)}
-                  isActive={currentPage === i + 1} href={"#"}                >
+                  isActive={currentPage === i + 1}
+                  href={"#"}
+                >
                   {i + 1}
                 </PaginationLink>
               </PaginationItem>
             ))}
             <PaginationItem>
               <PaginationNext
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                isActive={currentPage === totalPages && !hasNextPage} href={"#"}              />
+                onClick={() =>
+                  handlePageChange(Math.min(totalPages, currentPage + 1))
+                }
+                isActive={currentPage === totalPages && !hasNextPage}
+                href={"#"}
+              />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
@@ -114,7 +135,7 @@ export default Page;
 
 async function fetchRecords([client, cursor]: [
   client: SuiClient,
-  cursor: string
+  cursor: string | null
 ]) {
   const result = await getAllDeployRecords(client, cursor);
   return result;
