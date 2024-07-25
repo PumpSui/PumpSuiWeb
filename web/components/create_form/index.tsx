@@ -89,6 +89,12 @@ const ProjectForm: React.FC = () => {
           valueAsNumber
         />
         <FormField
+          name="ratioThreshold"
+          label="Threshold Ratio(%)"
+          placeholder=""
+          valueAsNumber
+        />
+        <FormField
           name="minValue"
           label="Min Value(SUI)"
           placeholder="Min Value"

@@ -122,6 +122,7 @@ export interface IformatedDeployParams {
   name: string;
   totalDeposit: bigint;
   ratioToBuilders: number;
+  ratioThreshold: number;
   minValue: bigint;
   maxValue: bigint;
   amount_per_sui: number;

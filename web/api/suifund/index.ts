@@ -63,6 +63,7 @@ const deploy = (params: IformatedDeployParams) => {
       tx.pure(bcs.u64().serialize(params.totalDeposit).toBytes()),
       tx.pure(bcs.u64().serialize(params.ratioToBuilders).toBytes()),
       tx.pure(bcs.u64().serialize(params.amount_per_sui).toBytes()),
+      tx.pure(bcs.u64().serialize(params.ratioThreshold).toBytes()),
       tx.pure(bcs.u64().serialize(params.minValue).toBytes()),
       tx.pure(bcs.u64().serialize(params.maxValue).toBytes()),
       coin,
@@ -136,7 +137,7 @@ const do_mint = (
     arguments: [tx.object(project_record), coin, tx.object("0x6")],
   });
   tx.transferObjects([coin, sp_rwd], tx.pure(bcs.Address.serialize(sender)));
-  if (recipient&&isValidSuiAddress(recipient)) {
+  if (recipient && isValidSuiAddress(recipient)) {
     const ref_value = (value * BigInt(5)) / BigInt(100);
     const [ref_coin] = tx.splitCoins(tx.gas, [ref_value]);
     tx.moveCall({

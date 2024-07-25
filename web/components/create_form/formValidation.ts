@@ -17,6 +17,7 @@ export const formSchema = z
       .min(1)
       .transform((val) => BigInt(val)),
     ratioToBuilders: z.number().min(0).max(100),
+    ratioThreshold: z.number().min(0).max(100),
     minValue: z
       .number()
       .int()
@@ -60,6 +61,7 @@ export const formatedDeployParams = (
     description: values.description,
     projectDuration: daysToTimestamp(values.projectDuration),
     ratioToBuilders: values.ratioToBuilders,
+    ratioThreshold: values.ratioThreshold,
     amount_per_sui: values.amount_per_sui,
     linktree: values.linktree!,
     xLink: values.xLink!,
