@@ -3,7 +3,7 @@ import { getAllDeployRecords } from "@/api/suifund";
 import ProjectCard from "@/components/project_card";
 import { ProjectRecord } from "@/type";
 import { useSuiClient } from "@mysten/dapp-kit";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import useSWRInfinite from "swr/infinite";
 import {
   Pagination,
@@ -11,7 +11,6 @@ import {
   PaginationItem,
   PaginationPrevious,
   PaginationLink,
-  PaginationEllipsis,
   PaginationNext,
 } from "@/components/ui/pagination";
 import { SuiClient } from "@mysten/sui/client";
@@ -22,7 +21,7 @@ const Page: React.FC = () => {
   const client = useSuiClient();
   const [records, setRecords] = useState<ProjectRecord[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(true);
 
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && !previousPageData.hasNextPage) return null;
@@ -34,29 +33,42 @@ const Page: React.FC = () => {
     fetchRecords
   );
 
+  const totalPages = useMemo(
+    () => Math.ceil(records.length / ITEMS_PER_PAGE),
+    [records]
+  );
+
   useEffect(() => {
     if (data) {
       const allRecords = data.flatMap((page) => page.data);
       setRecords(allRecords);
-      setTotalPages(Math.ceil(allRecords.length / ITEMS_PER_PAGE));
+      setHasNextPage(data[data.length - 1]?.hasNextPage || false);
     }
   }, [data]);
 
-  useEffect(() => {
-    // 如果当前页面是最后一页，并且还有更多数据可以加载，则加载下一页
+  const loadMoreIfNeeded = useCallback(() => {
+    const currentRecordCount = records.length;
+    const displayedRecordCount = currentPage * ITEMS_PER_PAGE;
+
     if (
-      currentPage === totalPages &&
-      data &&
-      data[data.length - 1]?.hasNextPage
+      displayedRecordCount >= currentRecordCount &&
+      hasNextPage &&
+      !isValidating
     ) {
       setSize(size + 1);
     }
-  }, [currentPage, totalPages, data, size, setSize]);
+  }, [currentPage, records.length, hasNextPage, isValidating, setSize, size]);
 
-  const displayedRecords = records.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  useEffect(() => {
+    loadMoreIfNeeded();
+  }, [loadMoreIfNeeded]);
+
+  const displayedRecords = useMemo(() => {
+    return records.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+    );
+  }, [records, currentPage]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -89,7 +101,7 @@ const Page: React.FC = () => {
             <PaginationItem>
               <PaginationNext
                 onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                isActive={currentPage === totalPages} href={"#"}              />
+                isActive={currentPage === totalPages && !hasNextPage} href={"#"}              />
             </PaginationItem>
           </PaginationContent>
         </Pagination>

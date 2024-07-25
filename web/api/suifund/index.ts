@@ -365,6 +365,7 @@ const getAllDeployRecords = async (
   hasNextPage: boolean;
   nextCursor: string | null;
 }> => {
+  console.log("cursor", cursor);
   const params: GetObjectParams = {
     id: process.env.NEXT_PUBLIC_DEPLOY_RECORD!,
     options: { showContent: true },
@@ -379,6 +380,7 @@ const getAllDeployRecords = async (
 
   const { data, hasNextPage, nextCursor } = await client.getDynamicFields({
     parentId: record_id,
+    limit:16,
     cursor,
   });
 
