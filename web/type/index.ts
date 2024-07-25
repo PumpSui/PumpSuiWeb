@@ -76,8 +76,13 @@ export interface ProjectRecord {
     max_value_sui: number;
     participants: string[];
     minted_per_user: Record<string, number>;
-    thread: string;
-    
+    thread: string;    
+}
+
+export interface ProjectRecordResponse {
+  hasNextPage: boolean;
+  nextCursor: string | null;
+  data: ProjectRecord[];
 }
 
 /*     public struct Comment has key, store {

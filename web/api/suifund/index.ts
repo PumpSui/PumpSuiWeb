@@ -1,4 +1,4 @@
-import { CommentType, IformatedDeployParams, ProjectRecord } from "@/type";
+import { CommentType, IformatedDeployParams, ProjectRecord, ProjectRecordResponse } from "@/type";
 import {
   DynamicFieldInfo,
   GetObjectParams,
@@ -358,23 +358,32 @@ const getProjectRecord = async (projectId:string, client:SuiClient) => {
 }
 
 const getAllDeployRecords = async (
-  client: SuiClient
-): Promise<ProjectRecord[]> => {
+  client: SuiClient,
+  cursor: string | null
+): Promise<{
+  data: ProjectRecord[];
+  hasNextPage: boolean;
+  nextCursor: string | null;
+}> => {
   const params: GetObjectParams = {
     id: process.env.NEXT_PUBLIC_DEPLOY_RECORD!,
-    options: {
-      showContent: true,
-    },
+    options: { showContent: true },
   };
   const deploy_object = await client.getObject(params);
   const content = deploy_object.data!.content as any;
   const record_id = content.fields.record.fields.id.id;
+
   if (!isValidSuiObjectId(record_id)) {
     throw new Error("Invalid record id");
   }
-  const record_data = await client.getDynamicFields({ parentId: record_id });
+
+  const { data, hasNextPage, nextCursor } = await client.getDynamicFields({
+    parentId: record_id,
+    cursor,
+  });
+
   const record_objects = await Promise.all(
-    record_data.data.map(async (record: DynamicFieldInfo) => {
+    data.map(async (record: DynamicFieldInfo) => {
       const response = await client.getObject({
         id: record.objectId,
         options: { showContent: true },
@@ -382,19 +391,20 @@ const getAllDeployRecords = async (
       return response.data?.content as SuiParsedData;
     })
   );
+
   const projects = await Promise.all(
     record_objects.map(async (record: SuiParsedData) => {
       const id = record as unknown as any;
       if (!isValidSuiObjectId(id.fields.value)) {
         throw new Error("Invalid record id");
       }
-      const response = await getProjectRecord(id.fields.value, client);
-      
-      return response;
+      return await getProjectRecord(id.fields.value, client);
     })
   );
-  return projects;
+
+  return { data: projects, hasNextPage, nextCursor };
 };
+
 
 const getAllComments = async (client: SuiClient, address: string) => {
   const response = await client.getDynamicFields({
