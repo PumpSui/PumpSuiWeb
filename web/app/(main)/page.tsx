@@ -34,11 +34,17 @@ const Page: React.FC = () => {
     []
   );
 
-  const { objects, isAllLoaded, hasNextPage, error, isLoading } =
-    useGetInfiniteObject<ProjectRecord>(client, fetchRecords, ITEMS_PER_PAGE);
+  const {
+    displayedObjects,
+    objects,
+    isAllLoaded,
+    hasNextPage,
+    error,
+    isLoading,
+  } = useGetInfiniteObject<ProjectRecord>(client, fetchRecords, ITEMS_PER_PAGE);
 
   const filteredAndSortedObjects = useMemo(() => {
-    if (!isAllLoaded) return [];
+    if (!isAllLoaded) return displayedObjects;
 
     let result = [...objects];
 
@@ -66,13 +72,17 @@ const Page: React.FC = () => {
     }
 
     return result;
-  }, [objects, isAllLoaded, tab, searchQuery, sortBy, currentAccount?.address]);
+  }, [isAllLoaded, displayedObjects, objects, tab, searchQuery, sortBy, currentAccount?.address]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [tab, searchQuery, sortBy]);
 
   const totalPages = useMemo(() => {
     return Math.ceil(filteredAndSortedObjects.length / ITEMS_PER_PAGE);
   }, [filteredAndSortedObjects]);
 
-  const displayedObjects = useMemo(() => {
+  const pageDisplayedObjects = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredAndSortedObjects.slice(
       startIndex,
@@ -113,7 +123,7 @@ const Page: React.FC = () => {
           onSort={handleSort}
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
-          {displayedObjects.map((project, index) => (
+          {pageDisplayedObjects.map((project, index) => (
             <ProjectCard key={index} {...project} />
           ))}
         </div>

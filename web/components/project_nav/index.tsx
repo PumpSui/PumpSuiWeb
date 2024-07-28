@@ -1,5 +1,5 @@
 // components/ProjectNavbar.tsx
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "../ui/input";
 import { Search } from "lucide-react";
@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "../ui/button";
+import { debounce } from "@/lib/utils";
 
 interface ProjectNavbarProps {
   onTabChange: (value: string) => void;
@@ -23,7 +23,23 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
   onSearch,
   onSort,
 }) => {
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(
+    debounce((query: string) => {
+      onSearch(query);
+    }, 200),
+    [onSearch]
+  );
+
+  useEffect(() => {
+    debouncedSearch(searchQuery);
+  }, [searchQuery, debouncedSearch]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
 
   return (
     <nav className="bg-background z-50 shadow-md m-4">
@@ -42,15 +58,8 @@ const ProjectNavbar: React.FC<ProjectNavbarProps> = ({
               placeholder="Search project..."
               className="w-full rounded-3xl bg-secondary pl-8 md:w-[200px] lg:w-[320px]"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
             />
-            <Button
-              size={"sm"}
-              className="rounded-3xl"
-              onClick={() => onSearch(searchQuery)}
-            >
-              Confirm
-            </Button>
           </div>
           <div className="ml-auto">
             <Select onValueChange={onSort}>
