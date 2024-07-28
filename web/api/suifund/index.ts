@@ -1,9 +1,8 @@
-import { CommentType, IformatedDeployParams, ProjectRecord, ProjectRecordResponse } from "@/type";
+import { CommentType, IformatedDeployParams, ProjectRecord} from "@/type";
 import {
   DynamicFieldInfo,
   GetObjectParams,
   SuiClient,
-  SuiObjectResponse,
   SuiParsedData,
 } from "@mysten/sui/client";
 import { isValidSuiObjectId, isValidSuiAddress } from "@mysten/sui/utils";
@@ -11,8 +10,7 @@ import { Transaction } from "@mysten/sui/transactions";
 import { bcs } from "@mysten/sui/bcs";
 import { SuiGraphQLClient } from "@mysten/sui/graphql";
 import { getAllCommentsQL } from "./graphqlContext";
-import { z } from "zod";
-import { formSchema } from "@/components/create_form/formValidation";
+import { ObjectsResponseType } from "@/hooks/useGetInfiniteObject";
 
 /*    public entry fun deploy(
     deploy_record: &mut DeployRecord,
@@ -360,7 +358,7 @@ const getProjectRecord = async (projectId:string, client:SuiClient) => {
 const getAllDeployRecords = async (
   client: SuiClient,
   cursor: string | null
-): Promise<ProjectRecordResponse> => {
+): Promise<ObjectsResponseType<ProjectRecord>> => {
   const params: GetObjectParams = {
     id: process.env.NEXT_PUBLIC_DEPLOY_RECORD!,
     options: { showContent: true },

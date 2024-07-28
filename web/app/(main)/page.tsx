@@ -1,10 +1,10 @@
+// pages/YourPage.tsx
 "use client";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { getAllDeployRecords } from "@/api/suifund";
 import ProjectCard from "@/components/project_card";
-import { ProjectRecord, ProjectRecordResponse } from "@/type";
-import { useSuiClient } from "@mysten/dapp-kit";
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
-import useSWRInfinite from "swr/infinite";
+import { ProjectRecord } from "@/type";
+import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 import {
   Pagination,
   PaginationContent,
@@ -14,84 +14,106 @@ import {
   PaginationNext,
 } from "@/components/ui/pagination";
 import { SuiClient } from "@mysten/sui/client";
+import ProjectNavbar from "@/components/project_nav";
+import { useGetInfiniteObject } from "@/hooks/useGetInfiniteObject";
 
 const ITEMS_PER_PAGE = 8;
 
 const Page: React.FC = () => {
   const client = useSuiClient();
-  const [records, setRecords] = useState<ProjectRecord[]>([]);
+  const currentAccount = useCurrentAccount();
+  const [tab, setTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("default");
   const [currentPage, setCurrentPage] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(true);
-  const loadingRef = useRef(false);
 
-  const getKey = (
-    pageIndex: number,
-    previousPageData: ProjectRecordResponse
-  ) => {
-    if (previousPageData && !previousPageData.hasNextPage) return null;
-    return [client, pageIndex === 0 ? null : previousPageData.nextCursor];
-  };
-
-  const { data, error, size, setSize, isValidating } = useSWRInfinite(
-    getKey,
-    fetchRecords
+  const fetchRecords = useCallback(
+    async ([client, cursor]: [SuiClient, string | null]) => {
+      return await getAllDeployRecords(client, cursor);
+    },
+    []
   );
 
-  const totalPages = useMemo(
-    () => Math.ceil(records.length / ITEMS_PER_PAGE),
-    [records]
-  );
+  const { objects, isAllLoaded, hasNextPage, error, isLoading } =
+    useGetInfiniteObject<ProjectRecord>(client, fetchRecords, ITEMS_PER_PAGE);
 
-  useEffect(() => {
-    if (data) {
-      const allRecords = data.flatMap((page) => page.data);
-      setRecords(allRecords);
-      setHasNextPage(data[data.length - 1]?.hasNextPage || false);
+  const filteredAndSortedObjects = useMemo(() => {
+    if (!isAllLoaded) return [];
+
+    let result = [...objects];
+
+    // Apply filtering
+    if (tab === "supported") {
+      // Filter for supported projects
+      // result = result.filter(project => project.isSupported);
+    } else if (tab === "created") {
+      result = result.filter(
+        (project) => project.creator === currentAccount?.address
+      );
     }
-  }, [data]);
 
-  const loadMoreIfNeeded = useCallback(async () => {
-    if (loadingRef.current || !hasNextPage || isValidating) return;
-
-    loadingRef.current = true;
-    try {
-      await setSize(size + 1);
-    } finally {
-      loadingRef.current = false;
+    if (searchQuery) {
+      result = result.filter((project) =>
+        project.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
-  }, [hasNextPage, isValidating, setSize, size]);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (hasNextPage && !loadingRef.current) {
-        loadMoreIfNeeded();
-      } else if (!hasNextPage) {
-        clearInterval(intervalId);
-      }
-    }, 2000); // 每2秒检查一次
+    // Apply sorting
+    if (sortBy === "newest") {
+      result.sort((a, b) => b.start_time_ms - a.start_time_ms);
+    } else if (sortBy === "oldest") {
+      result.sort((a, b) => a.start_time_ms - b.start_time_ms);
+    }
 
-    return () => clearInterval(intervalId);
-  }, [loadMoreIfNeeded, hasNextPage]);
+    return result;
+  }, [objects, isAllLoaded, tab, searchQuery, sortBy, currentAccount?.address]);
 
-  const displayedRecords = useMemo(() => {
-    return records.slice(
-      (currentPage - 1) * ITEMS_PER_PAGE,
-      currentPage * ITEMS_PER_PAGE
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredAndSortedObjects.length / ITEMS_PER_PAGE);
+  }, [filteredAndSortedObjects]);
+
+  const displayedObjects = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredAndSortedObjects.slice(
+      startIndex,
+      startIndex + ITEMS_PER_PAGE
     );
-  }, [records, currentPage]);
+  }, [filteredAndSortedObjects, currentPage]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [tab, searchQuery, sortBy]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
+  const handleTabChange = (value: string) => {
+    setTab(value);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleSort = (value: string) => {
+    setSortBy(value);
+  };
+
   if (error) return <div>Failed to load</div>;
-  if (!data) return <div>Loading...</div>;
+  if (isLoading) return <div>Loading...</div>;
 
   return (
     <main>
       <div className="py-8">
+        <ProjectNavbar
+          onTabChange={handleTabChange}
+          onSearch={handleSearch}
+          onSort={handleSort}
+        />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
-          {displayedRecords.map((project, index) => (
+          {displayedObjects.map((project, index) => (
             <ProjectCard key={index} {...project} />
           ))}
         </div>
@@ -120,7 +142,7 @@ const Page: React.FC = () => {
                 onClick={() =>
                   handlePageChange(Math.min(totalPages, currentPage + 1))
                 }
-                isActive={currentPage === totalPages && !hasNextPage}
+                isActive={currentPage === totalPages}
                 href={"#"}
               />
             </PaginationItem>
@@ -132,11 +154,3 @@ const Page: React.FC = () => {
 };
 
 export default Page;
-
-async function fetchRecords([client, cursor]: [
-  client: SuiClient,
-  cursor: string | null
-]) {
-  const result = await getAllDeployRecords(client, cursor);
-  return result;
-}

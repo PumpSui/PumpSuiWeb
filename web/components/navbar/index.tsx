@@ -29,16 +29,7 @@ const Navbar = () => {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority
           />
-        </div>
-
-        <div className="hidden md:flex relative flex-1 md:flex-grow-0 items-center min-h-10">
-          <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search project..."
-            className="w-full rounded-3xl bg-secondary pl-8 md:w-[200px] lg:w-[320px] min-h-10"
-          />
-        </div>
+        </div>        
 
         <div className="hidden md:flex ml-auto items-center gap-10">
           <div className="bg-secondary flex items-center min-h-14 px-3 rounded-3xl">
@@ -100,14 +91,6 @@ const Navbar = () => {
             <div className="flex items-center px-5">
               <ConnectButton />
             </div>
-          </div>
-          <div className="mt-3 px-2 relative">
-            <Search className="absolute left-5 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search project..."
-              className="w-full rounded-3xl bg-secondary pl-10 pr-4 py-2"
-            />
           </div>
         </div>
       )}
