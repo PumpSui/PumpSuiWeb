@@ -8,6 +8,19 @@ export interface Project {
   imgUrl?: string;
 }
 
+
+
+
+export enum EditEnum {
+  edit_description,
+  edit_image_url,
+  edit_x_url,
+  edit_telegram_url,
+  edit_discord_url,
+  edit_website_url,
+  edit_github_url,
+}
+
 /*
     public struct SupporterReward has key, store {
         id: UID,

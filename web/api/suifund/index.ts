@@ -1,4 +1,4 @@
-import { CommentType, IformatedDeployParams, ProjectRecord} from "@/type";
+import { CommentType, EditEnum, IformatedDeployParams, ProjectRecord } from "@/type";
 import {
   DynamicFieldInfo,
   GetObjectParams,
@@ -79,6 +79,37 @@ const get_deploy_fee = (total_deposit_sui: bigint, ratio: number): bigint => {
   }
   return deploy_fee;
 };
+/*public entry fun edit_image_url(
+        project_record: &mut ProjectRecord, 
+        project_admin_cap: &ProjectAdminCap,
+        image_url: vector<u8>,
+        ctx: &TxContext
+    )*/
+const edit_project = (
+  type: EditEnum,
+  project_record: string,
+  project_admin_cap: string,
+  content: string
+) => {
+  if (!isValidSuiObjectId(project_record)) {
+    throw new Error("Invalid project record id");
+  }
+  if (!isValidSuiObjectId(project_admin_cap)) {
+    throw new Error("Invalid project admin cap id");
+  }
+  const tx = new Transaction();
+  tx.moveCall({
+    package: process.env.NEXT_PUBLIC_PACKAGE!,
+    module: "suifund",
+    function: type.toString(),
+    arguments: [
+      tx.object(project_record),
+      tx.object(project_admin_cap),
+      tx.pure(bcs.string().serialize(content).toBytes()),
+    ],
+  });
+  return tx;
+};
 
 /* public fun claim(
         project_record: &mut ProjectRecord,
@@ -134,7 +165,7 @@ const do_mint = (
     arguments: [tx.object(project_record), coin, tx.object("0x6")],
   });
   tx.transferObjects([coin, sp_rwd], tx.pure(bcs.Address.serialize(sender)));
-  if (recipient&&isValidSuiAddress(recipient)) {
+  if (recipient && isValidSuiAddress(recipient)) {
     const ref_value = (value * BigInt(5)) / BigInt(100);
     const [ref_coin] = tx.splitCoins(tx.gas, [ref_value]);
     tx.moveCall({
@@ -318,7 +349,7 @@ const unlike_comment = (project_record: string, idx: number) => {
   return tx;
 };
 
-const getProjectRecord = async (projectId:string, client:SuiClient) => {
+const getProjectRecord = async (projectId: string, client: SuiClient) => {
   const response = await client.getObject({
     id: projectId,
     options: { showContent: true },
@@ -353,7 +384,7 @@ const getProjectRecord = async (projectId:string, client:SuiClient) => {
     thread: data.fields.thread.fields.contents.fields.id.id,
   };
   return project;
-}
+};
 
 const getAllDeployRecords = async (
   client: SuiClient,
@@ -399,7 +430,6 @@ const getAllDeployRecords = async (
 
   return { data: projects, hasNextPage, nextCursor };
 };
-
 
 const getAllComments = async (client: SuiClient, address: string) => {
   const response = await client.getDynamicFields({

@@ -1,7 +1,13 @@
 // pages/index.tsx
 "use client";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import Comment from "@/components/comment";
 import { useProject } from "@/components/providers/ProjectContext";
 import ProjectImage from "@/components/project_card/components/ProjectImage";
@@ -24,6 +30,9 @@ import { ParsedUrlQuery } from "querystring";
 import Head from "next/head";
 import { ProjectSkeleton } from "../Skeleton";
 import useSWR from "swr";
+import SocialIcons from "@/components/SocialIcons";
+import { ProjectRecord } from "@/type";
+import { EditProjectModal } from "@/components/EditProjectModal";
 
 interface ProjectPageParams extends ParsedUrlQuery {
   projectId: string;
@@ -39,7 +48,7 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
   const currentAccount = useCurrentAccount();
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const client = useSuiClient();
-
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const { data, error: swrError } = useSWR(
@@ -47,12 +56,35 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
     ([id, client]) => getProjectRecord(id, client)
   );
 
+  const handleEditSubmit = useCallback(
+    async (editedProject: Partial<ProjectRecord>) => {
+      // Implement the logic to update the project
+      // This might involve calling an API or updating the state
+      console.log("Edited project:", editedProject);
+      // You might want to update the selectedProject state here
+      // setSelectedProject(prevProject => ({ ...prevProject, ...editedProject }));
+      toast({
+        title: "Success",
+        description: "Project updated successfully",
+      });
+    },
+    [toast]
+  );
+
+  const handleBurnProject = useCallback(() => {
+    // Implement the logic to burn the project
+    // This might involve calling an API or updating the state
+    console.log("Project burned");
+    toast({
+      title: "Success",
+      description: "Project burned successfully",
+    });
+  }, [toast]);
+
   useEffect(() => {
     if (selectedProject) {
-      // 如果已经有 selectedProject，直接设置加载完成
       setIsLoading(false);
     } else if (data) {
-      // 如果 SWR 获取到了数据，更新 selectedProject
       setSelectedProject(data);
       setIsLoading(false);
     } else if (swrError) {
@@ -205,13 +237,23 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
       toast,
     ]
   );
-
   const isStartMint = useMemo(() => {
     if (!selectedProject) return false;
     return (
       selectedProject.start_time_ms > Date.now() ||
       selectedProject.end_time_ms < Date.now()
     );
+  }, [selectedProject]);
+
+  const socialLinks = useMemo(() => {
+    if (!selectedProject) return {};
+    return {
+      twitter: selectedProject.x,
+      telegram: selectedProject.telegram,
+      discord: selectedProject.discord,
+      website: selectedProject.website,
+      github: selectedProject.github,
+    };
   }, [selectedProject]);
 
   if (isLoading) {
@@ -240,12 +282,16 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
             </CardHeader>
             <CardContent>{selectedProject.description}</CardContent>
           </Card>
+
           <div className="md:w-96">
             <MintCard
+              onSubmitEdit={() => setIsEditModalOpen(true)}
+              isCreator={selectedProject.creator == currentAccount?.address}
               {...selectedProject}
               onSubmitMint={handleMintSubmit}
               isStartMint={isStartMint}
             />
+            <SocialIcons socialLinks={socialLinks} />
           </div>
         </div>
 
@@ -260,6 +306,13 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
           ))}
           <NewComment onSubmit={handleNewCommentSubmit} />
         </div>
+        <EditProjectModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSubmit={handleEditSubmit}
+          onBurn={handleBurnProject}
+          project={selectedProject}
+        />
       </div>
     </>
   );

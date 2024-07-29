@@ -20,12 +20,16 @@ import { useToast } from "../ui/use-toast";
 
 interface ProjectCardProps extends ProjectRecord {
   onSubmitMint: (value: number) => void;
-  isStartMint: boolean; 
+  onSubmitEdit: () => void;
+  isStartMint: boolean;
+  isCreator: boolean;
 }
 
 const MintCard: React.FC<ProjectCardProps> = ({
   onSubmitMint,
+  onSubmitEdit,
   isStartMint,
+  isCreator = false,
   remain,
   total_supply,
   amount_per_sui,
@@ -36,7 +40,7 @@ const MintCard: React.FC<ProjectCardProps> = ({
   max_value_sui,
 }) => {
   const [inputValue, setInputValue] = useState<number>(1);
-  const {toast} = useToast();
+  const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(Number(e.target.value));
@@ -53,6 +57,10 @@ const MintCard: React.FC<ProjectCardProps> = ({
       onSubmitMint(inputValue);
     }
   };
+
+  const handleEdit = () => { 
+    onSubmitEdit();
+  }
 
   return (
     <Card className={`max-w-sm bg-secondary rounded-2xl`}>
@@ -108,9 +116,26 @@ const MintCard: React.FC<ProjectCardProps> = ({
                   Receive: {inputValue && inputValue * amount_per_sui} {name}
                 </p>
               </div>
-              <Button type="submit" onClick={handleMint} disabled={isStartMint}>
-                Mint
-              </Button>
+              <div className="flex items-center justify-between gap-5">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  onClick={handleMint}
+                  disabled={isStartMint}
+                >
+                  Mint
+                </Button>
+                {isCreator && (
+                  <Button
+                    className="w-full"
+                    variant={"destructive"}
+                    type="submit"
+                    onClick={handleEdit}
+                  >
+                    Edit
+                  </Button>
+                )}
+              </div>
             </div>
           </CardFooter>
         </div>
