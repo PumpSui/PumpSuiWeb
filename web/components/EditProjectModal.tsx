@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ProjectRecord } from "@/type";
+import ConfirmDialog from "./ConfirmDialog";
 
 interface EditProjectModalProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
     onClose();
   };
 
-  const handleBurn = () => {
+  const handleBurn = async () => {
     onBurn();
     onClose();
   };
@@ -142,9 +143,14 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
         </div>
         <DialogFooter>
           <div className="flex justify-between w-full">
-            <Button type="submit" variant={"destructive"} onClick={handleBurn}>
-              Burn
-            </Button>
+            <ConfirmDialog
+              triggerText={"Burn"}
+              title={"Burn Project"}
+              description={
+                "Are you sure you want to destroy this item? This action cannot be undone."
+              }
+              onConfirm={handleBurn}
+            />
             <Button type="submit" onClick={handleSubmit}>
               Save changes
             </Button>

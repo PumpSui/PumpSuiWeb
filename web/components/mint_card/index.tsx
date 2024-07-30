@@ -136,6 +136,14 @@ const MintCard: React.FC<ProjectCardProps> = ({
                   </Button>
                 )}
               </div>
+              <Button
+                type="submit"
+                className="w-full"
+                onClick={handleMint}
+                disabled={isStartMint}
+              >
+                Claim
+              </Button>
             </div>
           </CardFooter>
         </div>

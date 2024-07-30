@@ -138,6 +138,8 @@ export interface CommentProps {
 export interface IformatedDeployParams {
   name: string;
   totalDeposit: bigint;
+  category: string;
+  threshold_ratio: number;
   ratioToBuilders: number;
   minValue: bigint;
   maxValue: bigint;

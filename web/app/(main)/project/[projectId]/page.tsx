@@ -24,9 +24,10 @@ import useSubmitComment from "@/hooks/useSubmitComment";
 import useSubmitCommentLike from "@/hooks/useSubmitCommentLike";
 import MintCard from "@/components/mint_card";
 import {
+  cancelAndBurnProject,
   do_mint,
-  edit_project,
-  getAllProjectAdminCapGraphql,
+  editProject,
+  getAllProjectAdminCap,
   getProjectRecord,
 } from "@/api/suifund";
 import { MIST_PER_SUI } from "@mysten/sui/utils";
@@ -38,7 +39,7 @@ import useSWR, { useSWRConfig } from "swr";
 import SocialIcons from "@/components/SocialIcons";
 import { EditEnum, editProjectParam, ProjectRecord } from "@/type";
 import { EditProjectModal } from "@/components/EditProjectModal";
-import { SuiGraphQLClient } from "@mysten/sui/graphql";
+import { useRouter } from "next/navigation";
 
 interface ProjectPageParams extends ParsedUrlQuery {
   projectId: string;
@@ -53,11 +54,9 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
   const { submitCommentLike } = useSubmitCommentLike(selectedProject?.id);
   const currentAccount = useCurrentAccount();
   const { mutate } = useSWRConfig();
+  const router = useRouter();
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const client = useSuiClient();
-  const graphqlClient = new SuiGraphQLClient({
-    url: "https://sui-testnet.mystenlabs.com/graphql",
-  });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);  
 
@@ -77,7 +76,7 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
 
   const { data: adminCapMap } = useSWR(
     currentAccount?.address ? [currentAccount?.address] : null,
-    ([address]) => getAllProjectAdminCapGraphql(graphqlClient, address)
+    ([address]) => getAllProjectAdminCap(client, address)
   );
 
   const handleEditSubmit = useCallback(
@@ -111,7 +110,7 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
         })
         .filter((param): param is editProjectParam => param !== null);
       
-      const txb = await edit_project(params);
+      const txb = await editProject(params);
       signAndExecuteTransaction(
         {
           transaction: txb,
@@ -141,12 +140,35 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
   const handleBurnProject = useCallback(() => {
     // Implement the logic to burn the project
     // This might involve calling an API or updating the state
-    console.log("Project burned");
+    const admincap = adminCapMap![selectedProject!.id];
+    const txb = cancelAndBurnProject(selectedProject!.id, admincap);
+    
+    signAndExecuteTransaction(
+      {
+        transaction: txb,
+      },
+      {
+        onSuccess: async () => {
+          router.push("/");
+          toast({
+            title: "Success",
+            description: "Project burned successfully",
+          });
+        },
+        onError: (error) => {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: error.message.toString(),
+          });
+        },
+      }
+    );
     toast({
       title: "Success",
       description: "Project burned successfully",
     });
-  }, [toast]);
+  }, [adminCapMap, refreshProjectData, selectedProject, signAndExecuteTransaction, toast]);
 
   useEffect(() => {
     if (data) {

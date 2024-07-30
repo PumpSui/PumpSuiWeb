@@ -36,7 +36,7 @@ const FormField: React.FC<FormFieldProps> = ({
 
   return (
     <div className={`flex items-center ${className}`}>
-      <span className="mr-2 w-1/3">{label}:</span>
+      <span className="mr-2 w-1/3 text-nowrap">{label}:</span>
       <div className="w-2/3">
         {isTextarea ? (
           <Textarea

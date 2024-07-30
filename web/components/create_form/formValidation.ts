@@ -39,6 +39,8 @@ export const formSchema = z
     discord: z.string().url().or(z.literal("")).optional(),
     website: z.string().url().or(z.literal("")).optional(),
     github: z.string().url().or(z.literal("")).optional(),
+    category: z.string().min(3).max(50),
+    threshold_ratio: z.number().min(0).max(100).default(0),
   })
   .superRefine((data, ctx) => {
     if (data.maxValue !== BigInt(0) && data.maxValue <= data.minValue) {
@@ -57,6 +59,8 @@ export const formatedDeployParams = (
 ): IformatedDeployParams => {
   return {
     name: values.name,
+    category:values.category,
+    threshold_ratio:values.threshold_ratio,
     description: values.description,
     projectDuration: daysToTimestamp(values.projectDuration),
     ratioToBuilders: values.ratioToBuilders,

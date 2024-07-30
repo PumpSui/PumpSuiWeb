@@ -11,14 +11,8 @@ const Page = () => {
             <h1 className="text-4xl text-white">Create a New Project</h1>
           </div>
         </div>
-        <div className="flex justify-center gap-x-10 p-4">
-          <Card className="p-4 min-w-96 shadow-md">
-            <CardHeader>
-              <CardTitle className="text-2xl">Explanation</CardTitle>
-            </CardHeader>
-            <CardContent></CardContent>
-          </Card>
-          <Card className="p-4 shadow-md w-[450px]">
+        <div className="flex justify-center w-full p-5">
+          <Card className="p-4 shadow-md max-w-lg w-full">
             <CardHeader>
               <CardTitle className="text-2xl">Create a New Project</CardTitle>
             </CardHeader>

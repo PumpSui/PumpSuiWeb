@@ -83,6 +83,12 @@ const ProjectForm: React.FC = () => {
           valueAsNumber
         />
         <FormField
+          name="threshold_ratio"
+          label="Threshold Ratio"
+          placeholder=""
+          valueAsNumber
+        />
+        <FormField
           name="ratioToBuilders"
           label="Ratio(%)"
           placeholder="TDL * Ratio = CrowdFund for Builders"
