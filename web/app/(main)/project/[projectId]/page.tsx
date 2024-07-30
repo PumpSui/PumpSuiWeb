@@ -58,7 +58,7 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const client = useSuiClient();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);  
+  const [isLoading, setIsLoading] = useState(true);
 
   const { data, error: swrError } = useSWR(
     [params.projectId, client],
@@ -109,7 +109,7 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
           return null;
         })
         .filter((param): param is editProjectParam => param !== null);
-      
+
       const txb = await editProject(params);
       signAndExecuteTransaction(
         {
@@ -134,7 +134,13 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
         }
       );
     },
-    [adminCapMap, refreshProjectData, selectedProject, signAndExecuteTransaction, toast]
+    [
+      adminCapMap,
+      refreshProjectData,
+      selectedProject,
+      signAndExecuteTransaction,
+      toast,
+    ]
   );
 
   const handleBurnProject = useCallback(() => {
@@ -142,7 +148,7 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
     // This might involve calling an API or updating the state
     const admincap = adminCapMap![selectedProject!.id];
     const txb = cancelAndBurnProject(selectedProject!.id, admincap);
-    
+
     signAndExecuteTransaction(
       {
         transaction: txb,
@@ -168,7 +174,7 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
       title: "Success",
       description: "Project burned successfully",
     });
-  }, [adminCapMap, refreshProjectData, selectedProject, signAndExecuteTransaction, toast]);
+  }, [adminCapMap, router, selectedProject, signAndExecuteTransaction, toast]);
 
   useEffect(() => {
     if (data) {
