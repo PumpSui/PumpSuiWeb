@@ -19,6 +19,7 @@ import {
 import { deploy } from "@/api/suifund";
 import { useRouter } from "next/navigation";
 import FormField from "./components/FormField";
+import FormSelect from "./components/FormSelect";
 
 
 const ProjectForm: React.FC = () => {
@@ -72,6 +73,13 @@ const ProjectForm: React.FC = () => {
     );
   };
 
+  const projectTypeOptions = [
+    { value: "defi", label: "DeFi" },
+    { value: "nft", label: "NFT" },
+    { value: "gaming", label: "Gaming" },
+    { value: "infrastructure", label: "Infrastructure" },
+  ];
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-md">
@@ -93,6 +101,12 @@ const ProjectForm: React.FC = () => {
           label="Ratio(%)"
           placeholder="TDL * Ratio = CrowdFund for Builders"
           valueAsNumber
+        />
+        <FormSelect
+          name="category"
+          label="Category"
+          options={projectTypeOptions}
+          placeholder="Select project Category"
         />
         <FormField
           name="minValue"

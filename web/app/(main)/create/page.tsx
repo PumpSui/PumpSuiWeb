@@ -7,8 +7,7 @@ const Page = () => {
     return (
       <div className="py-8">
         <div className="bg-gradient-to-r from-cyan-400 to-light-blue-500 h-24 flex items-center">
-          <div className="pl-5">
-            <h1 className="text-4xl text-white">Create a New Project</h1>
+          <div className="pl-5">            
           </div>
         </div>
         <div className="flex justify-center w-full p-5">
@@ -17,7 +16,7 @@ const Page = () => {
               <CardTitle className="text-2xl">Create a New Project</CardTitle>
             </CardHeader>
             <CardContent>
-              <ProjectForm/>
+              <ProjectForm />
             </CardContent>
           </Card>
         </div>
