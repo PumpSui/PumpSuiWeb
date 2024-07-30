@@ -1,4 +1,10 @@
-import { CommentType, EditEnum, IformatedDeployParams, ProjectRecord } from "@/type";
+import {
+  CommentType,
+  EditEnum,
+  editProjectParam,
+  IformatedDeployParams,
+  ProjectRecord,
+} from "@/type";
 import {
   DynamicFieldInfo,
   GetObjectParams,
@@ -9,7 +15,7 @@ import { isValidSuiObjectId, isValidSuiAddress } from "@mysten/sui/utils";
 import { Transaction } from "@mysten/sui/transactions";
 import { bcs } from "@mysten/sui/bcs";
 import { SuiGraphQLClient } from "@mysten/sui/graphql";
-import { getAllCommentsQL } from "./graphqlContext";
+import { getAdminCap, getAllCommentsQL } from "./graphqlContext";
 import { ObjectsResponseType } from "@/hooks/useGetInfiniteObject";
 
 /*    public entry fun deploy(
@@ -85,29 +91,29 @@ const get_deploy_fee = (total_deposit_sui: bigint, ratio: number): bigint => {
         image_url: vector<u8>,
         ctx: &TxContext
     )*/
-const edit_project = (
-  type: EditEnum,
-  project_record: string,
-  project_admin_cap: string,
-  content: string
-) => {
-  if (!isValidSuiObjectId(project_record)) {
-    throw new Error("Invalid project record id");
-  }
-  if (!isValidSuiObjectId(project_admin_cap)) {
-    throw new Error("Invalid project admin cap id");
-  }
+
+
+const edit_project = (params: editProjectParam[]) => {
   const tx = new Transaction();
-  tx.moveCall({
-    package: process.env.NEXT_PUBLIC_PACKAGE!,
-    module: "suifund",
-    function: type.toString(),
-    arguments: [
-      tx.object(project_record),
-      tx.object(project_admin_cap),
-      tx.pure(bcs.string().serialize(content).toBytes()),
-    ],
-  });
+  params.forEach((param) => {
+    if (!isValidSuiObjectId(param.project_record)) {
+      throw new Error("Invalid project record id");
+    }
+    if (!isValidSuiObjectId(param.project_admin_cap)) {
+      throw new Error("Invalid project admin cap id");
+    }
+    tx.moveCall({
+      package: process.env.NEXT_PUBLIC_PACKAGE!,
+      module: "suifund",
+      function: EditEnum[param.type],
+      arguments: [
+        tx.object(param.project_record),
+        tx.object(param.project_admin_cap),
+        tx.pure(bcs.string().serialize(param.content).toBytes()),
+      ],
+    });
+  });  
+  console.log(tx);
   return tx;
 };
 
@@ -459,10 +465,36 @@ const getAllComments = async (client: SuiClient, address: string) => {
   });
 };
 
-const getAllCommentsGraphQl = async (address: string) => {
-  const client = new SuiGraphQLClient({
-    url: "https://sui-testnet.mystenlabs.com/graphql",
+const getAllProjectAdminCapGraphql = async (
+  client: SuiGraphQLClient<{}>,
+  address: string
+): Promise<{ [key: string]: string }> => {
+  const response = await client.query({
+    query: getAdminCap,
+    variables: {
+      address: address,
+    },
   });
+
+  const result = response.data?.address?.objects.nodes as any;
+
+  const obj: { [key: string]: string } = {};
+
+  if (result && result.length > 0) {
+    result.forEach((node: any) => {
+      obj[node.contents.json.to] = node.contents.json.id;
+    });
+  }
+
+  return obj;
+};
+
+
+
+const getAllCommentsGraphql = async (
+  client: SuiGraphQLClient<{}>,
+  address: string
+) => {
   const response = await client.query({
     query: getAllCommentsQL,
     variables: {
@@ -496,7 +528,7 @@ export {
   getAllComments,
   getProjectRecord,
   getAllDeployRecords,
-  getAllCommentsGraphQl,
+  getAllProjectAdminCapGraphql,
   deploy,
   claim,
   do_mint,
@@ -508,4 +540,5 @@ export {
   add_comment,
   like_comment,
   unlike_comment,
+  edit_project,
 };

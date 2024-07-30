@@ -23,16 +23,22 @@ import useComments from "@/hooks/useComments";
 import useSubmitComment from "@/hooks/useSubmitComment";
 import useSubmitCommentLike from "@/hooks/useSubmitCommentLike";
 import MintCard from "@/components/mint_card";
-import { do_mint, getProjectRecord } from "@/api/suifund";
+import {
+  do_mint,
+  edit_project,
+  getAllProjectAdminCapGraphql,
+  getProjectRecord,
+} from "@/api/suifund";
 import { MIST_PER_SUI } from "@mysten/sui/utils";
 import { NextPage } from "next";
 import { ParsedUrlQuery } from "querystring";
 import Head from "next/head";
 import { ProjectSkeleton } from "../Skeleton";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import SocialIcons from "@/components/SocialIcons";
-import { ProjectRecord } from "@/type";
+import { EditEnum, editProjectParam, ProjectRecord } from "@/type";
 import { EditProjectModal } from "@/components/EditProjectModal";
+import { SuiGraphQLClient } from "@mysten/sui/graphql";
 
 interface ProjectPageParams extends ParsedUrlQuery {
   projectId: string;
@@ -46,29 +52,90 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
   const { submitComment } = useSubmitComment();
   const { submitCommentLike } = useSubmitCommentLike(selectedProject?.id);
   const currentAccount = useCurrentAccount();
+  const { mutate } = useSWRConfig();
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const client = useSuiClient();
+  const graphqlClient = new SuiGraphQLClient({
+    url: "https://sui-testnet.mystenlabs.com/graphql",
+  });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);  
 
   const { data, error: swrError } = useSWR(
-    !selectedProject ? [params.projectId, client] : null,
+    [params.projectId, client],
     ([id, client]) => getProjectRecord(id, client)
+  );
+
+  const refreshProjectData = useCallback(async () => {
+    if (params.projectId) {
+      const newData = await mutate([params.projectId, client]);
+      if (newData) {
+        setSelectedProject(newData);
+      }
+    }
+  }, [mutate, params.projectId, client, setSelectedProject]);
+
+  const { data: adminCapMap } = useSWR(
+    currentAccount?.address ? [currentAccount?.address] : null,
+    ([address]) => getAllProjectAdminCapGraphql(graphqlClient, address)
   );
 
   const handleEditSubmit = useCallback(
     async (editedProject: Partial<ProjectRecord>) => {
       // Implement the logic to update the project
       // This might involve calling an API or updating the state
-      console.log("Edited project:", editedProject);
-      // You might want to update the selectedProject state here
-      // setSelectedProject(prevProject => ({ ...prevProject, ...editedProject }));
-      toast({
-        title: "Success",
-        description: "Project updated successfully",
-      });
+      const admincap = adminCapMap![editedProject.id!];
+      const editFields = {
+        image_url: EditEnum.edit_image_url,
+        x: EditEnum.edit_x_url,
+        telegram: EditEnum.edit_telegram_url,
+        discord: EditEnum.edit_discord_url,
+        website: EditEnum.edit_website_url,
+        github: EditEnum.edit_github_url,
+        description: EditEnum.edit_description,
+      };
+      const params: editProjectParam[] = Object.entries(editFields)
+        .map(([field, editEnum]) => {
+          if (
+            editedProject[field as keyof Partial<ProjectRecord>] !==
+            selectedProject?.[field as keyof ProjectRecord]
+          ) {
+            return {
+              type: editEnum,
+              project_record: selectedProject?.id!,
+              project_admin_cap: admincap,
+              content: editedProject[field as keyof ProjectRecord] as string,
+            };
+          }
+          return null;
+        })
+        .filter((param): param is editProjectParam => param !== null);
+      
+      const txb = await edit_project(params);
+      signAndExecuteTransaction(
+        {
+          transaction: txb,
+          chain: "sui::testnet",
+        },
+        {
+          onSuccess: async () => {
+            toast({
+              title: "Success",
+              description: "Project updated successfully",
+            });
+            await refreshProjectData();
+          },
+          onError: (error) => {
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: error.message.toString(),
+            });
+          },
+        }
+      );
     },
-    [toast]
+    [adminCapMap, refreshProjectData, selectedProject, signAndExecuteTransaction, toast]
   );
 
   const handleBurnProject = useCallback(() => {
@@ -82,9 +149,7 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
   }, [toast]);
 
   useEffect(() => {
-    if (selectedProject) {
-      setIsLoading(false);
-    } else if (data) {
+    if (data) {
       setSelectedProject(data);
       setIsLoading(false);
     } else if (swrError) {
@@ -94,7 +159,7 @@ const Page: NextPage<{ params: ProjectPageParams }> = ({ params }) => {
       });
       setIsLoading(false);
     }
-  }, [selectedProject, data, swrError, setSelectedProject, toast]);
+  }, [data, swrError, setSelectedProject, toast]);
 
   const handleNewCommentSubmit = useCallback(
     async (content: string) => {

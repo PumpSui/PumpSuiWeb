@@ -1,9 +1,16 @@
 import React from "react";
 import Link from "next/link";
 import { IconType } from "react-icons";
-import { SiTwitter, SiDiscord, SiTelegram, SiGithub } from "react-icons/si";
+import {
+  SiTwitter,
+  SiDiscord,
+  SiTelegram,
+  SiGithub,
+  SiEmbarcadero,
+} from "react-icons/si";
 
 interface SocialLinks {
+  website?: string;
   twitter?: string;
   discord?: string;
   telegram?: string;
@@ -16,6 +23,7 @@ interface SocialIconProps {
 }
 
 const icons: { [key in keyof SocialLinks]: IconType } = {
+  website: SiEmbarcadero,
   twitter: SiTwitter,
   discord: SiDiscord,
   telegram: SiTelegram,
@@ -28,7 +36,7 @@ const SocialIcon: React.FC<SocialIconProps> = ({ href, Icon }) => {
   }
 
   return (
-    <Link href={href} passHref>
+    <Link href={href} passHref target="_blank">
       <Icon className="hover:cursor-pointer rounded-2xl" size={30} />
     </Link>
   );

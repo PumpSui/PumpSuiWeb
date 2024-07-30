@@ -8,7 +8,12 @@ export interface Project {
   imgUrl?: string;
 }
 
-
+export interface editProjectParam {
+  type: EditEnum;
+  project_record: string;
+  project_admin_cap: string;
+  content: string;
+}
 
 
 export enum EditEnum {

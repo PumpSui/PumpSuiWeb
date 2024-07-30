@@ -1,6 +1,9 @@
-'use client';
+"use client";
 import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { getAllDeployRecords } from "@/api/suifund";
+import {
+  getAllDeployRecords,
+  getAllProjectAdminCapGraphql,
+} from "@/api/suifund";
 import ProjectCard from "@/components/project_card";
 import { ProjectRecord } from "@/type";
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
@@ -11,6 +14,8 @@ import { useProjectFilters } from "@/hooks/useProjectFilters";
 import { PaginationComponent } from "@/components/PaginationComponent";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { getAdminCap } from "@/api/suifund/graphqlContext";
+import { SuiGraphQLClient } from "@mysten/sui/graphql";
 
 const ITEMS_PER_PAGE = 8;
 

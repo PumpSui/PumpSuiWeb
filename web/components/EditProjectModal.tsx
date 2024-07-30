@@ -48,7 +48,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Edit Project</DialogTitle>
         </DialogHeader>
@@ -66,12 +66,24 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="twitter" className="text-right">
+            <label htmlFor="website" className="text-right">
+              Website
+            </label>
+            <Input
+              id="website"
+              name="website"
+              value={editedProject.website}
+              onChange={handleChange}
+              className="col-span-3"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="x" className="text-right">
               Twitter
             </label>
             <Input
-              id="twitter"
-              name="twitter"
+              id="x"
+              name="x"
               value={editedProject.x}
               onChange={handleChange}
               className="col-span-3"

@@ -31,3 +31,21 @@ export const getAllCommentsQL = graphql(`
     json
   }
 `);
+
+export const getAdminCap = graphql(`
+  query ($address: SuiAddress!) {
+    address(address: $address) {
+      objects(
+        filter: {
+          type: "0x257d035780276a41187b9bac21ca05e73a69b6c93f06e786cc18e8da78832808::suifund::ProjectAdminCap"
+        }
+      ) {
+        nodes {
+          contents {
+            json
+          }
+        }
+      }
+    }
+  }
+`);
