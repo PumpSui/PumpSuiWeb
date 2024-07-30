@@ -1,7 +1,14 @@
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import React from "react";
 import { useFormContext } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { InfoIcon } from "lucide-react";
 
 interface FormFieldProps {
   name: string;
@@ -12,6 +19,7 @@ interface FormFieldProps {
   optional?: boolean;
   valueAsNumber?: boolean;
   isTextarea?: boolean;
+  tooltip?: string;
 }
 
 const FormField: React.FC<FormFieldProps> = ({
@@ -23,6 +31,7 @@ const FormField: React.FC<FormFieldProps> = ({
   optional = false,
   valueAsNumber = false,
   isTextarea = false,
+  tooltip,
 }) => {
   const {
     register,
@@ -30,13 +39,26 @@ const FormField: React.FC<FormFieldProps> = ({
     trigger,
   } = useFormContext();
 
-  // 确保错误消息为字符串类型
   const errorMessage = errors[name]?.message;
   const errorText = typeof errorMessage === "string" ? errorMessage : undefined;
 
   return (
     <div className={`flex items-center ${className}`}>
-      <span className="mr-2 w-1/3 text-nowrap">{label}:</span>
+      <span className="mr-2 w-1/3 text-nowrap flex items-center">
+        {label}:
+        {tooltip && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <InfoIcon className="ml-1 h-4 w-4 cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </span>
       <div className="w-2/3">
         {isTextarea ? (
           <Textarea

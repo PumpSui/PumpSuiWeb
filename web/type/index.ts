@@ -71,6 +71,7 @@ export enum EditEnum {
 export interface ProjectRecord {
     object_id: string;
     id:string;
+    category: string;
     creator: string;
     name: string;
     description: string;
@@ -83,6 +84,7 @@ export interface ProjectRecord {
     cancel: boolean;
     balance: number;
     ratio: number;
+    threshold_ratio: number;
     start_time_ms: number;
     end_time_ms: number;
     total_supply: number;

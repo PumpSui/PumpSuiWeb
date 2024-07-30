@@ -68,6 +68,7 @@ const getProjectRecord = async (projectId: string, client: SuiClient) => {
     id: projectId,
     options: { showContent: true },
   });
+  
   const data = response.data?.content as any;
   const project: ProjectRecord = {
     object_id: projectId,
@@ -96,6 +97,8 @@ const getProjectRecord = async (projectId: string, client: SuiClient) => {
     participants: data.fields.participants.fields.contents.fields.id.id,
     minted_per_user: data.fields.minted_per_user.fields.id.id,
     thread: data.fields.thread.fields.contents.fields.id.id,
+    category: data.fields.category,
+    threshold_ratio: data.fields.threshold_ratio,
   };
   return project;
 };

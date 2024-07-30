@@ -61,14 +61,12 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
                 <p>{getRealDate(project.end_time_ms)}</p>
               </div>
             </div>
-            <div className="mt-4">
-              <p className="font-semibold">Description:</p>
-              <p className="text-cyan-400">{project.description}</p>
+            <div className="mt-5 flex justify-center">
+              <p className="text-white text-2xl">{project.category.toLocaleUpperCase()}</p>
             </div>
           </CardContent>
         </div>
-        {project.start_time_ms < currentTime &&
-          project.end_time_ms > currentTime && (
+        {project.start_time_ms < currentTime && (
             <div className="absolute top-0 right-0 m-auto">
               <Image
                 src="/images/Pump.png"

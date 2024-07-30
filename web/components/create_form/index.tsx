@@ -94,6 +94,7 @@ const ProjectForm: React.FC = () => {
           name="threshold_ratio"
           label="Threshold Ratio"
           placeholder=""
+          tooltip="The ratio of the total deposit that must be reached before the project can be funded."
           valueAsNumber
         />
         <FormField
