@@ -18,9 +18,10 @@ import { getRealDate } from "@/lib/utils";
 import { MIST_PER_SUI } from "@mysten/sui/utils";
 import { useToast } from "../ui/use-toast";
 
-interface ProjectCardProps extends ProjectRecord {
+interface ProjectCardProps {
   onSubmitMint: (value: number) => void;
   onSubmitEdit: () => void;
+  project:ProjectRecord,
   isStartMint: boolean;
   isCreator: boolean;
 }
@@ -30,14 +31,7 @@ const MintCard: React.FC<ProjectCardProps> = ({
   onSubmitEdit,
   isStartMint,
   isCreator = false,
-  remain,
-  total_supply,
-  amount_per_sui,
-  name,
-  start_time_ms,
-  end_time_ms,
-  min_value_sui,
-  max_value_sui,
+  project
 }) => {
   const [inputValue, setInputValue] = useState<number>(1);
   const { toast } = useToast();
@@ -58,9 +52,9 @@ const MintCard: React.FC<ProjectCardProps> = ({
     }
   };
 
-  const handleEdit = () => { 
+  const handleEdit = () => {
     onSubmitEdit();
-  }
+  };
 
   return (
     <Card className={`max-w-sm bg-secondary rounded-2xl`}>
@@ -71,7 +65,7 @@ const MintCard: React.FC<ProjectCardProps> = ({
               <div className="">
                 Mint Progress
                 <Progress
-                  value={(1 - remain / total_supply) * 100}
+                  value={(1 - project.remain / project.total_supply) * 100}
                   className="w-full mt-2 self-center min-h-8 bg-primary-foreground rounded-lg"
                 />
               </div>
@@ -80,26 +74,33 @@ const MintCard: React.FC<ProjectCardProps> = ({
           <CardContent className="divide-y divide-white">
             <div className="flex justify-center max-h-min p-2">
               <h1 className="font-extrabold text-2xl max-w-xs overflow-hidden text-ellipsis whitespace-nowrap text-center">
-                1 SUI = {amount_per_sui} {name}
+                1 SUI = {project.amount_per_sui} {project.name}
               </h1>
             </div>
             <div className="text-sm p-2">
               <ProjectDetailItem
                 label="START"
-                value={getRealDate(start_time_ms)}
+                value={getRealDate(project.start_time_ms)}
               />
-              <ProjectDetailItem label="END" value={getRealDate(end_time_ms)} />
+              <ProjectDetailItem
+                label="END"
+                value={getRealDate(project.end_time_ms)}
+              />
               <ProjectDetailItem
                 label="TOTAL SUPPLY"
-                value={total_supply.toString()}
+                value={project.total_supply.toString()}
               />
               <ProjectDetailItem
                 label="Min"
-                value={(BigInt(min_value_sui) / MIST_PER_SUI).toString()}
+                value={(
+                  BigInt(project.min_value_sui) / MIST_PER_SUI
+                ).toString()}
               />
               <ProjectDetailItem
                 label="Max"
-                value={(BigInt(max_value_sui) / MIST_PER_SUI).toString()}
+                value={(
+                  BigInt(project.max_value_sui) / MIST_PER_SUI
+                ).toString()}
               />
             </div>
           </CardContent>
@@ -113,7 +114,8 @@ const MintCard: React.FC<ProjectCardProps> = ({
                   onChange={handleInputChange}
                 />
                 <p className="text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                  Receive: {inputValue && inputValue * amount_per_sui} {name}
+                  Receive: {inputValue && inputValue * project.amount_per_sui}{" "}
+                  {project.name}
                 </p>
               </div>
               <div className="flex items-center justify-between gap-5">
@@ -136,14 +138,16 @@ const MintCard: React.FC<ProjectCardProps> = ({
                   </Button>
                 )}
               </div>
-              <Button
-                type="submit"
-                className="w-full"
-                onClick={handleMint}
-                disabled={isStartMint}
-              >
-                Claim
-              </Button>
+              {isCreator && (
+                <Button
+                  type="submit"
+                  className="w-full"
+                  onClick={handleMint}
+                  disabled={isStartMint}
+                >
+                  Claim
+                </Button>
+              )}
             </div>
           </CardFooter>
         </div>

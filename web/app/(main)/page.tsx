@@ -1,8 +1,6 @@
 "use client";
 import React, { useState, useCallback, useEffect, useMemo } from "react";
-import {
-  getAllDeployRecords
-} from "@/api/suifund";
+import { getAllDeployRecords, getSupportedProjects } from "@/api/suifund";
 import ProjectCard from "@/components/project_card";
 import { ProjectRecord } from "@/type";
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
@@ -24,14 +22,37 @@ const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const fetchRecords = useCallback(
-    async ([client, cursor]: [SuiClient, string | null]) => {
-      return await getAllDeployRecords(client, cursor);
-    },
+    async ([client, cursor]: [SuiClient, string | null]) =>
+      getAllDeployRecords(client, cursor),
     []
   );
 
+  const fetchSupported = useCallback(
+    async ([client, cursor]: [SuiClient, string | null]) =>
+      currentAccount?.address
+        ? getSupportedProjects(client, currentAccount.address, cursor)
+        : { data: [], hasNextPage: false, nextCursor: null },
+    [currentAccount?.address]
+  );
+
   const { objects, isAllLoaded, hasNextPage, error, isLoading, loadMore } =
-    useGetInfiniteObject<ProjectRecord>(client, fetchRecords, ITEMS_PER_PAGE);
+    useGetInfiniteObject<ProjectRecord>(
+      client,
+      fetchRecords,
+      ITEMS_PER_PAGE,
+      true,
+      "deployRecords"
+    );
+
+  const { objects: supportedProjects, fetchData: fetchSupportedData } =
+    useGetInfiniteObject<string>(
+      client,
+      fetchSupported,
+      ITEMS_PER_PAGE,
+      false,
+      "supportedProjects",
+      false
+    );
 
   const {
     filteredAndSortedObjects,
@@ -41,11 +62,12 @@ const Page: React.FC = () => {
     handleTabChange,
     handleSearch,
     handleSort,
-  } = useProjectFilters(objects, currentAccount?.address);
+  } = useProjectFilters(objects, currentAccount?.address, supportedProjects);
 
-  const totalPages = useMemo(() => {
-    return Math.ceil(filteredAndSortedObjects.length / ITEMS_PER_PAGE);
-  }, [filteredAndSortedObjects]);
+  const totalPages = useMemo(
+    () => Math.ceil(filteredAndSortedObjects.length / ITEMS_PER_PAGE),
+    [filteredAndSortedObjects]
+  );
 
   const pageDisplayedObjects = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -75,6 +97,14 @@ const Page: React.FC = () => {
     loadMore,
   ]);
 
+  const handleTabChangeWithFetch = useCallback(
+    (value: string) => {
+      handleTabChange(value);
+      fetchSupportedData();
+    },
+    [handleTabChange, fetchSupportedData]
+  );
+
   if (error) return <div>Failed to load</div>;
   if (isLoading && objects.length === 0) return <LoadingIndicator />;
 
@@ -83,16 +113,12 @@ const Page: React.FC = () => {
       <main>
         <div className="py-8">
           <ProjectNavbar
-            onTabChange={handleTabChange}
+            onTabChange={handleTabChangeWithFetch}
             onSearch={handleSearch}
             onSort={handleSort}
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
-            {pageDisplayedObjects.map((project, index) => (
-              <ProjectCardMemo key={project.id} {...project} />
-            ))}
-          </div>
-          {pageDisplayedObjects.length === 0 && <div>No projects found</div>}
+          <ProjectGrid projects={pageDisplayedObjects} />
+          {pageDisplayedObjects.length === 0 && <NoProjectsFound />}
           {isLoading && <LoadingIndicator />}
           <PaginationComponent
             currentPage={currentPage}
@@ -104,5 +130,15 @@ const Page: React.FC = () => {
     </ErrorBoundary>
   );
 };
+
+const ProjectGrid: React.FC<{ projects: ProjectRecord[] }> = ({ projects }) => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+    {projects.map((project) => (
+      <ProjectCardMemo key={project.id} {...project} />
+    ))}
+  </div>
+);
+
+const NoProjectsFound: React.FC = () => <div>No projects found</div>;
 
 export default Page;

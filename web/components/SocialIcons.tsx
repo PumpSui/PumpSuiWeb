@@ -48,7 +48,7 @@ interface SocialIconsProps {
 
 const SocialIcons: React.FC<SocialIconsProps> = ({ socialLinks }) => {
   return (
-    <div className="flex flex-row mt-3 gap-3 justify-end">
+    <div className="flex flex-row max-w-sm w-full mb-3 gap-3 justify-evenly">
       {Object.keys(socialLinks).map((key) => {
         const IconComponent = icons[key as keyof SocialLinks];
         const href = socialLinks[key as keyof SocialLinks];

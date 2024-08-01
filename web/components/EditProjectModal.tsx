@@ -143,7 +143,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
         </div>
         <DialogFooter>
           <div className="flex justify-between w-full">
-            <ConfirmDialog
+            <ConfirmDialog              
               triggerText={"Burn"}
               title={"Burn Project"}
               description={

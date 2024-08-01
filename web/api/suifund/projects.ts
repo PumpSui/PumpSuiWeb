@@ -121,7 +121,6 @@ const getAllDeployRecords = async (
 
   const { data, hasNextPage, nextCursor } = await client.getDynamicFields({
     parentId: record_id,
-    limit: 32,
     cursor,
   });
 
@@ -272,6 +271,30 @@ const cancelAndBurnProject = (project_record: string, project_admin_cap: string)
     return tx;
 };
 
+const getSupportedProjects = async (
+  client: SuiClient,
+  address: string,
+  cursor: string | null
+): Promise<ObjectsResponseType<string>> => {
+  if (!isValidSuiAddress(address)) {
+    throw new Error("Invalid address");
+  }
+  const { hasNextPage, data, nextCursor } = await client.getOwnedObjects({
+    owner: address,
+    cursor,
+    filter: {
+      StructType: `${process.env
+        .NEXT_PUBLIC_PACKAGE!}::suifund::SupporterReward`,
+    },
+    options: { showContent: true },
+  });
+  const projects: string[] = data.map((node) => {
+    const data = node.data as any;
+    return data.content.fields.project_id;
+  });
+  return { hasNextPage, data: projects, nextCursor };
+};
+
 export {
   claim,
   editProject,
@@ -280,4 +303,5 @@ export {
   getProjectRecord,
   getAllProjectAdminCap,
   cancelAndBurnProject,
+  getSupportedProjects,
 };

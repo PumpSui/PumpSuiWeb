@@ -6,31 +6,39 @@ import { BareFetcher } from "swr";
 
 export type ObjectsResponseType<T> = {
   hasNextPage: boolean;
-  nextCursor: string | null;
+  nextCursor: string | null | undefined;
   data: T[];
 };
 
 export function useGetInfiniteObject<T>(
   client: SuiClient,
   fetchFunction: Function,
-  itemsPerPage: number = 8,
-  autoLoad: boolean = true
+  itemsPerPage: number = 50,
+  autoLoad: boolean = true,
+  cacheKey?: string,
+  initialFetch: boolean = true
 ) {
   const [objects, setObjects] = useState<T[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [isAllLoaded, setIsAllLoaded] = useState(false);
+  const [shouldFetch, setShouldFetch] = useState(initialFetch);
   const loadingRef = useRef(false);
 
   const getKey = (
     pageIndex: number,
     previousPageData: ObjectsResponseType<T>
   ) => {
+    if (!shouldFetch) return null; // 如果 shouldFetch 为 false，则不加载数据
     if (previousPageData && !previousPageData.hasNextPage) return null;
-    return [client, pageIndex === 0 ? null : previousPageData.nextCursor];
+    return [
+      client,
+      pageIndex === 0 ? null : previousPageData?.nextCursor,
+      cacheKey,
+    ];
   };
 
-  const { data, error, size, setSize, isValidating } = useSWRInfinite<
+  const { data, error, size, setSize, isValidating, mutate } = useSWRInfinite<
     ObjectsResponseType<T>,
     any
   >(
@@ -74,11 +82,11 @@ export function useGetInfiniteObject<T>(
     return () => clearInterval(intervalId);
   }, [loadMoreIfNeeded, hasNextPage, autoLoad]);
 
-    useEffect(() => {
-      if (!hasNextPage && data) {
-        setIsAllLoaded(true);
-      }
-    }, [hasNextPage, data]);
+  useEffect(() => {
+    if (!hasNextPage && data) {
+      setIsAllLoaded(true);
+    }
+  }, [hasNextPage, data]);
 
   const displayedObjects = useMemo(() => {
     return objects.slice(
@@ -102,6 +110,22 @@ export function useGetInfiniteObject<T>(
     }
   }, [hasNextPage, isValidating, loadMoreIfNeeded]);
 
+  // 新增：手动触发数据加载的函数
+  const fetchData = useCallback(() => {
+    setShouldFetch(true);
+    mutate();
+  }, [mutate]);
+
+  // 新增：重置数据的函数
+  const resetData = useCallback(() => {
+    setObjects([]);
+    setHasNextPage(true);
+    setIsAllLoaded(false);
+    setCurrentPage(1);
+    setSize(1);
+    setShouldFetch(false);
+  }, [setSize]);
+
   return {
     objects,
     displayedObjects,
@@ -114,5 +138,7 @@ export function useGetInfiniteObject<T>(
     isAllLoaded,
     handlePageChange,
     loadMore,
+    fetchData, // 新增
+    resetData, // 新增
   };
 }

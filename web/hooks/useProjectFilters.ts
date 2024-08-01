@@ -4,7 +4,8 @@ import { ProjectRecord } from "@/type";
 
 export const useProjectFilters = (
   objects: ProjectRecord[],
-  currentUserAddress?: string
+  currentUserAddress?: string,
+  supported?: string[]
 ) => {
   const [tab, setTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,10 +14,9 @@ export const useProjectFilters = (
   const filteredAndSortedObjects = useMemo(() => {
     let result = [...objects];
 
-    // Apply filtering
-    if (tab === "supported") {
+    if (tab === "supported" && supported && supported?.length > 0) {
       // Filter for supported projects
-      // result = result.filter(project => project.isSupported);
+      result = result.filter((project) => supported.includes(project.id));
     } else if (tab === "created") {
       result = result.filter(
         (project) => project.creator === currentUserAddress
@@ -37,7 +37,7 @@ export const useProjectFilters = (
     }
 
     return result;
-  }, [objects, tab, searchQuery, sortBy, currentUserAddress]);
+  }, [objects, supported, tab, searchQuery, sortBy, currentUserAddress]);
 
   const handleTabChange = (value: string) => {
     setTab(value);
