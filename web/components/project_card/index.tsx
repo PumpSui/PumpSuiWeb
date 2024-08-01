@@ -1,11 +1,10 @@
 import { Progress } from "../ui/progress";
 import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { ProjectRecord } from "@/type";
 import { useRouter } from "next/navigation";
 import { getRealDate } from "@/lib/utils";
 import { useProject } from "../providers/ProjectContext";
-import ProjectImage from "./components/ProjectImage";
+import styles from "./ProjectCard.module.css";
 
 interface ProjectCardProps extends ProjectRecord {
   isDetail?: boolean;
@@ -22,62 +21,67 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
   };
 
   return (
-    <Card
-      onClick={handleCardOnClick}
-      className={`${
-        !project.isDetail
-          ? "hover:outline hover:outline-2 hover:rounded-2xl hover:cursor-pointer active:bg-primary-foreground"
-          : ""
-      } p-4 max-w-sm bg-secondary rounded-2xl relative`} // 添加 relative 类
-    >
-      <div className="flex flex-col h-full">
-        {!project.isDetail && (
-          <div className="">
-            <ProjectImage imageUrl={project.image_url} />
-          </div>
-        )}
-        <div className="flex-grow">
-          <CardHeader>
-            <CardTitle className="truncate text-lg font-semibold">
-              Created by @{project.creator}
-            </CardTitle>
-            <CardTitle className="text-xl">Name: {project.name}</CardTitle>
-          </CardHeader>
-          <CardContent className="mt-2">
-            <div className="flex justify-center gap-5 mb-4">
-              <p className="font-semibold">Progress:</p>
-              <Progress
-                value={(1 - project.remain / project.total_supply) * 100}
-                className="w-full self-center min-h-4 bg-primary-foreground rounded-lg"
-              />
-            </div>
-            <div className="text-sm text-cyan-400">
-              <div className="flex justify-between">
-                <p>START:</p>
-                <p>{getRealDate(project.start_time_ms)}</p>
-              </div>
-              <div className="flex justify-between">
-                <p>END:</p>
-                <p>{getRealDate(project.end_time_ms)}</p>
-              </div>
-            </div>
-            <div className="mt-5 flex justify-center">
-              <p className="text-white text-2xl">{project.category.toLocaleUpperCase()}</p>
-            </div>
-          </CardContent>
-        </div>
-        {project.start_time_ms < currentTime && (
-            <div className="absolute top-0 right-0 m-auto">
-              <Image
-                src="/images/Pump.png"
-                alt="Indicator"
-                width={300}
-                height={24}
-              />
-            </div>
-          )}
+    <div onClick={handleCardOnClick} className={`group ${styles.card}`}>
+      <div
+        className={`${styles.background} group-hover:brightness-200 group-hover:contrast-125 group-hover:saturate-200`}
+      >
+        <Image
+          src="/images/card.svg"
+          alt="Background"
+          fill
+          className="object-cover"
+          quality={75}
+        />
       </div>
-    </Card>
+
+      <div className={styles.projectImage}>
+        <Image
+          src={project.image_url || "/images/DemoProject.png"}
+          alt="Project"
+          fill
+          className="object-cover"
+          quality={75}
+        />
+      </div>
+
+      <div className={styles.rocket}>
+        <Image
+          src="/images/rocket.svg"
+          alt="Rocket"
+          fill
+          className={`object-fill ${
+            project.start_time_ms < currentTime ? styles.activeRocket : ""
+          }`}
+          quality={75}
+        />
+      </div>
+
+      <div className="absolute inset-0 flex flex-col">
+        <div className={styles.createdBy}>
+          <p className="truncate text-yellow-400 text-sm font-bold">
+            Created by @{project.creator}
+          </p>
+        </div>
+
+        <div className={styles.name}>
+          <p className="text-gray-800 text-2xl font-bold truncate">
+            {project.name}
+          </p>
+        </div>
+
+        <div className={styles.progress}>
+          <div className={styles.progressBar}>
+            <p className="mb-1">Progress:</p>
+            <Progress
+              value={(1 - project.remain / project.total_supply) * 100}
+              className="w-full self-center min-h-4 bg-primary-foreground rounded-lg"
+            />
+          </div>
+          <p>START: {getRealDate(project.start_time_ms)}</p>
+          <p>END: {getRealDate(project.end_time_ms)}</p>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,0 +1,40 @@
+/* ProjectCard.module.css */
+.card {
+  @apply relative w-full max-w-sm aspect-[3/4] rounded-lg transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer;
+}
+
+.background {
+  @apply absolute inset-0;
+}
+
+.backgroundHover {
+  @apply brightness-200 contrast-125 saturate-200;
+}
+
+.projectImage {
+  @apply absolute inset-1 top-[20%] left-[20%] max-w-[65%] max-h-[36%] -z-10;
+}
+
+.rocket {
+  @apply absolute -top-3 -left-7 w-full h-full;
+}
+
+.createdBy {
+  @apply absolute top-[17%] right-[20%] max-w-[50%];
+}
+
+.name {
+  @apply absolute top-[57.5%] self-center;
+}
+
+.progress {
+  @apply absolute bottom-[14%] left-[20%] right-[5%] text-blue-300 text-sm gap-2 flex flex-col;
+}
+
+.progressBar {
+  @apply flex max-w-[80%] gap-2 items-center;
+}
+
+.activeRocket {
+  @apply brightness-200 contrast-125 saturate-200;
+}

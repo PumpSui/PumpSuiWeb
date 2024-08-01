@@ -11,6 +11,7 @@ interface ProjectListViewProps {
   currentPage: number;
   itemsPerPage: number;
   isLoading: boolean;
+  isAutoLoad?: boolean;
   onTabChange: (value: string) => void;
   onSearch: (query: string) => void;
   onSort: (sortBy: string) => void;
@@ -23,6 +24,7 @@ export const ProjectListView: React.FC<ProjectListViewProps> = ({
   currentPage,
   itemsPerPage,
   isLoading,
+  isAutoLoad = true,
   onTabChange,
   onSearch,
   onSort,
@@ -55,7 +57,7 @@ export const ProjectListView: React.FC<ProjectListViewProps> = ({
         totalPages={totalPages}
         onPageChange={onPageChange}
       />
-      {projects.length >= currentPage * itemsPerPage && (
+      {!isAutoLoad&&projects.length >= currentPage * itemsPerPage && (
         <button onClick={onLoadMore}>Load More</button>
       )}
     </>
