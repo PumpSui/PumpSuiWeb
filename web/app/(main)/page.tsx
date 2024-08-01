@@ -1,144 +1,84 @@
 "use client";
-import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { getAllDeployRecords, getSupportedProjects } from "@/api/suifund";
-import ProjectCard from "@/components/project_card";
-import { ProjectRecord } from "@/type";
+import React, { useState, useCallback, useEffect } from "react";
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
-import { SuiClient } from "@mysten/sui/client";
-import ProjectNavbar from "@/components/project_nav";
-import { useGetInfiniteObject } from "@/hooks/useGetInfiniteObject";
-import { useProjectFilters } from "@/hooks/useProjectFilters";
-import { PaginationComponent } from "@/components/PaginationComponent";
-import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ProjectListView } from "@/components/ProjectListView";
+import { useProjectsData } from "@/hooks/useProjectsData";
+import { useProjectFilters } from "@/hooks/useProjectFilters";
 
 const ITEMS_PER_PAGE = 8;
-
-const ProjectCardMemo = React.memo(ProjectCard);
 
 const Page: React.FC = () => {
   const client = useSuiClient();
   const currentAccount = useCurrentAccount();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const fetchRecords = useCallback(
-    async ([client, cursor]: [SuiClient, string | null]) =>
-      getAllDeployRecords(client, cursor),
-    []
-  );
-
-  const fetchSupported = useCallback(
-    async ([client, cursor]: [SuiClient, string | null]) =>
-      currentAccount?.address
-        ? getSupportedProjects(client, currentAccount.address, cursor)
-        : { data: [], hasNextPage: false, nextCursor: null },
-    [currentAccount?.address]
-  );
-
-  const { objects, isAllLoaded, hasNextPage, error, isLoading, loadMore } =
-    useGetInfiniteObject<ProjectRecord>(
-      client,
-      fetchRecords,
-      ITEMS_PER_PAGE,
-      true,
-      "deployRecords"
-    );
-
-  const { objects: supportedProjects, fetchData: fetchSupportedData } =
-    useGetInfiniteObject<string>(
-      client,
-      fetchSupported,
-      ITEMS_PER_PAGE,
-      false,
-      "supportedProjects",
-      false
-    );
+  const {
+    projects,
+    supportedProjects,
+    isLoading,
+    error,
+    loadMore,
+    fetchSupportedData,
+  } = useProjectsData(client, currentAccount?.address);
 
   const {
-    filteredAndSortedObjects,
-    tab,
-    searchQuery,
-    sortBy,
-    handleTabChange,
-    handleSearch,
-    handleSort,
-  } = useProjectFilters(objects, currentAccount?.address, supportedProjects);
-
-  const totalPages = useMemo(
-    () => Math.ceil(filteredAndSortedObjects.length / ITEMS_PER_PAGE),
-    [filteredAndSortedObjects]
-  );
-
-  const pageDisplayedObjects = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredAndSortedObjects.slice(
-      startIndex,
-      startIndex + ITEMS_PER_PAGE
-    );
-  }, [filteredAndSortedObjects, currentPage]);
+    filteredAndSortedProjects,
+    filterState,
+    setTab,
+    setSearchQuery,
+    setSortBy,
+  } = useProjectFilters(projects, supportedProjects,currentAccount?.address);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [tab, searchQuery, sortBy]);
+  }, [filterState]);
 
-  useEffect(() => {
-    if (
-      !isAllLoaded &&
-      hasNextPage &&
-      filteredAndSortedObjects.length < currentPage * ITEMS_PER_PAGE
-    ) {
-      loadMore();
-    }
-  }, [
-    isAllLoaded,
-    hasNextPage,
-    filteredAndSortedObjects.length,
-    currentPage,
-    loadMore,
-  ]);
-
-  const handleTabChangeWithFetch = useCallback(
+  const handleTabChange = useCallback(
     (value: string) => {
-      handleTabChange(value);
-      fetchSupportedData();
+      setTab(value);
+      if (value === "supported") {
+        fetchSupportedData();
+      }
     },
-    [handleTabChange, fetchSupportedData]
+    [setTab, fetchSupportedData]
+  );
+
+  const handleSearch = useCallback(
+    (query: string) => {
+      setSearchQuery(query);
+    },
+    [setSearchQuery]
+  );
+
+  const handleSort = useCallback(
+    (sortBy: string) => {
+      setSortBy(sortBy);
+    },
+    [setSortBy]
   );
 
   if (error) return <div>Failed to load</div>;
-  if (isLoading && objects.length === 0) return <LoadingIndicator />;
 
   return (
     <ErrorBoundary>
       <main>
         <div className="py-8">
-          <ProjectNavbar
-            onTabChange={handleTabChangeWithFetch}
+          <ProjectListView
+            projects={filteredAndSortedProjects}
+            currentPage={currentPage}
+            itemsPerPage={ITEMS_PER_PAGE}
+            isLoading={isLoading}
+            onTabChange={handleTabChange}
             onSearch={handleSearch}
             onSort={handleSort}
-          />
-          <ProjectGrid projects={pageDisplayedObjects} />
-          {pageDisplayedObjects.length === 0 && <NoProjectsFound />}
-          {isLoading && <LoadingIndicator />}
-          <PaginationComponent
-            currentPage={currentPage}
-            totalPages={totalPages}
             onPageChange={setCurrentPage}
+            onLoadMore={loadMore}
           />
         </div>
       </main>
     </ErrorBoundary>
   );
 };
-
-const ProjectGrid: React.FC<{ projects: ProjectRecord[] }> = ({ projects }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
-    {projects.map((project) => (
-      <ProjectCardMemo key={project.id} {...project} />
-    ))}
-  </div>
-);
-
-const NoProjectsFound: React.FC = () => <div>No projects found</div>;
 
 export default Page;

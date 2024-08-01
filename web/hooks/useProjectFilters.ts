@@ -1,63 +1,72 @@
 // hooks/useProjectFilters.ts
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { ProjectRecord } from "@/type";
 
 export const useProjectFilters = (
-  objects: ProjectRecord[],
-  currentUserAddress?: string,
-  supported?: string[]
+  projects: ProjectRecord[],
+  supportedProjects: string[],
+  address: string | null | undefined,
 ) => {
-  const [tab, setTab] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("default");
+  const [filterState, setFilterState] = useState({
+    tab: "all",
+    searchQuery: "",
+    sortBy: "latest",
+  });
 
-  const filteredAndSortedObjects = useMemo(() => {
-    let result = [...objects];
+  const filteredAndSortedProjects = useMemo(() => {
+    let filtered = projects;
 
-    if (tab === "supported" && supported && supported?.length > 0) {
-      // Filter for supported projects
-      result = result.filter((project) => supported.includes(project.id));
-    } else if (tab === "created") {
-      result = result.filter(
-        (project) => project.creator === currentUserAddress
+    // Filter by tab
+    if (filterState.tab === "supported") {
+      filtered = filtered.filter((project) =>
+        supportedProjects.includes(project.id)
+      );
+    }
+    if (filterState.tab === "created") {
+      filtered = filtered.filter((project) => project.creator === address);
+    }
+
+    // Filter by search query
+    if (filterState.searchQuery) {
+      const query = filterState.searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (project) =>
+          project.name.toLowerCase().includes(query) ||
+          project.description.toLowerCase().includes(query)
       );
     }
 
-    if (searchQuery) {
-      result = result.filter((project) =>
-        project.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+    // Sort projects
+    switch (filterState.sortBy) {
+      case "latest":
+        filtered.sort((a, b) => a.start_time_ms - b.start_time_ms);
+        break;
+      case "oldest":
+        filtered.sort((a, b) => b.start_time_ms - a.start_time_ms);
+        break;
+      // Add more sorting options as needed
     }
 
-    // Apply sorting
-    if (sortBy === "newest") {
-      result.sort((a, b) => b.start_time_ms - a.start_time_ms);
-    } else if (sortBy === "oldest") {
-      result.sort((a, b) => a.start_time_ms - b.start_time_ms);
-    }
+    return filtered;
+  }, [projects, supportedProjects, filterState]);
 
-    return result;
-  }, [objects, supported, tab, searchQuery, sortBy, currentUserAddress]);
+  const setTab = useCallback((tab: string) => {
+    setFilterState((prev) => ({ ...prev, tab }));
+  }, []);
 
-  const handleTabChange = (value: string) => {
-    setTab(value);
-  };
+  const setSearchQuery = useCallback((searchQuery: string) => {
+    setFilterState((prev) => ({ ...prev, searchQuery }));
+  }, []);
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  const handleSort = (value: string) => {
-    setSortBy(value);
-  };
+  const setSortBy = useCallback((sortBy: string) => {
+    setFilterState((prev) => ({ ...prev, sortBy }));
+  }, []);
 
   return {
-    filteredAndSortedObjects,
-    tab,
-    searchQuery,
-    sortBy,
-    handleTabChange,
-    handleSearch,
-    handleSort,
+    filteredAndSortedProjects,
+    filterState,
+    setTab,
+    setSearchQuery,
+    setSortBy,
   };
 };

@@ -7,7 +7,7 @@ import { useProject } from "@/components/providers/ProjectContext";
 import { useToast } from "@/components/ui/use-toast";
 import { ProjectSkeleton } from "../Skeleton";
 import { EditProjectModal } from "@/components/EditProjectModal";
-import useProjectData from "@/hooks/useProjectData";
+
 import useProjectActions from "@/hooks/useProjectActions";
 import useMintActions from "@/hooks/useMintActions";
 import ProjectHeader from "@/components/ProjectHeader";
@@ -15,6 +15,8 @@ import ProjectDescription from "@/components/ProjectDescription";
 import ProjectSocial from "@/components/ProjectSocial";
 import CommentSection from "@/components/CommentSection";
 import MintCard from "@/components/mint_card";
+import useProjectData from "@/hooks/useProjectData";
+
 
 const Page: NextPage<{ params: { projectId: string } }> = ({ params }) => {
   const { selectedProject, setSelectedProject } = useProject();
