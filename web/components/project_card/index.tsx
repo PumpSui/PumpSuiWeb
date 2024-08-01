@@ -29,7 +29,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           src="/images/card.svg"
           alt="Background"
           fill
-          className="object-cover"
+          className="object-fill"
           quality={75}
         />
       </div>
@@ -39,7 +39,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           src={project.image_url || "/images/DemoProject.png"}
           alt="Project"
           fill
-          className="object-cover"
+          className="object-fill"
           quality={75}
         />
       </div>

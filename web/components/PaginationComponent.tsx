@@ -21,7 +21,7 @@ export const PaginationComponent: React.FC<PaginationComponentProps> = ({
   onPageChange,
 }) => {
   return (
-    <Pagination className="mt-4">
+    <Pagination className="mt-10">
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious

@@ -1,6 +1,6 @@
 /* ProjectCard.module.css */
 .card {
-  @apply relative w-full max-w-sm aspect-[3/4] rounded-lg transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer;
+  @apply relative w-full max-w-[480px] aspect-[3.5/4] rounded-lg transition-transform duration-300 ease-in-out hover:scale-105 cursor-pointer ;
 }
 
 .background {
@@ -16,7 +16,7 @@
 }
 
 .rocket {
-  @apply absolute -top-3 -left-7 w-full h-full;
+  @apply absolute w-full h-full ;
 }
 
 .createdBy {
@@ -28,7 +28,7 @@
 }
 
 .progress {
-  @apply absolute bottom-[14%] left-[20%] right-[5%] text-blue-300 text-sm gap-2 flex flex-col;
+  @apply absolute bottom-[14%] left-[25%] right-[5%] text-blue-300 text-sm gap-2 flex flex-col;
 }
 
 .progressBar {
