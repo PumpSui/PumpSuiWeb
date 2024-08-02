@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Comment from "@/components/comment";
 import NewComment from "@/components/new_comment";
 import useComments from "@/hooks/useComments";
@@ -8,15 +8,25 @@ import { useCurrentWallet } from "@mysten/dapp-kit";
 import { useToast } from "@/components/ui/use-toast";
 
 interface CommentSectionProps {
-  projectId: string;
+  threadID: string;
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ projectId }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({ threadID }) => {
   const { connectionStatus } = useCurrentWallet();
   const { toast } = useToast();
-  const { comments, fetchComments } = useComments(projectId);
+  const { comments, fetchComments } = useComments(threadID);
   const { submitComment } = useSubmitComment();
-  const { submitCommentLike } = useSubmitCommentLike(projectId);
+  const { submitCommentLike } = useSubmitCommentLike(threadID);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // 使用 useEffect 来监听 refreshTrigger 的变化，并在变化时刷新评论
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments, refreshTrigger]);
+
+  const refreshComments = useCallback(() => {
+    setRefreshTrigger((prev) => prev + 1);
+  }, []);
 
   const handleNewCommentSubmit = useCallback(
     async (content: string) => {
@@ -29,11 +39,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ projectId }) => {
       }
 
       await submitComment(
-        projectId,
+        threadID,
         content,
         "",
         async () => {
-          await fetchComments();
+          refreshComments();
           toast({
             title: "Success",
             description: "Comment added successfully",
@@ -48,7 +58,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ projectId }) => {
         }
       );
     },
-    [connectionStatus, projectId, submitComment, fetchComments, toast]
+    [connectionStatus, threadID, submitComment, refreshComments, toast]
   );
 
   const handleReplySubmit = useCallback(
@@ -62,11 +72,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ projectId }) => {
       }
 
       await submitComment(
-        projectId,
+        threadID,
         comment,
         id,
         async () => {
-          await fetchComments();
+          refreshComments();
           toast({
             title: "Success",
             description: "Reply added successfully",
@@ -81,7 +91,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ projectId }) => {
         }
       );
     },
-    [connectionStatus, projectId, submitComment, fetchComments, toast]
+    [connectionStatus, threadID, submitComment, refreshComments, toast]
   );
 
   const handleLikeClick = useCallback(
@@ -97,7 +107,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ projectId }) => {
         index,
         islike,
         async () => {
-          await fetchComments();
+          refreshComments();
           toast({
             title: "Success",
             description: "Like added successfully",
@@ -112,7 +122,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ projectId }) => {
         }
       );
     },
-    [connectionStatus, submitCommentLike, fetchComments, toast]
+    [connectionStatus, submitCommentLike, refreshComments, toast]
   );
 
   return (

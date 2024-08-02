@@ -50,7 +50,9 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           alt="Rocket"
           fill
           className={`object-fill ${
-            project.start_time_ms < currentTime ? styles.activeRocket : ""
+            project.start_time_ms < currentTime
+              ? styles.activeRocket
+              : " brightness-50 saturate-50"
           }`}
           quality={75}
         />
@@ -71,10 +73,11 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
 
         <div className={styles.progress}>
           <div className={styles.progressBar}>
-            <p className="mb-1">Progress:</p>
+            <p className="mb-1">PROGRESS:</p>
             <Progress
               value={(1 - project.remain / project.total_supply) * 100}
-              className="w-full self-center min-h-4 bg-primary-foreground rounded-lg"
+              className="w-full self-center min-h-4 mb-1"
+              indicatorColor="bg-gradient-to-b from-yellow-300 to-orange-500 rounded-lg shadow-2xl transform"
             />
           </div>
           <p>START: {getRealDate(project.start_time_ms)}</p>

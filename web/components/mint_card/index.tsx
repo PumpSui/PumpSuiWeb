@@ -66,8 +66,7 @@ const MintCard: React.FC<ProjectCardProps> = ({
                 Mint Progress
                 <Progress
                   value={(1 - project.remain / project.total_supply) * 100}
-                  className="w-full mt-2 self-center min-h-8 bg-primary-foreground rounded-lg"
-                />
+                  className="w-full mt-2 self-center min-h-8 bg-primary-foreground rounded-lg" indicatorColor={""}                />
               </div>
             </CardTitle>
           </CardHeader>

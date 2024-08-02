@@ -16,7 +16,7 @@
 }
 
 .rocket {
-  @apply absolute w-full h-full ;
+  @apply absolute w-full h-full;
 }
 
 .createdBy {

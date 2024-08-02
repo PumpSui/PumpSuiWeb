@@ -91,6 +91,7 @@ const getAllComments = async (client: SuiClient, address: string) => {
       return returnData;
     })
   );
+  console.log("responses", responses);
   return responses.sort((a: CommentType, b: CommentType) => {
     return a.index - b.index;
   });
