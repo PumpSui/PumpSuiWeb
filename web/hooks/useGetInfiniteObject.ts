@@ -3,15 +3,12 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import useSWRInfinite, { SWRInfiniteConfiguration } from "swr/infinite";
 import { SuiClient } from "@mysten/sui/client";
 import { BareFetcher } from "swr";
+import { ObjectsResponseType } from "@/type";
+import { SuiGraphQLClient } from "@mysten/sui/graphql";
 
-export type ObjectsResponseType<T> = {
-  hasNextPage: boolean;
-  nextCursor: string | null | undefined;
-  data: T[];
-};
 
 export function useGetInfiniteObject<T>(
-  client: SuiClient,
+  client: SuiClient | SuiGraphQLClient<{}>,
   fetchFunction: Function,
   itemsPerPage: number = 50,
   autoLoad: boolean = true,

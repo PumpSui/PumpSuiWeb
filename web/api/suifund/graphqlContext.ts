@@ -1,34 +1,28 @@
 import { graphql } from "@mysten/sui/graphql/schemas/2024.4";
 
 export const getAllCommentsQL = graphql(`
-  query ($id: SuiAddress!) {
+  query ($id: SuiAddress!, $nextCursor: String) {
     owner(address: $id) {
-      dynamicFields {
+      dynamicFields(after: $nextCursor) {
+        pageInfo {
+          hasPreviousPage
+          hasNextPage
+          startCursor
+          endCursor
+        }
         nodes {
           name {
-            ...Value
+            json
           }
           value {
-            __typename
             ... on MoveValue {
-              ...Value
-            }
-            ... on MoveObject {
-              contents {
-                ...Value
-              }
+              json
+              bcs
             }
           }
         }
       }
     }
-  }
-
-  fragment Value on MoveValue {
-    type {
-      repr
-    }
-    json
   }
 `);
 

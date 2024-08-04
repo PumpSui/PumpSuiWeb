@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import Comment from "@/components/comment";
 import NewComment from "@/components/new_comment";
 import useComments from "@/hooks/useComments";
@@ -9,24 +9,26 @@ import { useToast } from "@/components/ui/use-toast";
 
 interface CommentSectionProps {
   threadID: string;
+  selectedProjectId: string;
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ threadID }) => {
-  const { connectionStatus } = useCurrentWallet();
-  const { toast } = useToast();
-  const { comments, fetchComments } = useComments(threadID);
-  const { submitComment } = useSubmitComment();
-  const { submitCommentLike } = useSubmitCommentLike(threadID);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-  // 使用 useEffect 来监听 refreshTrigger 的变化，并在变化时刷新评论
-  useEffect(() => {
-    fetchComments();
-  }, [fetchComments, refreshTrigger]);
-
-  const refreshComments = useCallback(() => {
-    setRefreshTrigger((prev) => prev + 1);
-  }, []);
+const CommentSection: React.FC<CommentSectionProps> = ({
+  threadID,
+  selectedProjectId,
+}) => {
+   const { connectionStatus } = useCurrentWallet();
+   const intervalRef = useRef<number | null>(null);
+   const { toast } = useToast();
+   const {
+     comments,
+     refreshComments,
+     loadMore,
+     isLoadingMore,
+     isEmpty,
+     isReachingEnd,
+   } = useComments(threadID);
+   const { submitComment } = useSubmitComment();
+   const { submitCommentLike } = useSubmitCommentLike(selectedProjectId);
 
   const handleNewCommentSubmit = useCallback(
     async (content: string) => {
@@ -39,7 +41,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ threadID }) => {
       }
 
       await submitComment(
-        threadID,
+        selectedProjectId,
         content,
         "",
         async () => {
@@ -58,7 +60,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ threadID }) => {
         }
       );
     },
-    [connectionStatus, threadID, submitComment, refreshComments, toast]
+    [connectionStatus, submitComment, selectedProjectId, toast, refreshComments]
   );
 
   const handleReplySubmit = useCallback(
@@ -72,7 +74,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ threadID }) => {
       }
 
       await submitComment(
-        threadID,
+        selectedProjectId,
         comment,
         id,
         async () => {
@@ -91,7 +93,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ threadID }) => {
         }
       );
     },
-    [connectionStatus, threadID, submitComment, refreshComments, toast]
+    [connectionStatus, submitComment, selectedProjectId, refreshComments, toast]
   );
 
   const handleLikeClick = useCallback(
@@ -125,7 +127,23 @@ const CommentSection: React.FC<CommentSectionProps> = ({ threadID }) => {
     [connectionStatus, submitCommentLike, refreshComments, toast]
   );
 
-  return (
+  useEffect(() => {
+    intervalRef.current = window.setInterval(() => {
+      if (!isReachingEnd && !isEmpty) {
+        loadMore();
+      }
+    }, 2000); // 2000 毫秒的间隔
+
+    // 清理函数，组件卸载时清除定时器
+    return () => {
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isReachingEnd, isEmpty, loadMore]);
+
+
+   return (
     <div className="space-y-4">
       {comments.map((comment, index) => (
         <Comment
@@ -135,6 +153,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ threadID }) => {
           onLikeSubmit={handleLikeClick}
         />
       ))}
+      {!isEmpty && !isReachingEnd && (
+        <button onClick={loadMore} disabled={isLoadingMore}>
+          {isLoadingMore ? 'Loading...' : 'Load More'}
+        </button>
+      )}
       <NewComment onSubmit={handleNewCommentSubmit} />
     </div>
   );

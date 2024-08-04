@@ -117,8 +117,15 @@ export interface CommentType {
     content: string;
     timestamp: number;
     likes: string[];
+    bcs?: string;
 
 }
+
+export type ObjectsResponseType<T> = {
+  hasNextPage: boolean;
+  nextCursor: string | null | undefined;
+  data: T[];
+};
 
 // types/index.ts
 export interface CommentProps {

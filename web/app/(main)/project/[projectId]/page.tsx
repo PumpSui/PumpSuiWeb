@@ -63,7 +63,10 @@ const Page: NextPage<{ params: { projectId: string } }> = ({ params }) => {
           />
         </div>
         <ProjectSocial project={selectedProject} projectId={params.projectId} />
-        <CommentSection threadID={selectedProject.thread} />
+        <CommentSection
+          threadID={selectedProject.thread}
+          selectedProjectId={selectedProject.id}
+        />
         <EditProjectModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}

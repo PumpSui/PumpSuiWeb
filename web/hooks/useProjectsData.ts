@@ -22,8 +22,6 @@ export const useProjectsData = (client: SuiClient, address?: string) => {
 
   const {
     objects: projects,
-    isAllLoaded,
-    hasNextPage,
     error,
     isLoading,
     loadMore,

@@ -13,7 +13,7 @@ import {
   ProjectRecord,
 } from "@/type";
 import { isValidSuiAddress, isValidSuiObjectId } from "@mysten/sui/utils";
-import { ObjectsResponseType } from "@/hooks/useGetInfiniteObject";
+import { ObjectsResponseType } from "@/type";
 import { Transaction } from "@mysten/sui/transactions";
 import { bcs } from "@mysten/sui/bcs";
 

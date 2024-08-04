@@ -1,4 +1,4 @@
-import { CommentType } from "@/type";
+import { CommentType, ObjectsResponseType } from "@/type";
 import { bcs } from "@mysten/sui/bcs";
 import { DynamicFieldInfo, SuiClient } from "@mysten/sui/client";
 import { SuiGraphQLClient } from "@mysten/sui/graphql";
@@ -68,12 +68,17 @@ const unlike_comment = (project_record: string, idx: number) => {
   return tx;
 };
 
-const getAllComments = async (client: SuiClient, address: string) => {
-  const response = await client.getDynamicFields({
+const getAllComments = async (
+  client: SuiClient,
+  address: string,
+  cursor: string | undefined
+): Promise<ObjectsResponseType<CommentType>> => {
+  const { hasNextPage, data, nextCursor } = await client.getDynamicFields({
     parentId: address,
+    cursor,
   });
   const responses = await Promise.all(
-    response.data.map(async (record: DynamicFieldInfo) => {
+    data.map(async (record: DynamicFieldInfo) => {
       const result = (await client.getObject({
         id: record.objectId,
         options: { showContent: true },
@@ -91,43 +96,60 @@ const getAllComments = async (client: SuiClient, address: string) => {
       return returnData;
     })
   );
-  console.log("responses", responses);
-  return responses.sort((a: CommentType, b: CommentType) => {
-    return a.index - b.index;
-  });
+  return {
+    hasNextPage,
+    nextCursor,
+    data: responses,
+  };
 };
 
 const getAllCommentsGraphql = async (
   client: SuiGraphQLClient<{}>,
-  address: string
-) => {
+  address: string,
+  nextCursor?: string
+): Promise<ObjectsResponseType<CommentType>> => {
   const response = await client.query({
     query: getAllCommentsQL,
     variables: {
       id: address,
+      nextCursor: nextCursor,
     },
   });
   if (!response.data?.owner) {
-    return [];
+    return {
+      hasNextPage: false,
+      nextCursor: undefined,
+      data: [],
+    };
   }
-  const result: CommentType[] = response
-    .data!.owner!.dynamicFields.nodes.map((node: any) => {
+  console.log("response", response);
+  const result: CommentType[] = response.data!.owner!.dynamicFields.nodes.map(
+    (node: any) => {
       return {
         index: node.name.json,
         creator: node.value.json.creator,
         timestamp: node.value.json.timestamp,
         content: node.value.json.content,
         media_link: node.value.json.media_link,
-        likes: node.value.json.likes,
+        likes: node.value.json.likes.contents,
         id: node.value.json.id,
         reply: node.value.json.reply,
+        bcs: node.value.bcs,
       };
-    })
-    .sort((a: CommentType, b: CommentType) => {
-      return a.index - b.index;
-    });
+    }
+  );
 
-  return result;
+  return {
+    hasNextPage: response.data.owner.dynamicFields.pageInfo.hasNextPage,
+    nextCursor: response.data.owner.dynamicFields.pageInfo.endCursor,
+    data: result,
+  };
 };
 
-export { getAllComments, add_comment, like_comment, unlike_comment };
+export {
+  getAllComments,
+  add_comment,
+  like_comment,
+  unlike_comment,
+  getAllCommentsGraphql,
+};
