@@ -88,19 +88,21 @@ const ProjectForm: React.FC = () => {
           name="totalDeposit"
           label="TDL(SUI)"
           placeholder="Total Deposit Value"
+          tooltip="Total Deposit Value. The total amount of funds raised, including the portion distributed to the project team through the project treasury and the portion retained in the supporter ticket NFT."
           valueAsNumber
         />
         <FormField
           name="threshold_ratio"
           label="Threshold Ratio"
           placeholder=""
-          tooltip="The ratio of the total deposit that must be reached before the project can be funded."
+          tooltip="Should be an integer less than or equal to 100. When the fundraising amount reaches TDL * Threshold Ratio / 100, the crowdfunding project is activated, and the project team can receive funds from the project treasury through streaming payments. Before this, the project team can choose to cancel the crowdfunding, and supporters can retrieve all their investments without loss."
           valueAsNumber
         />
         <FormField
           name="ratioToBuilders"
           label="Ratio(%)"
           placeholder="TDL * Ratio = CrowdFund for Builders"
+          tooltip="Should be an integer less than or equal to 100. A portion of the total funds raised, TDL * Ratio / 100, will be allocated to the project treasury for team expenses. The remaining portion will be locked with the supporters and will be used for exchange with the supporters' rights when the project is completed. It is recommended to choose an appropriate ratio parameter, such as 10% to 30%, unless the project's product is already very mature. The cost of deploying a crowdfunding project is TDL * Ratio / 10000."
           valueAsNumber
         />
         <FormSelect
@@ -113,18 +115,21 @@ const ProjectForm: React.FC = () => {
           name="minValue"
           label="Min Value(SUI)"
           placeholder="Min Value"
+          tooltip="The minimum amount that project supporters must invest in the crowdfunding project each time, which should be set to be greater than or equal to 1 SUI."
           valueAsNumber
         />
         <FormField
           name="maxValue"
           label="Max Value(SUI)"
           placeholder="∞"
+          tooltip="The maximum amount that each project supporter can support for the crowdfunding project. The default value is 0, indicating no limit. It should be set to a value greater than the minimum amount when there is a concern about the risk of withdrawal due to over-reliance on a single investor."
           valueAsNumber
         />
         <FormField
           name="amount_per_sui"
           label="Amount Per Sui"
           placeholder="Amount Per Sui"
+          tooltip="The face value amount of the supporter ticket NFT that project supporters receive for each 1 SUI invested."
           valueAsNumber
         />
 
@@ -157,12 +162,14 @@ const ProjectForm: React.FC = () => {
           name="projectDuration"
           label="Duration"
           placeholder="Development Time (days)"
+          tooltip="The estimated project execution period, in days, with a minimum of three days. The fundraising in the project treasury will be linearly unlocked and allocated according to the project cycle time. It is recommended to set a reasonable project cycle unless the project's product is already very mature."
           valueAsNumber
         />
         <FormField
           name="description"
           label="Description"
           placeholder="Description"
+          tooltip="Project description. It is recommended to include an introduction to the project, the project team, proof of previous work, and the returns that project supporters can get. This part can be edited again in the future."
           isTextarea
         />
 

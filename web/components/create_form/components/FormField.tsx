@@ -53,7 +53,9 @@ const FormField: React.FC<FormFieldProps> = ({
                 <InfoIcon className="ml-1 h-4 w-4 cursor-help" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>{tooltip}</p>
+                <article className="text-pretty max-w-sm">
+                  <p>{tooltip}</p>
+                </article>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
