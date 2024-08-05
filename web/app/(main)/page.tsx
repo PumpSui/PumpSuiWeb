@@ -58,10 +58,7 @@ const Page: React.FC = () => {
     [setSortBy]
   );
 
-  if (error) return <div>Failed to load</div>;
-
   return (
-    <ErrorBoundary>
       <main>
         <div className="py-8">
           <ProjectListView
@@ -77,7 +74,6 @@ const Page: React.FC = () => {
           />
         </div>
       </main>
-    </ErrorBoundary>
   );
 };
 

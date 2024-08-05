@@ -19,13 +19,14 @@ const ProjectSocial: React.FC<ProjectSocialProps> = ({
       discord: project.discord,
       website: project.website,
       github: project.github,
+      linktree: project.linktree,
     };
   }, [project]);
 
   return (
-    <div className="flex justify-around items-center">
-      <ReferralLink projectId={projectId} />
+    <div className="flex justify-end gap-5">
       <SocialIcons socialLinks={socialLinks} />
+      <ReferralLink projectId={projectId} />
     </div>
   );
 };

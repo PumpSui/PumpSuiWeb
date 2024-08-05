@@ -97,6 +97,7 @@ export interface ProjectRecord {
     participants: string[];
     minted_per_user: Record<string, number>;
     thread: string;    
+    linktree: string;
 }
 
 /*     public struct Comment has key, store {

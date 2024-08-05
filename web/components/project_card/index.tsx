@@ -78,6 +78,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
               value={(1 - project.remain / project.total_supply) * 100}
               className="w-full self-center min-h-4 mb-1"
               indicatorColor="bg-gradient-to-b from-yellow-300 to-orange-500 rounded-lg shadow-2xl transform"
+              threshhold={project.threshold_ratio}
             />
           </div>
           <p>START: {getRealDate(project.start_time_ms)}</p>

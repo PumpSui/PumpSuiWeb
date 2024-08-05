@@ -99,6 +99,7 @@ const getProjectRecord = async (projectId: string, client: SuiClient) => {
     thread: data.fields.thread.fields.contents.fields.id.id,
     category: data.fields.category,
     threshold_ratio: data.fields.threshold_ratio,
+    linktree: data.fields.linktree,
   };
   return project;
 };

@@ -55,7 +55,6 @@ const ProjectForm: React.FC = () => {
 
   const onSubmit = async (values: FormSchema) => {
     const formattedValues = formatedDeployParams(values, currentUser?.address!);
-    console.log("formattedValues", formattedValues);
     const txb = deploy(formattedValues);
     await signAndExecuteTransaction(
       {

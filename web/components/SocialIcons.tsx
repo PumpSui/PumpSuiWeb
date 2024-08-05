@@ -7,6 +7,7 @@ import {
   SiTelegram,
   SiGithub,
   SiEmbarcadero,
+  SiLinktree,
 } from "react-icons/si";
 
 interface SocialLinks {
@@ -15,6 +16,7 @@ interface SocialLinks {
   discord?: string;
   telegram?: string;
   github?: string;
+  linktree?: string;
 }
 
 interface SocialIconProps {
@@ -28,6 +30,7 @@ const icons: { [key in keyof SocialLinks]: IconType } = {
   discord: SiDiscord,
   telegram: SiTelegram,
   github: SiGithub,
+  linktree: SiLinktree
 };
 
 const SocialIcon: React.FC<SocialIconProps> = ({ href, Icon }) => {

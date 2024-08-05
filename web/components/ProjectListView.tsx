@@ -50,7 +50,6 @@ export const ProjectListView: React.FC<ProjectListViewProps> = ({
           <ProjectCard key={project.id} {...project} />
         ))}
       </div>
-      {pageDisplayedProjects.length === 0 && <div>No projects found</div>}
       {isLoading && <LoadingIndicator />}
       <PaginationComponent
         currentPage={currentPage}

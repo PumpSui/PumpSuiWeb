@@ -1,33 +1,70 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as ProgressPrimitive from "@radix-ui/react-progress"
+import * as React from "react";
+import * as ProgressPrimitive from "@radix-ui/react-progress";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 interface CustomProgressProps
   extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {
   indicatorColor: string;
+  threshhold?: number;
+  showThreshholdText?: boolean;
 }
 
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   CustomProgressProps
->(({ className, value, indicatorColor, ...props }, ref) => (
-  <ProgressPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative h-2 w-full overflow-hidden rounded-full bg-primary/20",
-      className
-    )}
-    {...props}
-  >
-    <ProgressPrimitive.Indicator
-      className={`h-full w-full flex-1 transition-all ${indicatorColor}`}
-      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
-    />
-  </ProgressPrimitive.Root>
-));
-Progress.displayName = ProgressPrimitive.Root.displayName
+>(
+  (
+    {
+      className,
+      value,
+      indicatorColor,
+      threshhold,
+      showThreshholdText,
+      ...props
+    },
+    ref
+  ) => (    
+    <div className="relative w-full">
+      <ProgressPrimitive.Root
+        ref={ref}
+        className={cn(
+          "relative h-2 w-full overflow-hidden rounded-full bg-primary/20 ",
+          className
+        )}
+        {...props}
+      >
+        <ProgressPrimitive.Indicator
+          className={`h-full w-full flex-1 transition-all ${indicatorColor}`}
+          style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+        ></ProgressPrimitive.Indicator>
 
-export { Progress }
+        {threshhold && <div
+          className="absolute top-0 left-0 h-full bg-red-400 rounded-3xl"
+          style={{
+            width: "4px",
+            left: `${threshhold}%`,
+          }}
+        ></div>}
+      </ProgressPrimitive.Root>
+      {showThreshholdText && (
+        <p
+          className="absolute text-xs font-bold text-red-400"
+          style={{
+            top: "100%",
+            left: `${threshhold}%`,
+            transform: "translateX(-50%)",
+            zIndex: 10,
+          }}
+        >
+          {threshhold}%
+        </p>
+      )}
+    </div>
+  )
+);
+Progress.displayName = ProgressPrimitive.Root.displayName;
+
+export { Progress };

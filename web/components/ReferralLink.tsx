@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { SlShareAlt } from "react-icons/sl";
 
 interface ReferralLinkProps {
   projectId: string;
@@ -36,21 +37,15 @@ const ReferralLink: React.FC<ReferralLinkProps> = ({ projectId }) => {
   };
 
   return (
-    <div className="flex items-center justify-between bg-gray-100 p-2 rounded-lg mb-4">
-      <div className="flex-grow mr-4">
-        <p className="text-sm font-medium text-gray-700">
-          Referral ID:{" "}
-          <span className="text-lg font-bold text-gray-900"> {referralId}</span>
-        </p>
-      </div>
-      <Button
-        onClick={handleCopy}
-        variant="outline"
-        className={isCopied ? "bg-green-500 text-white" : ""}
-      >
-        {isCopied ? "Copied!" : "Copy Link"}
-      </Button>
-    </div>
+    <SlShareAlt
+      onClick={handleCopy}
+      size={30}
+      className={
+        isCopied
+          ? "bg-blue-500 text-white"
+          : "hover:cursor-pointer bg-black"
+      }
+    />
   );
 };
 

@@ -54,15 +54,21 @@ const Page: NextPage<{ params: { projectId: string } }> = ({ params }) => {
         <ProjectHeader project={selectedProject} />
         <div className="flex flex-col md:flex-row gap-6">
           <ProjectDescription project={selectedProject} />
-          <MintCard
-            project={selectedProject}
-            isCreator={isCreator}
-            onSubmitMint={handleMintSubmit}
-            isStartMint={isStartMint}
-            onSubmitEdit={() => setIsEditModalOpen(true)}
-          />
+          <div>
+            <ProjectSocial
+              project={selectedProject}
+              projectId={params.projectId}
+            />
+            <MintCard
+              project={selectedProject}
+              isCreator={isCreator}
+              onSubmitMint={handleMintSubmit}
+              isStartMint={isStartMint}
+              onSubmitEdit={() => setIsEditModalOpen(true)}
+            />
+          </div>
         </div>
-        <ProjectSocial project={selectedProject} projectId={params.projectId} />
+
         <CommentSection
           threadID={selectedProject.thread}
           selectedProjectId={selectedProject.id}

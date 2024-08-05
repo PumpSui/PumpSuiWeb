@@ -21,7 +21,7 @@ import { useToast } from "../ui/use-toast";
 interface ProjectCardProps {
   onSubmitMint: (value: number) => void;
   onSubmitEdit: () => void;
-  project:ProjectRecord,
+  project: ProjectRecord;
   isStartMint: boolean;
   isCreator: boolean;
 }
@@ -31,7 +31,7 @@ const MintCard: React.FC<ProjectCardProps> = ({
   onSubmitEdit,
   isStartMint,
   isCreator = false,
-  project
+  project,
 }) => {
   const [inputValue, setInputValue] = useState<number>(1);
   const { toast } = useToast();
@@ -66,7 +66,11 @@ const MintCard: React.FC<ProjectCardProps> = ({
                 Mint Progress
                 <Progress
                   value={(1 - project.remain / project.total_supply) * 100}
-                  className="w-full mt-2 self-center min-h-8 bg-primary-foreground rounded-lg" indicatorColor={""}                />
+                  className="w-full mt-2 self-center min-h-6 bg-primary-foreground rounded-lg"
+                  indicatorColor={""}
+                  threshhold={project.threshold_ratio}
+                  showThreshholdText
+                />
               </div>
             </CardTitle>
           </CardHeader>
@@ -100,6 +104,15 @@ const MintCard: React.FC<ProjectCardProps> = ({
                 value={(
                   BigInt(project.max_value_sui) / MIST_PER_SUI
                 ).toString()}
+              />
+              <div className="flex justify-between mt-2">
+                <p className="font-bold text-red-400">Users</p>
+                <p className="font-bold text-blue-500">Project</p>
+              </div>
+              <Progress
+                value={project.ratio}
+                className="w-full mt-2 self-center min-h-6 bg-blue-500 rounded-lg"
+                indicatorColor={"bg-red-500"}
               />
             </div>
           </CardContent>
