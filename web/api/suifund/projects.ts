@@ -48,8 +48,8 @@ const getAllProjectAdminCap = async (
   const response = await client.getOwnedObjects({
     owner: address,
     filter: {
-      StructType:
-        "0x257d035780276a41187b9bac21ca05e73a69b6c93f06e786cc18e8da78832808::suifund::ProjectAdminCap",
+      StructType: `${process.env
+        .NEXT_PUBLIC_PACKAGE}::suifund::ProjectAdminCap`,
     },
     options: { showContent: true },
   });
@@ -256,7 +256,7 @@ const cancelAndBurnProject = (project_record: string, project_admin_cap: string)
       function: "cancel_project_by_team",
       arguments: [
         tx.object(project_admin_cap),
-        tx.object(process.env.NEXT_PUBLIC_PACKAGE!),
+        tx.object(process.env.NEXT_PUBLIC_DEPLOY_RECORD!),
         tx.object(project_record),
       ],
     });

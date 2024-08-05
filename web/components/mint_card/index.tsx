@@ -105,9 +105,13 @@ const MintCard: React.FC<ProjectCardProps> = ({
                   BigInt(project.max_value_sui) / MIST_PER_SUI
                 ).toString()}
               />
-              <div className="flex justify-between mt-2">
-                <p className="font-bold text-red-400">Users</p>
-                <p className="font-bold text-blue-500">Project</p>
+              <div className="flex justify-between mt-4">
+                <p className="font-bold text-red-400">
+                  Project: {project.ratio}%
+                </p>
+                <p className="font-bold text-blue-500">
+                  Users: {100-project.ratio}%
+                </p>
               </div>
               <Progress
                 value={project.ratio}

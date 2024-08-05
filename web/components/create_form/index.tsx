@@ -49,7 +49,7 @@ const ProjectForm: React.FC = () => {
 
   const getDeployFee = () => {
     const TDL = Number(watch("totalDeposit", BigInt(0)));
-    const fee = TDL * watch("ratioToBuilders", 0) * 0.01;
+    const fee = TDL * watch("ratioToBuilders", 0) /10000;
     return Number.isNaN(fee) || fee < 20 ? 20 : fee;
   };
 
