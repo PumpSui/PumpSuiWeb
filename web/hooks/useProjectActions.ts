@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { useToast } from "@/components/ui/use-toast";
-import { editProject, cancelAndBurnProject } from "@/api/suifund";
+import { editProject, cancelAndBurnProject, claim } from "@/api/suifund";
 import { EditEnum, editProjectParam, ProjectRecord } from "@/type";
 import { useRouter } from "next/navigation";
 import useSWR, { useSWRConfig } from "swr";
@@ -89,6 +89,34 @@ const useProjectActions = (selectedProject: ProjectRecord | null) => {
     ]
   );
 
+  const handleClaimSubmit = useCallback(async () => {
+    if (!selectedProject || !adminCapMap) return;
+
+    const admincap = adminCapMap[selectedProject.id];
+    const txb = claim(selectedProject.id, admincap);
+
+    signAndExecuteTransaction(
+      {
+        transaction: txb,
+      },
+      {
+        onSuccess: async () => {
+          toast({
+            title: "Success",
+            description: "Project claimed successfully",
+          });
+        },
+        onError: (error) => {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: error.message.toString(),
+          });
+        },
+      }
+    )
+  },[adminCapMap, selectedProject, signAndExecuteTransaction, toast]);
+
   const handleBurnProject = useCallback(() => {
     if (!selectedProject || !adminCapMap) return;
 
@@ -118,7 +146,7 @@ const useProjectActions = (selectedProject: ProjectRecord | null) => {
     );
   }, [adminCapMap, router, selectedProject, signAndExecuteTransaction, toast]);
 
-  return { handleEditSubmit, handleBurnProject };
+  return { handleEditSubmit, handleBurnProject,handleClaimSubmit };
 };
 
 export default useProjectActions;

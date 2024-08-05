@@ -11,7 +11,8 @@ import { ProjectRecord } from "@/type";
 
 const useMintActions = (
   selectedProject: ProjectRecord | null,
-  refId: string | null
+  refId: string | null,
+  onSubmit: () => void
 ) => {
   const { connectionStatus } = useCurrentWallet();
   const { toast } = useToast();
@@ -42,6 +43,7 @@ const useMintActions = (
         },
         {
           onSuccess: async () => {
+            onSubmit();
             toast({
               title: "Success",
               description: "Minted successfully",

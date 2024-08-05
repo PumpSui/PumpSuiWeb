@@ -37,18 +37,18 @@ export const useProjectFilters = (
     }
 
     // Sort projects
-    switch (filterState.sortBy) {
-      case "latest":
-        filtered.sort((a, b) => a.start_time_ms - b.start_time_ms);
+    switch (filterState.sortBy) { 
+      case "newest":
+        filtered.sort((a, b) => b.start_time_ms - a.start_time_ms);
         break;
       case "oldest":
-        filtered.sort((a, b) => b.start_time_ms - a.start_time_ms);
+        filtered.sort((a, b) => a.start_time_ms - b.start_time_ms);
         break;
       // Add more sorting options as needed
     }
 
     return filtered;
-  }, [projects, supportedProjects, filterState]);
+  }, [projects, filterState.tab, filterState.searchQuery, filterState.sortBy, supportedProjects, address]);
 
   const setTab = useCallback((tab: string) => {
     setFilterState((prev) => ({ ...prev, tab }));

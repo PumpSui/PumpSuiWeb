@@ -21,6 +21,7 @@ import { useToast } from "../ui/use-toast";
 interface ProjectCardProps {
   onSubmitMint: (value: number) => void;
   onSubmitEdit: () => void;
+  onSubmitClaim: () => void;
   project: ProjectRecord;
   isStartMint: boolean;
   isCreator: boolean;
@@ -29,6 +30,7 @@ interface ProjectCardProps {
 const MintCard: React.FC<ProjectCardProps> = ({
   onSubmitMint,
   onSubmitEdit,
+  onSubmitClaim,
   isStartMint,
   isCreator = false,
   project,
@@ -56,6 +58,10 @@ const MintCard: React.FC<ProjectCardProps> = ({
     onSubmitEdit();
   };
 
+  const handleClaim = () => {
+    onSubmitClaim();
+  }
+
   return (
     <Card className={`max-w-sm bg-secondary rounded-2xl`}>
       <div className="flex flex-col h-full">
@@ -66,8 +72,8 @@ const MintCard: React.FC<ProjectCardProps> = ({
                 Mint Progress
                 <Progress
                   value={(1 - project.remain / project.total_supply) * 100}
-                  className="w-full mt-2 self-center min-h-6 bg-primary-foreground rounded-lg"
-                  indicatorColor={""}
+                  className="w-full mt-2 self-center min-h-6 bg-primary-foreground rounded-lg "
+                  indicatorColor={"bg-orange-400"}
                   threshhold={project.threshold_ratio}
                   showThreshholdText
                 />
@@ -89,6 +95,7 @@ const MintCard: React.FC<ProjectCardProps> = ({
                 label="END"
                 value={getRealDate(project.end_time_ms)}
               />
+              {project.remain}
               <ProjectDetailItem
                 label="TOTAL SUPPLY"
                 value={project.total_supply.toString()}
@@ -110,7 +117,7 @@ const MintCard: React.FC<ProjectCardProps> = ({
                   Project: {project.ratio}%
                 </p>
                 <p className="font-bold text-blue-500">
-                  Users: {100-project.ratio}%
+                  Users: {100 - project.ratio}%
                 </p>
               </div>
               <Progress
@@ -139,9 +146,9 @@ const MintCard: React.FC<ProjectCardProps> = ({
                   type="submit"
                   className="w-full"
                   onClick={handleMint}
-                  disabled={isStartMint}
+                  disabled={project.remain <= 0 || isStartMint}
                 >
-                  Mint
+                  {project.remain > 0 ? "Mint" : "Sold Out"}
                 </Button>
                 {isCreator && (
                   <Button
@@ -158,8 +165,8 @@ const MintCard: React.FC<ProjectCardProps> = ({
                 <Button
                   type="submit"
                   className="w-full"
-                  onClick={handleMint}
-                  disabled={isStartMint}
+                  onClick={handleClaim}
+                  disabled={!isCreator}
                 >
                   Claim
                 </Button>

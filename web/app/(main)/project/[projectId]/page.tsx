@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import Head from "next/head";
 import { NextPage } from "next";
 import { useSearchParams } from "next/navigation";
@@ -25,13 +25,16 @@ const Page: NextPage<{ params: { projectId: string } }> = ({ params }) => {
   const refId = searchParams.get("ref");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const { data, error, isLoading } = useProjectData(params.projectId);
-  const { handleEditSubmit, handleBurnProject } =
+  const { data, error, isLoading, refreshProjectData} = useProjectData(
+    params.projectId
+  );
+  const { handleEditSubmit, handleBurnProject,handleClaimSubmit } =
     useProjectActions(selectedProject);
   const { handleMintSubmit, isStartMint, isCreator } = useMintActions(
     selectedProject,
-    refId
-  );
+    refId,
+    refreshProjectData
+  );  
 
   useEffect(() => {
     if (data) {
@@ -65,6 +68,7 @@ const Page: NextPage<{ params: { projectId: string } }> = ({ params }) => {
               onSubmitMint={handleMintSubmit}
               isStartMint={isStartMint}
               onSubmitEdit={() => setIsEditModalOpen(true)}
+              onSubmitClaim={handleClaimSubmit}
             />
           </div>
         </div>
