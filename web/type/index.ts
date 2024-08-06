@@ -15,6 +15,16 @@ export interface editProjectParam {
   content: string;
 }
 
+export interface ProjectReward{
+  amount: number;
+  balance: number;
+  end: number;
+  start: number;
+  id: string;
+  image: string;
+  name: string;
+  project_id: string;
+}
 
 export enum EditEnum {
   edit_description,

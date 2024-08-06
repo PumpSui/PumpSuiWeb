@@ -1,4 +1,6 @@
+import { ProjectReward } from "@/type";
 import { bcs } from "@mysten/sui/bcs";
+import { SuiClient } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
 import { isValidSuiAddress, isValidSuiObjectId } from "@mysten/sui/utils";
 
@@ -93,8 +95,36 @@ const do_burn = (project_record: string, sp_rwd: string, sender: string) => {
   return tx;
 };
 
+const getAllSupportTicket = async (
+  client: SuiClient,
+  address: string
+): Promise<ProjectReward[]> => {
+  const response = await client.getOwnedObjects({
+    owner: address,
+    filter: {
+      StructType: `${process.env.NEXT_PUBLIC_PACKAGE}::suifund::SupporterReward`,
+    },
+    options: { showContent: true },
+  });
+  const data = response.data as any;
+  const result:ProjectReward[] = data.map((item: any) => {
+    return {
+      id: item.data.content.fields.id.id,
+      name: item.data.content.fields.name,
+      project_id: item.data.content.fields.project_id,
+      image: item.data.content.fields.image,
+      amount: item.data.content.fields.amount,
+      balance: item.data.content.fields.balance,
+      start: item.data.content.fields.start,
+      end: item.data.content.fields.end,
+    };
+  });
+  return result;
+};
+
+
 const native_stake = () => {};
 
 const native_unstake = () => {};
 
-export { do_mint, do_merge, do_split, do_burn };
+export { do_mint, do_merge, do_split, do_burn, getAllSupportTicket };
