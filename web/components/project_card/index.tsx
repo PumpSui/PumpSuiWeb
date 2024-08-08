@@ -41,6 +41,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           alt="Project"
           fill
           className="object-fill"
+          objectFit="cover"
           quality={75}
         />
       </div>
