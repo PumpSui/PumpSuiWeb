@@ -1,8 +1,6 @@
 "use client";
 import { getAllSupportTicket } from "@/api/suifund";
-import RewardCard from "@/components/reward_card";
-import SupportCard from "@/components/SupportCard";
-import { projects } from "@/mock";
+import SupportCard from "@/components/support_card/SupportCard";
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 import { isValidSuiAddress } from "@mysten/sui/utils";
 import useSWR from "swr";
@@ -19,7 +17,7 @@ const Page = () => {
   return (
     <div>
       <div className="py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
           {data && data.map((item) => <div key={item.id}> 
             <SupportCard base64Image={item.image} name={item.name} amount={item.amount.toString()}></SupportCard>
           </div>)}

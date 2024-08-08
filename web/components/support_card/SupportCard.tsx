@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import SupportButton from "./components/SupportButton";
 
 interface SupportCardSVGProps {
   base64Image: string;
@@ -125,28 +127,25 @@ const SupportCard: React.FC<SupportCardSVGProps> = ({
 
         {/* Back side */}
         <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 [transform:rotateY(180deg)]">
-          <div
-            className="absolute bg-orange-300 flex flex-col justify-center p-4 rounded-lg"
-            style={backContentStyle}
-          >
-            <div className="grid grid-cols-2 gap-2">
-              <Button className="bg-secondary text-xs" variant="link">
-                Transfer
-              </Button>
-              <Button className="bg-secondary text-xs" variant="link">
-                Split
-              </Button>
-              <Button className="bg-secondary text-xs" variant="link">
-                Burn
-              </Button>
-              <Button className="bg-secondary text-xs" variant="link">
-                Stake
-              </Button>
-            </div>
-            <div className="mt-2">
-              <Button className="w-full bg-secondary text-xs" variant="link">
-                Deposit
-              </Button>
+          <div className="relative w-full h-full">
+            {/* Background Image */}
+            <Image
+              src="/images/Supporter_Ticket_Back.svg"
+              alt="Ticket Background"
+              layout="fill"
+              objectFit="fill"
+            />
+
+            {/* Content overlay */}
+            <div className="absolute inset-0 flex flex-col justify-center items-center p-4 mb-10">
+              <div className="bg-opacity-80 rounded-lg p-4 w-4/5 max-w-[300px]">
+                <div className="flex flex-col gap-10">
+                  <SupportButton>Transfer</SupportButton>
+                  <SupportButton>Split</SupportButton>
+                  <SupportButton>Burn</SupportButton>
+                  <SupportButton>Stake</SupportButton>                  
+                </div>
+              </div>
             </div>
           </div>
         </div>
