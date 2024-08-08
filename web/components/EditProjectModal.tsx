@@ -1,5 +1,5 @@
-// components/EditProjectModal.tsx
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ProjectRecord } from "@/type";
 import ConfirmDialog from "./ConfirmDialog";
+import ImageUploader from "@/components/imageUploader";
 
 interface EditProjectModalProps {
   isOpen: boolean;
@@ -47,88 +48,112 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
     onClose();
   };
 
+  const handleImageUpload = (file: any) => {
+    const url = file.cdnUrl;
+    setEditedProject((prev) => ({ ...prev, image_url: url }));
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent aria-describedby={undefined}>
+      <DialogContent
+        className="max-w-[800px] max-h-[90vh] overflow-y-auto"
+        aria-describedby={undefined}
+      >
         <DialogHeader>
           <DialogTitle>Edit Project</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="image_url" className="text-right">
-              Image_Url
+        <div className="grid gap-6 py-4">
+          <div className="space-y-2">
+            <label htmlFor="image_url" className="block text-sm font-medium">
+              Project Image
             </label>
-            <Input
-              id="image_url"
-              name="image_url"
-              value={editedProject.image_url}
-              onChange={handleChange}
-              className="col-span-3"
-            />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="website" className="text-right">
-              Website
-            </label>
-            <Input
-              id="website"
-              name="website"
-              value={editedProject.website}
-              onChange={handleChange}
-              className="col-span-3"
-            />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="x" className="text-right">
-              Twitter
-            </label>
-            <Input
-              id="x"
-              name="x"
-              value={editedProject.x}
-              onChange={handleChange}
-              className="col-span-3"
-            />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="telegram" className="text-right">
-              Telegram
-            </label>
-            <Input
-              id="telegram"
-              name="telegram"
-              value={editedProject.telegram}
-              onChange={handleChange}
-              className="col-span-3"
-            />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="discord" className="text-right">
-              Discord
-            </label>
-            <Input
-              id="discord"
-              name="discord"
-              value={editedProject.discord}
-              onChange={handleChange}
-              className="col-span-3"
-            />
+            <div className="flex flex-col space-y-2">
+              <ImageUploader onFileUploadSuccess={handleImageUpload} />
+              <Input
+                id="image_url"
+                name="image_url"
+                value={editedProject.image_url}
+                onChange={handleChange}
+                placeholder="Image URL"
+              />
+              {editedProject.image_url && (
+                <div className="relative w-full h-[200px] bg-gray-100 rounded-md overflow-hidden">
+                  <Image
+                    src={editedProject.image_url}
+                    alt="Project"
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="github" className="text-right">
-              GitHub
-            </label>
-            <Input
-              id="github"
-              name="github"
-              value={editedProject.github}
-              onChange={handleChange}
-              className="col-span-3"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label htmlFor="website" className="block text-sm font-medium">
+                Website
+              </label>
+              <Input
+                id="website"
+                name="website"
+                value={editedProject.website}
+                onChange={handleChange}
+                placeholder="https://example.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="x" className="block text-sm font-medium">
+                Twitter
+              </label>
+              <Input
+                id="x"
+                name="x"
+                value={editedProject.x}
+                onChange={handleChange}
+                placeholder="@username"
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="telegram" className="block text-sm font-medium">
+                Telegram
+              </label>
+              <Input
+                id="telegram"
+                name="telegram"
+                value={editedProject.telegram}
+                onChange={handleChange}
+                placeholder="t.me/username"
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="discord" className="block text-sm font-medium">
+                Discord
+              </label>
+              <Input
+                id="discord"
+                name="discord"
+                value={editedProject.discord}
+                onChange={handleChange}
+                placeholder="discord.gg/invite"
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="github" className="block text-sm font-medium">
+                GitHub
+              </label>
+              <Input
+                id="github"
+                name="github"
+                value={editedProject.github}
+                onChange={handleChange}
+                placeholder="github.com/username"
+              />
+            </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="description" className="text-right">
+
+          <div className="space-y-2">
+            <label htmlFor="description" className="block text-sm font-medium">
               Description
             </label>
             <Textarea
@@ -136,19 +161,17 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
               name="description"
               value={editedProject.description}
               onChange={handleChange}
-              className="col-span-3"
+              rows={4}
+              placeholder="Describe your project..."
             />
           </div>
-          {/* Add more fields as needed */}
         </div>
         <DialogFooter>
           <div className="flex justify-between w-full">
-            <ConfirmDialog              
-              triggerText={"Burn"}
-              title={"Burn Project"}
-              description={
-                "Are you sure you want to destroy this item? This action cannot be undone."
-              }
+            <ConfirmDialog
+              triggerText="Burn Project"
+              title="Burn Project"
+              description="Are you sure you want to destroy this item? This action cannot be undone."
               onConfirm={handleBurn}
             />
             <Button type="submit" onClick={handleSubmit}>
@@ -160,3 +183,5 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
     </Dialog>
   );
 };
+
+export default EditProjectModal;

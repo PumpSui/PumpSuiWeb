@@ -6,6 +6,7 @@ import { getRealDate } from "@/lib/utils";
 import { useProject } from "../providers/ProjectContext";
 import styles from "./ProjectCard.module.css";
 
+
 interface ProjectCardProps extends ProjectRecord {
   isDetail?: boolean;
 }

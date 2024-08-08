@@ -20,6 +20,8 @@ import { deploy } from "@/api/suifund";
 import { useRouter } from "next/navigation";
 import FormField from "./components/FormField";
 import FormSelect from "./components/FormSelect";
+import ImageUploader from "../imageUploader";
+import FormImage from "./components/FormImage";
 
 
 const ProjectForm: React.FC = () => {
@@ -71,6 +73,10 @@ const ProjectForm: React.FC = () => {
       }
     );
   };
+
+  const handleImageUpload = (file: any) => {
+    console.log(file);
+  }
 
   const projectTypeOptions = [
     { value: "defi", label: "DeFi" },
@@ -170,18 +176,13 @@ const ProjectForm: React.FC = () => {
           placeholder="Description"
           tooltip="Project description. It is recommended to include an introduction to the project, the project team, proof of previous work, and the returns that project supporters can get. This part can be edited again in the future."
           isTextarea
-        />
+        />       
 
         <Accordion type="single" collapsible>
           <AccordionItem value="Optional">
             <AccordionTrigger>Some more options ?</AccordionTrigger>
             <AccordionContent>
-              <FormField
-                name="imageUrl"
-                label="Image URL"
-                placeholder="Image URL (Optional)"
-                optional
-              />
+              <FormImage name={"imageUrl"} label={"Image URL"}/>
               <FormField
                 name="linktree"
                 label="LinkTree"

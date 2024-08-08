@@ -19,7 +19,7 @@ const Navbar = () => {
   return (
     <nav className="fixed bg-background top-0 left-0 right-0 z-50 shadow-md">
       <div className="flex pl-4 py-6 justify-between items-center gap-10">
-        <div className="flex-shrink-0 w-56 h-14 relative">
+        <div className="flex-shrink-0 w-56 h-14 relative scale-125">
           <Image
             onClick={() => router.push("/")}
             className="hover:cursor-pointer object-contain"
