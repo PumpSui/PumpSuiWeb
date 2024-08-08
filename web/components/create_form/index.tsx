@@ -3,12 +3,6 @@ import React from "react";
 import { Button } from "../ui/button";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../ui/accordion";
 import { useForm, FormProvider, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatedDeployParams, formSchema, FormSchema } from "./formValidation";
@@ -20,9 +14,7 @@ import { deploy } from "@/api/suifund";
 import { useRouter } from "next/navigation";
 import FormField from "./components/FormField";
 import FormSelect from "./components/FormSelect";
-import ImageUploader from "../imageUploader";
 import FormImage from "./components/FormImage";
-
 
 const ProjectForm: React.FC = () => {
   const currentUser = useCurrentAccount();
@@ -51,7 +43,7 @@ const ProjectForm: React.FC = () => {
 
   const getDeployFee = () => {
     const TDL = Number(watch("totalDeposit", BigInt(0)));
-    const fee = TDL * watch("ratioToBuilders", 0) /10000;
+    const fee = (TDL * watch("ratioToBuilders", 0)) / 10000;
     return Number.isNaN(fee) || fee < 20 ? 20 : fee;
   };
 
@@ -74,10 +66,6 @@ const ProjectForm: React.FC = () => {
     );
   };
 
-  const handleImageUpload = (file: any) => {
-    console.log(file);
-  }
-
   const projectTypeOptions = [
     { value: "defi", label: "DeFi" },
     { value: "nft", label: "NFT" },
@@ -87,147 +75,168 @@ const ProjectForm: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-md">
-        <FormField name="name" label="Name" placeholder="Name" />
-        <FormField
-          name="totalDeposit"
-          label="TDL(SUI)"
-          placeholder="Total Deposit Value"
-          tooltip="Total Deposit Value. The total amount of funds raised, including the portion distributed to the project team through the project treasury and the portion retained in the supporter ticket NFT."
-          valueAsNumber
-        />
-        <FormField
-          name="threshold_ratio"
-          label="Threshold Ratio"
-          placeholder=""
-          tooltip="Should be an integer less than or equal to 100. When the fundraising amount reaches TDL * Threshold Ratio / 100, the crowdfunding project is activated, and the project team can receive funds from the project treasury through streaming payments. Before this, the project team can choose to cancel the crowdfunding, and supporters can retrieve all their investments without loss."
-          valueAsNumber
-        />
-        <FormField
-          name="ratioToBuilders"
-          label="Ratio(%)"
-          placeholder="TDL * Ratio = CrowdFund for Builders"
-          tooltip="Should be an integer less than or equal to 100. A portion of the total funds raised, TDL * Ratio / 100, will be allocated to the project treasury for team expenses. The remaining portion will be locked with the supporters and will be used for exchange with the supporters' rights when the project is completed. It is recommended to choose an appropriate ratio parameter, such as 10% to 30%, unless the project's product is already very mature. The cost of deploying a crowdfunding project is TDL * Ratio / 10000."
-          valueAsNumber
-        />
-        <FormSelect
-          name="category"
-          label="Category"
-          options={projectTypeOptions}
-          placeholder="Select project Category"
-        />
-        <FormField
-          name="minValue"
-          label="Min Value(SUI)"
-          placeholder="Min Value"
-          tooltip="The minimum amount that project supporters must invest in the crowdfunding project each time, which should be set to be greater than or equal to 1 SUI."
-          valueAsNumber
-        />
-        <FormField
-          name="maxValue"
-          label="Max Value(SUI)"
-          placeholder="∞"
-          tooltip="The maximum amount that each project supporter can support for the crowdfunding project. The default value is 0, indicating no limit. It should be set to a value greater than the minimum amount when there is a concern about the risk of withdrawal due to over-reliance on a single investor."
-          valueAsNumber
-        />
-        <FormField
-          name="amount_per_sui"
-          label="Amount Per Sui"
-          placeholder="Amount Per Sui"
-          tooltip="The face value amount of the supporter ticket NFT that project supporters receive for each 1 SUI invested."
-          valueAsNumber
-        />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 max-w-6xl mx-auto">
+        {/* 基本信息部分 */}
+        <div className="p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField name="name" label="Project Name" placeholder="Enter project name" />
+            <FormSelect
+              name="category"
+              label="Category"
+              options={projectTypeOptions}
+              placeholder="Select project category"
+            />
+            <FormField
+              name="description"
+              label="Description"
+              placeholder="Project description, team introduction, previous work, and supporter benefits"
+              tooltip="This part can be edited in the future."
+              isTextarea
+            />
+            <FormImage name="imageUrl" label="Project Image" />
+          </div>
+        </div>
 
-        <div className="flex items-center">
-          <span className="mr-2 w-1/3">Start Time:</span>
-          <div className="w-2/3">
-            <Controller
-              control={control}
-              name="startTime"
-              render={({ field }) => (
-                <DatePicker
-                  selected={field.value}
-                  onChange={(date: Date | null) => {
-                    field.onChange(date);
-                    trigger("startTime");
-                  }}
-                  showTimeSelect
-                  dateFormat="Pp"
-                  className="min-full bg-primary-foreground border rounded px-3 py-2"
-                />
-              )}
+        {/* 财务设置部分 */}
+        <div className="p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Financial Settings</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormField
+              name="totalDeposit"
+              label="TDL (SUI)"
+              placeholder="Total Deposit Value"
+              tooltip="Total Deposit Value. The total amount of funds raised."
+              valueAsNumber
+            />
+            <FormField
+              name="threshold_ratio"
+              label="Threshold Ratio (%)"
+              placeholder="0-100"
+              tooltip="When the fundraising amount reaches TDL * Threshold Ratio / 100, the crowdfunding project is activated."
+              valueAsNumber
+            />
+            <FormField
+              name="ratioToBuilders"
+              label="Ratio to Builders (%)"
+              placeholder="TDL * Ratio = CrowdFund for Builders"
+              tooltip="Portion of the total funds raised allocated to the project treasury."
+              valueAsNumber
+            />
+            <FormField
+              name="minValue"
+              label="Min Investment (SUI)"
+              placeholder="Min Value"
+              tooltip="Minimum investment amount (≥ 1 SUI)"
+              valueAsNumber
+            />
+            <FormField
+              name="maxValue"
+              label="Max Investment (SUI)"
+              placeholder="∞"
+              tooltip="Maximum investment amount per supporter (0 for no limit)"
+              valueAsNumber
+            />
+            <FormField
+              name="amount_per_sui"
+              label="Amount Per SUI"
+              placeholder="Face value per 1 SUI"
+              tooltip="Face value of supporter ticket NFT per 1 SUI invested"
+              valueAsNumber
             />
           </div>
         </div>
-        {errors.startTime && (
-          <p className="text-red-500">{errors.startTime.message}</p>
-        )}
 
-        <FormField
-          name="projectDuration"
-          label="Duration"
-          placeholder="Development Time (days)"
-          tooltip="The estimated project execution period, in days, with a minimum of three days. The fundraising in the project treasury will be linearly unlocked and allocated according to the project cycle time. It is recommended to set a reasonable project cycle unless the project's product is already very mature."
-          valueAsNumber
-        />
-        <FormField
-          name="description"
-          label="Description"
-          placeholder="Description"
-          tooltip="Project description. It is recommended to include an introduction to the project, the project team, proof of previous work, and the returns that project supporters can get. This part can be edited again in the future."
-          isTextarea
-        />       
+        {/* 时间设置部分 */}
+        <div className="p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Time Settings</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Start Time</label>
+              <Controller
+                control={control}
+                name="startTime"
+                render={({ field }) => (
+                  <DatePicker
+                    selected={field.value}
+                    onChange={(date: Date | null) => {
+                      field.onChange(date);
+                      trigger("startTime");
+                    }}
+                    showTimeSelect
+                    dateFormat="Pp"
+                    className="w-full bg-primary-foreground border rounded px-3 py-2"
+                  />
+                )}
+              />
+              {errors.startTime && (
+                <p className="text-red-500 text-sm">{errors.startTime.message}</p>
+              )}
+            </div>
+            <FormField
+              name="projectDuration"
+              label="Duration (days)"
+              placeholder="Development Time"
+              tooltip="Estimated project execution period in days (minimum 3 days)"
+              valueAsNumber
+            />
+          </div>
+        </div>
 
-        <Accordion type="single" collapsible>
-          <AccordionItem value="Optional">
-            <AccordionTrigger>Some more options ?</AccordionTrigger>
-            <AccordionContent>
-              <FormImage name={"imageUrl"} label={"Image URL"}/>
-              <FormField
-                name="linktree"
-                label="LinkTree"
-                placeholder="LinkTree (Optional)"
-                optional
-              />
-              <FormField
-                name="xLink"
-                label="X Link"
-                placeholder="X Link (Optional)"
-                optional
-              />
-              <FormField
-                name="telegramLink"
-                label="Telegram Link"
-                placeholder="Telegram Link (Optional)"
-                optional
-              />
-              <FormField
-                name="discord"
-                label="Discord"
-                placeholder="Discord (Optional)"
-                optional
-              />
-              <FormField
-                name="website"
-                label="Website"
-                placeholder="Website (Optional)"
-                optional
-              />
-              <FormField
-                name="github"
-                label="Github"
-                placeholder="Github (Optional)"
-                optional
-              />
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+        {/* 社交链接部分 */}
+        <div className="p-6 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Social Links</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <FormField
+              name="linktree"
+              label="LinkTree"
+              placeholder="LinkTree URL (Optional)"
+              optional
+            />
+            <FormField
+              name="xLink"
+              label="X (Twitter) Link"
+              placeholder="X Profile URL (Optional)"
+              optional
+            />
+            <FormField
+              name="telegramLink"
+              label="Telegram Link"
+              placeholder="Telegram Group/Channel URL (Optional)"
+              optional
+            />
+            <FormField
+              name="discord"
+              label="Discord"
+              placeholder="Discord Invite URL (Optional)"
+              optional
+            />
+            <FormField
+              name="website"
+              label="Website"
+              placeholder="Project Website URL (Optional)"
+              optional
+            />
+            <FormField
+              name="github"
+              label="Github"
+              placeholder="Github Repository URL (Optional)"
+              optional
+            />
+          </div>
+        </div>
 
-        <Button className="min-w-full" type="submit" disabled={isSubmitting}>
-          Create Project
-        </Button>
-
-        <p className="text-cyan-400">Deploy Fee: {getDeployFee()} SUI</p>
+        {/* 提交按钮部分 */}
+        <div className="flex flex-col items-center space-y-4">
+          <Button
+            className="w-full max-w-md text-lg py-3"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            Create Project
+          </Button>
+          <p className="text-cyan-600 font-semibold">Deploy Fee: {getDeployFee()} SUI</p>
+        </div>
       </form>
     </FormProvider>
   );

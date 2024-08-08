@@ -43,14 +43,16 @@ const FormField: React.FC<FormFieldProps> = ({
   const errorText = typeof errorMessage === "string" ? errorMessage : undefined;
 
   return (
-    <div className={`flex items-center ${className}`}>
-      <span className="mr-2 w-1/3 text-nowrap flex items-center">
-        {label}:
+    <div className={`flex flex-col space-y-2 ${className}`}>
+      <div className="flex items-center">
+        <label htmlFor={name} className="text-sm font-medium text-gray-700">
+          {label}
+        </label>
         {tooltip && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <InfoIcon className="ml-1 h-4 w-4 cursor-help" />
+                <InfoIcon className="ml-1 h-4 w-4 cursor-help text-gray-400" />
               </TooltipTrigger>
               <TooltipContent>
                 <article className="text-pretty max-w-sm">
@@ -60,19 +62,22 @@ const FormField: React.FC<FormFieldProps> = ({
             </Tooltip>
           </TooltipProvider>
         )}
-      </span>
-      <div className="w-2/3">
+      </div>
+      <div className="w-full">
         {isTextarea ? (
           <Textarea
+            id={name}
             {...register(name, {
               required: !optional && `${label} is required`,
               valueAsNumber,
             })}
             placeholder={placeholder}
             onBlur={() => trigger(name)}
+            className="w-full"
           />
         ) : (
           <Input
+            id={name}
             {...register(name, {
               required: !optional && `${label} is required`,
               valueAsNumber,
@@ -80,9 +85,10 @@ const FormField: React.FC<FormFieldProps> = ({
             type={type}
             placeholder={placeholder}
             onBlur={() => trigger(name)}
+            className="w-full"
           />
         )}
-        {errorText && <p className="text-red-500">{errorText}</p>}
+        {errorText && <p className="text-red-500 text-sm mt-1">{errorText}</p>}
       </div>
     </div>
   );
