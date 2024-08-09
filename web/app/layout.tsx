@@ -31,7 +31,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         ) : (
-          children
+          <div className="bg-black"></div>
         )}
       </body>
     </html>
