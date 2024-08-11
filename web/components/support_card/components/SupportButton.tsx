@@ -18,7 +18,7 @@ const SupportButton: React.FC<SupportButtonProps> = ({
     }
   };
   return (
-    <div className="relative inline-block my-2">
+    <div className="relative inline-block my-1 scale-50 xl:scale-75 h-full">
       <div
         className={`absolute inset-0 min-h-10 flex justify-center items-center ${
           disabled && disabled ? "" : "hover:cursor-pointer hover:scale-125"
@@ -28,8 +28,9 @@ const SupportButton: React.FC<SupportButtonProps> = ({
         <Image
           src={"/images/Supporter_Ticket_Button.png"}
           alt="Button background"
-          layout="fill"
-          objectFit="contain"
+          fill
+          style={{ objectFit: "fill" }}
+          sizes="100%"
           className={`w-full h-full ${
             disabled && disabled ? "contrast-50 brightness-50" : ""
           }`}
@@ -37,7 +38,7 @@ const SupportButton: React.FC<SupportButtonProps> = ({
         <span
           className={`z-10  font-bold ${
             disabled && disabled ? "text-gray-500" : "text-orange-200"
-          }`}
+          } text-xl`}
         >
           {children}
         </span>

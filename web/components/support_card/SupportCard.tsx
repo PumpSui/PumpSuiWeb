@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import SupportButton from "./components/SupportButton";
 
@@ -16,49 +16,43 @@ interface SupportCardProps {
   onCardClick?: (id: string) => void;
 }
 
-const SupportCard: React.FC<SupportCardProps> = ({
-  id,
-  base64Image,
-  name,
-  amount,
-  onButtonClick,
-  className = "",
-  isSelected = false,
-  isMultiSelectMode = false,
-  onCardClick,
-}) => {
-  const [isFlipped, setIsFlipped] = useState(false);
+const SupportCard: React.FC<SupportCardProps> = React.memo(
+  ({
+    id,
+    base64Image,
+    name,
+    amount,
+    onButtonClick,
+    className = "",
+    isSelected = false,
+    isMultiSelectMode = false,
+    onCardClick,
+  }) => {
+    const [isFlipped, setIsFlipped] = useState(false);
 
-  const handleButtonClick = (action: ButtonAction) => {
-    onButtonClick(action, name, id);
-  };
+    const handleButtonClick = useCallback(
+      (action: ButtonAction) => {
+        onButtonClick(action, name, id);
+      },
+      [onButtonClick, name, id]
+    );
 
-  const handleCardClick = () => {
-    if (isMultiSelectMode && onCardClick) {
-      onCardClick(id);
-    }
-  };
+    const handleCardClick = useCallback(() => {
+      if (isMultiSelectMode && onCardClick) {
+        onCardClick(id);
+      }
+    }, [isMultiSelectMode, onCardClick, id]);
 
-  return (
-    <div
-      className={`relative w-full max-w-[500px] aspect-square ${className} ${
-        isSelected ? "ring-4 ring-blue-500" : ""
-      }`}
-      onMouseEnter={() => !isMultiSelectMode && setIsFlipped(true)}
-      onMouseLeave={() => !isMultiSelectMode && setIsFlipped(false)}
-      onClick={handleCardClick}
-    >
-      <div
-        className={`w-full h-full transition-all duration-700 [perspective:1000px]`}
-        style={{
-          transformStyle: "preserve-3d",
-          transform:
-            isFlipped && !isMultiSelectMode
-              ? "rotateY(180deg)"
-              : "rotateY(0deg)",
-        }}
-      >
-        {/* Front side */}
+    const cardStyle = useMemo(
+      () =>
+        ({
+          "--rotation": isFlipped && !isMultiSelectMode ? "180deg" : "0deg",
+        } as React.CSSProperties),
+      [isFlipped, isMultiSelectMode]
+    );
+
+    const frontSide = useMemo(
+      () => (
         <div
           className="absolute w-full h-full backface-hidden"
           style={{ backfaceVisibility: "hidden" }}
@@ -68,7 +62,6 @@ const SupportCard: React.FC<SupportCardProps> = ({
             viewBox="0 0 2492 2492"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* SVG content remains the same */}
             <defs>
               <filter id="golden-outline">
                 <feFlood floodColor="#FFD700" floodOpacity="1" result="gold" />
@@ -152,8 +145,12 @@ const SupportCard: React.FC<SupportCardProps> = ({
             </text>
           </svg>
         </div>
+      ),
+      [base64Image, name, amount]
+    );
 
-        {/* Back side */}
+    const backSide = useMemo(
+      () => (
         <div
           className="absolute inset-0 w-full h-full backface-hidden"
           style={{
@@ -165,57 +162,89 @@ const SupportCard: React.FC<SupportCardProps> = ({
             <Image
               src="/images/Supporter_Ticket_Back.svg"
               alt="Ticket Background"
-              layout="fill"
-              objectFit="fill"
+              fill
+              sizes="(max-width: 500px) 100vw, 500px"
+              priority
+              style={{ objectFit: "fill" }}
             />
 
-            <div className="absolute inset-0 flex flex-col justify-center items-center p-4 mb-10">
-              <div className="bg-opacity-80 rounded-lg p-4 w-4/5 max-w-[300px]">
-                <div className="flex flex-col gap-10">
-                  <SupportButton onClick={() => handleButtonClick("transfer")}>
-                    Transfer
-                  </SupportButton>
-                  <SupportButton onClick={() => handleButtonClick("merge")}>
-                    Merge
-                  </SupportButton>
-                  <SupportButton onClick={() => handleButtonClick("split")}>
-                    Split
-                  </SupportButton>
-                  <SupportButton onClick={() => handleButtonClick("burn")}>
-                    <p className="text-destructive">Burn</p>
-                  </SupportButton>
-                  <SupportButton
-                    disabled
-                    onClick={() => handleButtonClick("stake")}
-                  >
-                    Stake
-                  </SupportButton>
-                </div>
+            <div className="absolute inset-0 flex flex-col justify-center items-center">
+              <div className="flex flex-col bg-opacity-80 rounded-lg p-8 lg:p-12 w-4/5 max-w-[300px] h-full">
+                <SupportButton onClick={() => handleButtonClick("transfer")}>
+                  Transfer
+                </SupportButton>
+                <SupportButton onClick={() => handleButtonClick("merge")}>
+                  Merge
+                </SupportButton>
+                <SupportButton onClick={() => handleButtonClick("split")}>
+                  Split
+                </SupportButton>
+                <SupportButton onClick={() => handleButtonClick("burn")}>
+                  <p className="text-destructive">Burn</p>
+                </SupportButton>
+                <SupportButton
+                  disabled
+                  onClick={() => handleButtonClick("stake")}
+                >
+                  Stake
+                </SupportButton>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      {isMultiSelectMode && isSelected && (
-        <div className="absolute top-2 right-2 bg-blue-500 text-white rounded-full p-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
+      ),
+      [handleButtonClick]
+    );
+
+    return (
+      <div
+        className={`relative w-full max-w-[500px] aspect-square ${className} ${
+          isSelected ? "ring-4 ring-blue-500" : ""
+        }`}
+        onMouseEnter={useCallback(
+          () => !isMultiSelectMode && setIsFlipped(true),
+          [isMultiSelectMode]
+        )}
+        onMouseLeave={useCallback(
+          () => !isMultiSelectMode && setIsFlipped(false),
+          [isMultiSelectMode]
+        )}
+        onClick={handleCardClick}
+      >
+        <div
+          className={`w-full h-full transition-all duration-700 [perspective:1000px]`}
+          style={{
+            transformStyle: "preserve-3d",
+            transform: `rotateY(var(--rotation))`,
+            ...cardStyle,
+          }}
+        >
+          {frontSide}
+          {backSide}
         </div>
-      )}
-    </div>
-  );
-};
+        {isMultiSelectMode && isSelected && (
+          <div className="absolute top-2 right-2 bg-blue-500 text-white rounded-full p-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+        )}
+      </div>
+    );
+  }
+);
+
+SupportCard.displayName = "SupportCard";
 
 export default SupportCard;

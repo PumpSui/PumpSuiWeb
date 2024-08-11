@@ -30,7 +30,8 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           src="/images/card.svg"
           alt="Background"
           fill
-          className="object-fill"
+          sizes="100%"
+          priority
           quality={75}
         />
       </div>
@@ -40,8 +41,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           src={project.image_url || "/images/DemoProject.png"}
           alt="Project"
           fill
-          className="object-fill"
-          objectFit="cover"
+          sizes="100%"
           quality={75}
         />
       </div>
@@ -51,11 +51,13 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           src="/images/rocket.svg"
           alt="Rocket"
           fill
-          className={`object-fill ${
+          priority
+          className={`${
             project.start_time_ms < currentTime
               ? styles.activeRocket
               : " brightness-50 saturate-50"
           }`}
+          sizes="100%"
           quality={75}
         />
       </div>

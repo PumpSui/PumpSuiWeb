@@ -6,33 +6,48 @@ import SupportCard, {
 } from "@/components/support_card/SupportCard";
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
 import { isValidSuiAddress } from "@mysten/sui/utils";
+import { useState, useMemo, useCallback } from "react";
 import useSWR from "swr";
-import { useState, useEffect } from "react";
-import { ProjectReward } from "@/type";
+import {
+  ConfirmationData,
+  SupportCardActionDialog,
+  SupportCardActionDialogData,
+} from "@/components/support_card/components/SupportCardActionDialog";
+import React from "react";
+import useTicketActions from "@/hooks/useTicketActions";
+import { SuiClient } from "@mysten/sui/client";
+
+const getSwrKey = (client: SuiClient | null, address: string | undefined) =>
+  ["supportTickets", client, address] as const;
 
 const Page = () => {
   const currentAccount = useCurrentAccount();
   const address = currentAccount?.address;
   const client = useSuiClient();
-  const { data } = useSWR([client, address], ([client, address]) =>
+  const swrkey = getSwrKey(client, address!);
+  const { data, mutate } = useSWR(swrkey, ([_, client, address]) =>
     address && isValidSuiAddress(address)
-      ? getAllSupportTicket(client, address)
+      ? getAllSupportTicket(client!, address)
       : null
   );
 
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const [filteredData, setFilteredData] = useState<ProjectReward[]>([]);
+
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogData, setDialogData] = useState<
+    SupportCardActionDialogData | undefined
+  >(undefined);
+  const { transferTicket } = useTicketActions(async () => {
+    await mutate(undefined,{revalidate:true});
+  });
 
-  useEffect(() => {
-    if (data) {
-      if (selectedProject) {
-        setFilteredData(data.filter((item) => item.name === selectedProject));
-      } else {
-        setFilteredData(data);
-      }
-    }
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    return selectedProject
+      ? data.filter((item) => item.name === selectedProject)
+      : data;
   }, [data, selectedProject]);
 
   const handleCategorySelect = (project: string) => {
@@ -41,30 +56,36 @@ const Page = () => {
     setSelectedProject(project === selectedProject ? null : project);
   };
 
-  const handleSupportButtonClick = (
-    action: ButtonAction,
-    name: string,
-    id: string
-  ) => {
-    if (action === "merge") {
-      setIsMultiSelectMode(true);
-      setSelectedProject(name);
-      setSelectedCards([id]);
-    } else {
-      // Handle other actions
-      console.log(`Action: ${action}, Name: ${name}, ID: ${id}`);
-    }
-  };
+  const handleSupportButtonClick = useCallback(
+    (action: ButtonAction, name: string, id: string) => {
+      if (action === "merge") {
+        setIsMultiSelectMode(true);
+        setSelectedProject(name);
+        setSelectedCards([id]);
+      } else {
+        // Handle other actions
+        const ticket = data?.find((item) => item.id === id);
+        if (ticket) {
+          setDialogData({ ticket, action });
+          setIsDialogOpen(true);
+        }
+      }
+    },
+    [data]
+  );
 
-  const handleCardClick = (id: string) => {
-    if (isMultiSelectMode) {
-      setSelectedCards((prev) =>
-        prev.includes(id)
-          ? prev.filter((cardId) => cardId !== id)
-          : [...prev, id]
-      );
-    }
-  };
+  const handleCardClick = useCallback(
+    (id: string) => {
+      if (isMultiSelectMode) {
+        setSelectedCards((prev) =>
+          prev.includes(id)
+            ? prev.filter((cardId) => cardId !== id)
+            : [...prev, id]
+        );
+      }
+    },
+    [isMultiSelectMode]
+  );
 
   const handleMergeConfirm = () => {
     // Implement merge logic here
@@ -72,6 +93,26 @@ const Page = () => {
     // Reset multi-select mode and selected cards
     setIsMultiSelectMode(false);
     setSelectedCards([]);
+  };
+
+  const handleActionDialogConfirm = async (data: ConfirmationData) => {
+    switch (data.action) {
+      case "transfer":
+        console.log("Transfering ticket:", data);
+        await transferTicket(data.id, data.address!)        
+        break;
+      case "split":
+        console.log("Spliting ticket:", data);
+        break;
+      case "burn":
+        console.log("Burning ticket:", data);
+        break;
+      case "stake":
+        console.log("Staking ticket:", data);
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -103,7 +144,7 @@ const Page = () => {
         </div>
       </div>
       {isMultiSelectMode && (
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-800 p-4 flex justify-between items-center">
+        <div className="fixed top-24 left-0 right-0 bg-gray-800 p-4 flex justify-between items-center">
           <span className="text-white">
             Selected: {selectedCards.length} cards
           </span>
@@ -115,6 +156,12 @@ const Page = () => {
           </button>
         </div>
       )}
+      <SupportCardActionDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onConfirm={handleActionDialogConfirm}
+        data={dialogData}
+      />
     </div>
   );
 };
