@@ -9,8 +9,6 @@ import {
   CardTitle,
 } from "../ui/card";
 import { ProjectRecord } from "@/type";
-import { useRouter } from "next/navigation";
-import { useProject } from "../providers/ProjectContext";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import ProjectDetailItem from "./components/ProjectDetailItem";
