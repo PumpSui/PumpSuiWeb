@@ -45,7 +45,7 @@ const Page: React.FC = () => {
   >(undefined);
 
   const { transferTicket, burnTicket, mergeTickets, splitTicket } =
-    useTicketActions();
+    useTicketActions(async () => await refreshData());
 
   const handleCategorySelect = useCallback(
     (project: string) => {
@@ -90,7 +90,7 @@ const Page: React.FC = () => {
     await mergeTickets(selectedCards);
     setIsMultiSelectMode(false);
     setSelectedCards([]);
-    refreshData();
+    await refreshData();
   };
 
   const handleMergeCancel = () => {
@@ -114,7 +114,6 @@ const Page: React.FC = () => {
         console.log("Staking ticket:", c_data);
         break;
     }
-    refreshData();
   };
 
   if (error) return <div>Error loading tickets: {error.message}</div>;

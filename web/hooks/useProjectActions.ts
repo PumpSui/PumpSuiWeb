@@ -81,13 +81,7 @@ const useProjectActions = (selectedProject: ProjectRecord | null) => {
         }
       );
     },
-    [
-      adminCapMap,
-      refreshProjectData,
-      selectedProject,
-      signAndExecuteTransaction,
-      toast,
-    ]
+    [adminCapMap, currentAccount, refreshProjectData, selectedProject, signAndExecuteTransaction, toast]
   );
 
   const handleClaimSubmit = useCallback(async () => {

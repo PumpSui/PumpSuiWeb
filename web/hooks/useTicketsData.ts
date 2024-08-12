@@ -37,6 +37,13 @@ export const useTicketsData = (
     false
   );
 
+  const refreshData = useCallback(async () => {
+    setSelectedProject(null); // 重置选中的项目
+    setCurrentPage(1); // 重置当前页面
+    await resetData();
+    await fetchData();
+  }, [resetData, fetchData]);
+
   const filteredTickets = useMemo(() => {
     return selectedProject
       ? allTickets.filter((item) => item.name === selectedProject)
@@ -50,11 +57,7 @@ export const useTicketsData = (
 
   const totalPages = Math.ceil(filteredTickets.length / ticketsPerPage);
 
-  const refreshData = useCallback(() => {
-    resetData();
-    fetchData();
-    setCurrentPage(1);
-  }, [resetData, fetchData]);
+  
 
   const loadMore = useCallback(() => {
     if (currentPage < totalPages) {
@@ -66,7 +69,7 @@ export const useTicketsData = (
 
   useEffect(() => {
     fetchData();
-  }, [fetchData,address]);
+  }, [fetchData, address]);
 
   return {
     tickets: paginatedTickets,
