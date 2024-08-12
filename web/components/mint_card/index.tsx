@@ -60,7 +60,7 @@ const MintCard: React.FC<ProjectCardProps> = ({
 
   const handleClaim = () => {
     onSubmitClaim();
-  }
+  };
 
   return (
     <Card className={`max-w-sm bg-secondary rounded-2xl`}>
@@ -68,8 +68,21 @@ const MintCard: React.FC<ProjectCardProps> = ({
         <div className="flex-grow">
           <CardHeader>
             <CardTitle className="text-xl">
-              <div className="">
-                Mint Progress
+              <div>
+                <div className="flex justify-between items-center">
+                  <h1 className="font-extrabold text-2xl max-w-xs overflow-hidden text-ellipsis whitespace-nowrap">
+                    {"Progress"}
+                  </h1>
+                  <div className="inline-block space-x-1">
+                    <p className="inline-block text-orange-400 text-sm">
+                      {project.remain}
+                    </p>
+                    <p className="inline-block">/</p>
+                    <p className="inline-block text-blue-400 text-sm">
+                      {project.total_supply}
+                    </p>
+                  </div>
+                </div>
                 <Progress
                   value={(1 - project.remain / project.total_supply) * 100}
                   className="w-full mt-2 self-center min-h-6 bg-primary-foreground rounded-lg "
@@ -129,15 +142,16 @@ const MintCard: React.FC<ProjectCardProps> = ({
           </CardContent>
           <CardFooter>
             <div className="flex flex-col w-full max-w-sm space-y-5">
-              <div className="flex justify-between items-center gap-5">
+              <div className="flex items-center gap-1">
                 <Input
                   type="number"
-                  className="bg-primary-foreground w-1/2"
+                  className="bg-primary-foreground w-1/3"
                   value={inputValue}
                   onChange={handleInputChange}
                 />
                 <p className="text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                  Receive: {inputValue && inputValue * project.amount_per_sui}{" "}
+                  <p className="inline-block font-bold text-blue-400">Sui</p> ={" "}
+                  {inputValue && inputValue * project.amount_per_sui}{" "}
                   {project.name}
                 </p>
               </div>

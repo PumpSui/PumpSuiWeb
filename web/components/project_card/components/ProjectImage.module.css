@@ -1,0 +1,34 @@
+.imageContainer {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.scrollingWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 200%; /* 两倍高度 */
+  animation: scrollY 10s linear infinite;
+}
+
+.scrollingImage {
+  width: 100%;
+  height: 50%; /* 每个图像占总高度的一半 */
+  object-fit: cover;
+}
+
+@keyframes scrollY {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+/* 可选：鼠标悬停时暂停动画 */
+.imageContainer:hover .scrollingWrapper {
+  animation-play-state: paused;
+}

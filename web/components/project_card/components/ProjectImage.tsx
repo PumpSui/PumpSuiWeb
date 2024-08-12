@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import styles from "./ProjectImage.module.css"; // 假设我们将CSS放在这个文件中
 
 interface ProjectImageProps {
   imageUrl: string;
@@ -27,20 +28,29 @@ const ProjectImage: React.FC<ProjectImageProps> = ({
   }, []);
 
   return (
-    <div
-      className="relative min-w-min w-full"
-      style={{ height: `${height}px` }}
-    >
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        style={{ objectFit: "cover" }}
-        className="rounded-2xl"
-        onError={handleError}
-        priority={priority}
-      />
+    <div className={styles.imageContainer} style={{ height: `${height}px` }}>
+      <div className={styles.scrollingWrapper}>
+        <Image
+          src={src}
+          alt={alt}
+          width={500} // 设置一个合适的宽度
+          height={height}
+          objectFit="cover"
+          className={styles.scrollingImage}
+          onError={handleError}
+          priority={priority}
+        />
+        <Image
+          src={src}
+          alt={alt}
+          width={500} // 设置一个合适的宽度
+          height={height}
+          objectFit="cover"
+          className={styles.scrollingImage}
+          onError={handleError}
+          priority={priority}
+        />
+      </div>
     </div>
   );
 };
