@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useCallback, useEffect } from "react";
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ProjectListView } from "@/components/ProjectListView";
 import { useProjectsData } from "@/hooks/useProjectsData";
 import { useProjectFilters } from "@/hooks/useProjectFilters";

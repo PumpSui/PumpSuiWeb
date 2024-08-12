@@ -16,6 +16,8 @@ import {
 import React from "react";
 import useTicketActions from "@/hooks/useTicketActions";
 import { SuiClient } from "@mysten/sui/client";
+import { Button } from "@/components/ui/button";
+import { ProjectReward } from "@/type";
 
 const getSwrKey = (client: SuiClient | null, address: string | undefined) =>
   ["supportTickets", client, address] as const;
@@ -39,7 +41,7 @@ const Page = () => {
   const [dialogData, setDialogData] = useState<
     SupportCardActionDialogData | undefined
   >(undefined);
-  const { transferTicket } = useTicketActions(async () => {
+  const { transferTicket,burnTicket } = useTicketActions(async () => {
     await mutate(undefined,{revalidate:true});
   });
 
@@ -95,20 +97,27 @@ const Page = () => {
     setSelectedCards([]);
   };
 
-  const handleActionDialogConfirm = async (data: ConfirmationData) => {
-    switch (data.action) {
+  const handleMergeCancel = () => {
+    setIsMultiSelectMode(false);
+    setSelectedCards([]);
+  }
+
+  const handleActionDialogConfirm = async (c_data: ConfirmationData) => {
+    const ticket = data!.find((item) => item.id === c_data.id)!;
+    switch (c_data.action) {
       case "transfer":
-        console.log("Transfering ticket:", data);
-        await transferTicket(data.id, data.address!)        
+        console.log("Transfering ticket:", c_data);
+        await transferTicket(ticket, c_data.address!);        
         break;
       case "split":
-        console.log("Spliting ticket:", data);
+        console.log("Spliting ticket:", c_data);
         break;
       case "burn":
-        console.log("Burning ticket:", data);
+        await burnTicket(ticket, currentAccount!.address);
+        console.log("Burning ticket:", c_data);
         break;
       case "stake":
-        console.log("Staking ticket:", data);
+        console.log("Staking ticket:", c_data);
         break;
       default:
         break;
@@ -144,16 +153,23 @@ const Page = () => {
         </div>
       </div>
       {isMultiSelectMode && (
-        <div className="fixed top-24 left-0 right-0 bg-gray-800 p-4 flex justify-between items-center">
+        <div className="fixed top-24 left-0 right-0 bg-gray-800 p-4 flex justify-between items-center gap-5">
           <span className="text-white">
             Selected: {selectedCards.length} cards
           </span>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          <Button
+            className="ml-auto"
+            onClick={handleMergeCancel}
+            variant={"destructive"}
+          >
+            Cancel
+          </Button>
+          <Button
+            className=""
             onClick={handleMergeConfirm}
           >
             Merge Selected
-          </button>
+          </Button>
         </div>
       )}
       <SupportCardActionDialog
@@ -167,3 +183,4 @@ const Page = () => {
 };
 
 export default Page;
+
