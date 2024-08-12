@@ -13,13 +13,25 @@ interface PaginationComponentProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onLoadMore?: () => void; // 新增的可选属性
+  hasNextPage?: boolean; // 新增的可选属性，用于判断是否有下一页
 }
 
 export const PaginationComponent: React.FC<PaginationComponentProps> = ({
   currentPage,
   totalPages,
   onPageChange,
+  onLoadMore,
+  hasNextPage = false,
 }) => {
+  const handleNextClick = () => {
+    if (currentPage < totalPages) {
+      onPageChange(currentPage + 1);
+    } else if (hasNextPage && onLoadMore) {
+      onLoadMore();
+    }
+  };
+
   return (
     <Pagination className="mt-10">
       <PaginationContent>
@@ -43,8 +55,8 @@ export const PaginationComponent: React.FC<PaginationComponentProps> = ({
         ))}
         <PaginationItem>
           <PaginationNext
-            onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-            isActive={currentPage === totalPages}
+            onClick={handleNextClick}
+            isActive={currentPage === totalPages && !hasNextPage}
             href={"#"}
           />
         </PaginationItem>

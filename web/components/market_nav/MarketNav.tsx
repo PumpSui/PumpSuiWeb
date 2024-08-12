@@ -25,15 +25,14 @@ const MarketNav: React.FC<MarketNavProps> = ({
   return (
     <nav className="flex flex-col border-r-2 border-gray-700 min-h-screen">
       <div className="px-8">
-        <div>
-          <h1 className="text-2xl font-bold">Projects</h1>
+        <div className="w-40">
           {categories.map((category, index) => (
             <div key={index} className="mt-4">
               <Button
                 variant={selectedProject === category ? "default" : "ghost"}
                 onClick={() => onProjectSelect(category)}
               >
-                {category}
+                <p className="font-bold">{category.toUpperCase()}</p>
               </Button>
             </div>
           ))}

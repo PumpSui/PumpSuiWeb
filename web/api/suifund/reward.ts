@@ -1,4 +1,4 @@
-import { ProjectReward } from "@/type";
+import { ObjectsResponseType, ProjectReward } from "@/type";
 import { bcs } from "@mysten/sui/bcs";
 import { SuiClient } from "@mysten/sui/client";
 import { Transaction } from "@mysten/sui/transactions";
@@ -97,17 +97,19 @@ const do_burn = (project_record: string, sp_rwd: string, sender: string) => {
 
 const getAllSupportTicket = async (
   client: SuiClient,
-  address: string
-): Promise<ProjectReward[]> => {
-  const response = await client.getOwnedObjects({
+  address: string,
+  cursor: string|null
+): Promise<ObjectsResponseType<ProjectReward>> => {
+  const {data,hasNextPage,nextCursor} = await client.getOwnedObjects({
     owner: address,
     filter: {
       StructType: `${process.env.NEXT_PUBLIC_PACKAGE}::suifund::SupporterReward`,
     },
     options: { showContent: true },
+    cursor: cursor,
   });
-  const data = response.data as any;
-  const result:ProjectReward[] = data.map((item: any) => {
+  const Resdata = data as any;
+  const result: ProjectReward[] = Resdata.map((item: any) => {
     return {
       id: item.data.content.fields.id.id,
       name: item.data.content.fields.name,
@@ -119,7 +121,7 @@ const getAllSupportTicket = async (
       end: item.data.content.fields.end,
     };
   });
-  return result;
+  return {data: result, hasNextPage, nextCursor};
 };
 
 

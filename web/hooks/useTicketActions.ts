@@ -5,7 +5,7 @@ import { useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import { isValidSuiAddress } from "@mysten/sui/utils";
 
-const useTicketActions = (onSuccess: () => void) => {
+const useTicketActions = (onSuccess?: () => void) => {
   const { toast } = useToast();
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
@@ -24,7 +24,7 @@ const useTicketActions = (onSuccess: () => void) => {
       },
       {
         onSuccess: (res) => {
-          onSuccess();
+          onSuccess && onSuccess();
           toast({
             title: "Success",
             description: `Ticket transferred successfully \n 
@@ -53,7 +53,7 @@ const useTicketActions = (onSuccess: () => void) => {
       },
       {
         onSuccess: () => {
-          onSuccess();
+         onSuccess && onSuccess();
           toast({
             title: "Success",
             description: `Ticket burned successfully`,
@@ -92,7 +92,7 @@ const useTicketActions = (onSuccess: () => void) => {
       },
       {
         onSuccess: () => {
-          onSuccess();
+          onSuccess && onSuccess();
           toast({
             title: "Success",
             description: `Tickets merged successfully`,
@@ -123,7 +123,7 @@ const useTicketActions = (onSuccess: () => void) => {
       },
       {
         onSuccess: () => {
-          onSuccess();
+          onSuccess && onSuccess();
           toast({
             title: "Success",
             description: `Ticket split successfully`,

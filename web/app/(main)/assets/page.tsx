@@ -1,39 +1,41 @@
+// pages/Page.tsx
 "use client";
-import { getAllSupportTicket } from "@/api/suifund";
-import MarketNav from "@/components/market_nav/MarketNav";
-import SupportCard, {
-  ButtonAction,
-} from "@/components/support_card/SupportCard";
+import React, { useState, useCallback } from "react";
 import { useCurrentAccount, useSuiClient } from "@mysten/dapp-kit";
-import { isValidSuiAddress } from "@mysten/sui/utils";
-import { useState, useMemo, useCallback } from "react";
-import useSWR from "swr";
+import MarketNav from "@/components/market_nav/MarketNav";
 import {
   ConfirmationData,
   SupportCardActionDialog,
   SupportCardActionDialogData,
 } from "@/components/support_card/components/SupportCardActionDialog";
-import React from "react";
 import useTicketActions from "@/hooks/useTicketActions";
-import { SuiClient } from "@mysten/sui/client";
 import { Button } from "@/components/ui/button";
-import { ProjectReward } from "@/type";
+import { useTicketsData } from "@/hooks/useTicketsData";
+import { PaginationComponent } from "@/components/PaginationComponent";
+import TicketList from "@/components/TicketList";
+import MergeActionBar from "@/components/MergeActionBar";
+import { ButtonAction } from "@/components/support_card/SupportCard";
 
-const getSwrKey = (client: SuiClient | null, address: string | undefined) =>
-  ["supportTickets", client, address] as const;
+const TICKETS_PER_PAGE = 50;
 
-const Page = () => {
+const Page: React.FC = () => {
   const currentAccount = useCurrentAccount();
-  const address = currentAccount?.address;
   const client = useSuiClient();
-  const swrkey = getSwrKey(client, address!);
-  const { data, mutate } = useSWR(swrkey, ([_, client, address]) =>
-    address && isValidSuiAddress(address)
-      ? getAllSupportTicket(client!, address)
-      : null
-  );
 
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const {
+    tickets,
+    allTickets,
+    isLoading,
+    error,
+    loadMore,
+    refreshData,
+    selectedProject,
+    setSelectedProject,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    hasNextPage,
+  } = useTicketsData(client, currentAccount?.address!, TICKETS_PER_PAGE);
 
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
@@ -41,22 +43,18 @@ const Page = () => {
   const [dialogData, setDialogData] = useState<
     SupportCardActionDialogData | undefined
   >(undefined);
-  const { transferTicket,burnTicket,mergeTickets,splitTicket } = useTicketActions(async () => {
-    await mutate(undefined,{revalidate:true});
-  });
 
-  const filteredData = useMemo(() => {
-    if (!data) return [];
-    return selectedProject
-      ? data.filter((item) => item.name === selectedProject)
-      : data;
-  }, [data, selectedProject]);
+  const { transferTicket, burnTicket, mergeTickets, splitTicket } =
+    useTicketActions();
 
-  const handleCategorySelect = (project: string) => {
-    setSelectedCards([]);
-    setIsMultiSelectMode(false);
-    setSelectedProject(project === selectedProject ? null : project);
-  };
+  const handleCategorySelect = useCallback(
+    (project: string) => {
+      setSelectedCards([]);
+      setIsMultiSelectMode(false);
+      setSelectedProject(project === selectedProject ? null : project);
+    },
+    [selectedProject, setSelectedProject]
+  );
 
   const handleSupportButtonClick = useCallback(
     (action: ButtonAction, name: string, id: string) => {
@@ -65,15 +63,14 @@ const Page = () => {
         setSelectedProject(name);
         setSelectedCards([id]);
       } else {
-        // Handle other actions
-        const ticket = data?.find((item) => item.id === id);
+        const ticket = tickets.find((item) => item.id === id);
         if (ticket) {
           setDialogData({ ticket, action });
           setIsDialogOpen(true);
         }
       }
     },
-    [data]
+    [tickets, setSelectedProject]
   );
 
   const handleCardClick = useCallback(
@@ -90,89 +87,71 @@ const Page = () => {
   );
 
   const handleMergeConfirm = async () => {
-    // Implement merge logic here
-    console.log("Merging cards:", selectedCards);
-   await mergeTickets(selectedCards);
-    // Reset multi-select mode and selected cards
+    await mergeTickets(selectedCards);
     setIsMultiSelectMode(false);
     setSelectedCards([]);
+    refreshData();
   };
 
   const handleMergeCancel = () => {
     setIsMultiSelectMode(false);
     setSelectedCards([]);
-  }
+  };
 
   const handleActionDialogConfirm = async (c_data: ConfirmationData) => {
-    const ticket = data!.find((item) => item.id === c_data.id)!;
+    const ticket = tickets.find((item) => item.id === c_data.id)!;
     switch (c_data.action) {
       case "transfer":
-        console.log("Transfering ticket:", c_data);
-        await transferTicket(ticket, c_data.address!);        
+        await transferTicket(ticket, c_data.address!);
         break;
       case "split":
         await splitTicket(ticket, c_data.amount!, currentAccount!.address);
-        console.log("Spliting ticket:", c_data);
         break;
       case "burn":
         await burnTicket(ticket, currentAccount!.address);
-        console.log("Burning ticket:", c_data);
         break;
       case "stake":
         console.log("Staking ticket:", c_data);
         break;
-      default:
-        break;
     }
+    refreshData();
   };
+
+  if (error) return <div>Error loading tickets: {error.message}</div>;
 
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex flex-1">
         <div className="max-w-lg">
           <MarketNav
-            tickets={data && data.length > 0 ? data : []}
+            tickets={tickets}
             onProjectSelect={handleCategorySelect}
             selectedProject={selectedProject}
           />
         </div>
         <div className="w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
-            {filteredData.map((item) => (
-              <SupportCard
-                key={item.id}
-                id={item.id}
-                base64Image={item.image}
-                name={item.name}
-                amount={item.amount.toString()}
-                onButtonClick={handleSupportButtonClick}
-                isSelected={selectedCards.includes(item.id)}
-                isMultiSelectMode={isMultiSelectMode}
-                onCardClick={handleCardClick}
-              />
-            ))}
-          </div>
+          <TicketList
+            filteredData={tickets}
+            selectedCards={selectedCards}
+            isMultiSelectMode={isMultiSelectMode}
+            onButtonClick={handleSupportButtonClick}
+            onCardClick={handleCardClick}
+          />
+          <PaginationComponent
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            onLoadMore={loadMore}
+            hasNextPage={hasNextPage}
+          />
         </div>
       </div>
       {isMultiSelectMode && (
-        <div className="fixed top-24 left-0 right-0 bg-gray-800 p-4 flex justify-between items-center gap-5">
-          <span className="text-white">
-            Selected: {selectedCards.length} cards
-          </span>
-          <Button
-            className="ml-auto"
-            onClick={handleMergeCancel}
-            variant={"destructive"}
-          >
-            Cancel
-          </Button>
-          <Button
-            className=""
-            onClick={handleMergeConfirm}
-          >
-            Merge Selected
-          </Button>
-        </div>
+        <MergeActionBar
+          selectedCardsCount={selectedCards.length}
+          onCancel={handleMergeCancel}
+          onMerge={handleMergeConfirm}
+        />
       )}
       <SupportCardActionDialog
         isOpen={isDialogOpen}
@@ -185,4 +164,3 @@ const Page = () => {
 };
 
 export default Page;
-
