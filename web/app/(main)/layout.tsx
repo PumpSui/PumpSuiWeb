@@ -8,15 +8,15 @@ import {
   SuiClientProvider,
   WalletProvider,
 } from "@mysten/dapp-kit";
-import { getFullnodeUrl } from "@mysten/sui/client";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { LoadingProvider } from "@/contexts/LoadingContext";
 
 const { networkConfig } = createNetworkConfig({
-  testnet: { url: getFullnodeUrl("testnet") },
-  mainnet: { url: getFullnodeUrl("mainnet") },
+  product: { url: process.env.NEXT_PUBLIC_SUI_NETWORK! },
 });
+console.log(networkConfig);
 const queryClient = new QueryClient();
 
 const main = ({
@@ -28,7 +28,7 @@ const main = ({
     <>
       <LoadingProvider>
         <QueryClientProvider client={queryClient}>
-          <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
+          <SuiClientProvider networks={networkConfig} defaultNetwork="product">
             <WalletProvider theme={customTheme} autoConnect>
               <Navbar></Navbar>
               <ProjectProvider>
