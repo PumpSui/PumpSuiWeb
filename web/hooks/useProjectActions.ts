@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
+import { useCurrentAccount, useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { useToast } from "@/components/ui/use-toast";
 import { editProject, cancelAndBurnProject, claim } from "@/api/suifund";
 import { EditEnum, editProjectParam, ProjectRecord } from "@/type";
@@ -12,6 +12,7 @@ const useProjectActions = (selectedProject: ProjectRecord | null) => {
   const router = useRouter();
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
   const client = useSuiClient();
+  const currentAccount = useCurrentAccount();
   const { mutate } = useSWRConfig();
 
   const { data: adminCapMap } = useSWR(
@@ -56,7 +57,7 @@ const useProjectActions = (selectedProject: ProjectRecord | null) => {
         })
         .filter((param): param is editProjectParam => param !== null);
 
-      const txb = await editProject(params);
+      const txb = await editProject(params, currentAccount!.address);
       signAndExecuteTransaction(
         {
           transaction: txb,

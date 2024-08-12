@@ -48,8 +48,7 @@ const getAllProjectAdminCap = async (
   const response = await client.getOwnedObjects({
     owner: address,
     filter: {
-      StructType: `${process.env
-        .NEXT_PUBLIC_PACKAGE}::suifund::ProjectAdminCap`,
+      StructType: `${process.env.NEXT_PUBLIC_PACKAGE}::suifund::ProjectAdminCap`,
     },
     options: { showContent: true },
   });
@@ -68,7 +67,7 @@ const getProjectRecord = async (projectId: string, client: SuiClient) => {
     id: projectId,
     options: { showContent: true },
   });
-  
+
   const data = response.data?.content as any;
   const project: ProjectRecord = {
     object_id: projectId,
@@ -197,7 +196,11 @@ const get_deploy_fee = (total_deposit_sui: bigint, ratio: number): bigint => {
   return deploy_fee;
 };
 
-const editProject = (params: editProjectParam[]) => {
+const editProject = (params: editProjectParam[],address:string) => {
+  console.log(params)
+  if (!isValidSuiAddress(address)) {
+    throw new Error("Invalid tx sender");
+  }
   const tx = new Transaction();
   params.forEach((param) => {
     if (!isValidSuiObjectId(param.project_record)) {
@@ -206,16 +209,33 @@ const editProject = (params: editProjectParam[]) => {
     if (!isValidSuiObjectId(param.project_admin_cap)) {
       throw new Error("Invalid project admin cap id");
     }
-    tx.moveCall({
-      package: process.env.NEXT_PUBLIC_PACKAGE!,
-      module: "suifund",
-      function: EditEnum[param.type],
-      arguments: [
-        tx.object(param.project_record),
-        tx.object(param.project_admin_cap),
-        tx.pure(bcs.string().serialize(param.content).toBytes()),
-      ],
-    });
+    if (EditEnum[param.type] === "edit_image_url") {
+      const coin = tx.splitCoins(tx.gas, [BigInt(1_000_000_00)]);
+      tx.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: EditEnum[param.type],
+        arguments: [
+          tx.object(param.project_record),
+          tx.object(param.project_admin_cap),
+          tx.pure(bcs.string().serialize(param.content).toBytes()),
+          tx.object(process.env.NEXT_PUBLIC_DEPLOY_RECORD!),
+          tx.object(coin[0]),
+        ],
+      });
+      tx.transferObjects([coin], address);
+    } else {
+      tx.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: EditEnum[param.type],
+        arguments: [
+          tx.object(param.project_record),
+          tx.object(param.project_admin_cap),
+          tx.pure(bcs.string().serialize(param.content).toBytes()),
+        ],
+      });
+    }
   });
   console.log(tx);
   return tx;
@@ -242,34 +262,34 @@ const claim = (project_record: string, project_admin_cap: string) => {
   return tx;
 };
 
-const cancelAndBurnProject = (project_record: string, project_admin_cap: string) => {
-    if (!isValidSuiObjectId(project_record)) {
-        throw new Error("Invalid project record id");
-    }
-    if (!isValidSuiObjectId(project_admin_cap)) {
-        throw new Error("Invalid project admin cap id");
-    }
-    const tx = new Transaction();
-    tx.moveCall({
-      package: process.env.NEXT_PUBLIC_PACKAGE!,
-      module: "suifund",
-      function: "cancel_project_by_team",
-      arguments: [
-        tx.object(project_admin_cap),
-        tx.object(process.env.NEXT_PUBLIC_DEPLOY_RECORD!),
-        tx.object(project_record),
-      ],
-    });
-    tx.moveCall({
-      package: process.env.NEXT_PUBLIC_PACKAGE!,
-      module: "suifund",
-      function: "burn_project_admin_cap",
-      arguments: [
-        tx.object(project_record),
-        tx.object(project_admin_cap),
-      ],
-    });
-    return tx;
+const cancelAndBurnProject = (
+  project_record: string,
+  project_admin_cap: string
+) => {
+  if (!isValidSuiObjectId(project_record)) {
+    throw new Error("Invalid project record id");
+  }
+  if (!isValidSuiObjectId(project_admin_cap)) {
+    throw new Error("Invalid project admin cap id");
+  }
+  const tx = new Transaction();
+  tx.moveCall({
+    package: process.env.NEXT_PUBLIC_PACKAGE!,
+    module: "suifund",
+    function: "cancel_project_by_team",
+    arguments: [
+      tx.object(project_admin_cap),
+      tx.object(process.env.NEXT_PUBLIC_DEPLOY_RECORD!),
+      tx.object(project_record),
+    ],
+  });
+  tx.moveCall({
+    package: process.env.NEXT_PUBLIC_PACKAGE!,
+    module: "suifund",
+    function: "burn_project_admin_cap",
+    arguments: [tx.object(project_record), tx.object(project_admin_cap)],
+  });
+  return tx;
 };
 
 const getSupportedProjects = async (

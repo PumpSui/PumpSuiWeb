@@ -29,7 +29,7 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
   onSubmit,
   project,
 }) => {
-  const [editedProject, setEditedProject] = useState(project);
+  const [editedProject, setEditedProject] = useState(project); 
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -81,8 +81,8 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({
                   <Image
                     src={editedProject.image_url}
                     alt="Project"
-                    layout="fill"
-                    objectFit="contain"
+                    fill
+                    style={{ objectFit: "contain" }}
                   />
                 </div>
               )}
