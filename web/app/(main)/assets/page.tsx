@@ -41,7 +41,7 @@ const Page = () => {
   const [dialogData, setDialogData] = useState<
     SupportCardActionDialogData | undefined
   >(undefined);
-  const { transferTicket,burnTicket } = useTicketActions(async () => {
+  const { transferTicket,burnTicket,mergeTickets,splitTicket } = useTicketActions(async () => {
     await mutate(undefined,{revalidate:true});
   });
 
@@ -89,9 +89,10 @@ const Page = () => {
     [isMultiSelectMode]
   );
 
-  const handleMergeConfirm = () => {
+  const handleMergeConfirm = async () => {
     // Implement merge logic here
     console.log("Merging cards:", selectedCards);
+   await mergeTickets(selectedCards);
     // Reset multi-select mode and selected cards
     setIsMultiSelectMode(false);
     setSelectedCards([]);
@@ -110,6 +111,7 @@ const Page = () => {
         await transferTicket(ticket, c_data.address!);        
         break;
       case "split":
+        await splitTicket(ticket, c_data.amount!, currentAccount!.address);
         console.log("Spliting ticket:", c_data);
         break;
       case "burn":

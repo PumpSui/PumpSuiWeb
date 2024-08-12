@@ -1,4 +1,4 @@
-import { do_burn } from "@/api/suifund";
+import { do_burn, do_split } from "@/api/suifund";
 import { useToast } from "@/components/ui/use-toast";
 import { ProjectReward } from "@/type";
 import { useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
@@ -70,9 +70,81 @@ const useTicketActions = (onSuccess: () => void) => {
     );
   };
 
+  const mergeTickets = async (tickets: string[]) => {
+    if (tickets.length < 2) {
+      throw new Error("Invalid number of tickets to merge");
+    }
+    const txb = new Transaction();
+    for (let i = 1; i < tickets.length; i++) {
+      if (!isValidSuiAddress(tickets[i])) {
+        throw new Error("Invalid address");
+      }
+      txb.moveCall({
+        package: process.env.NEXT_PUBLIC_PACKAGE!,
+        module: "suifund",
+        function: "do_merge",
+        arguments: [txb.object(tickets[0]), txb.object(tickets[i])],
+      });
+    }
+    await signAndExecuteTransaction(
+      {
+        transaction: txb,
+      },
+      {
+        onSuccess: () => {
+          onSuccess();
+          toast({
+            title: "Success",
+            description: `Tickets merged successfully`,
+          });
+        },
+        onError: () => {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to merge tickets",
+          });
+        },
+      }
+    );
+  };
+
+  const splitTicket = async (ticket: ProjectReward, amount: number,address:string) => {
+    if (!isValidSuiAddress(ticket.id)) {
+      throw new Error("Invalid address");
+    }
+    if(!isValidSuiAddress(address)){
+        throw new Error("Invalid address");
+    }
+    const txb = do_split(ticket.id, amount, address);
+    await signAndExecuteTransaction(
+      {
+        transaction: txb,
+      },
+      {
+        onSuccess: () => {
+          onSuccess();
+          toast({
+            title: "Success",
+            description: `Ticket split successfully`,
+          });
+        },
+        onError: () => {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to split ticket",
+          });
+        },
+      }
+    );
+  }
+
   return {
     transferTicket,
     burnTicket,
+    mergeTickets,
+    splitTicket,
   };
 };
 
