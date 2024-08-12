@@ -1,5 +1,6 @@
 import { do_burn, do_split } from "@/api/suifund";
 import { useToast } from "@/components/ui/use-toast";
+import { useLoading } from "@/contexts/LoadingContext";
 import { ProjectReward } from "@/type";
 import { useSignAndExecuteTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
@@ -8,6 +9,7 @@ import { isValidSuiAddress } from "@mysten/sui/utils";
 const useTicketActions = (onSuccess?: () => void) => {
   const { toast } = useToast();
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
+  const { setIsLoading } = useLoading();
 
   const transferTicket = async (ticket: ProjectReward, address: string) => {
     if (!isValidSuiAddress(address)) {
@@ -16,6 +18,7 @@ const useTicketActions = (onSuccess?: () => void) => {
     if (!isValidSuiAddress(ticket.id)) {
       throw new Error("Invalid address");
     }
+    setIsLoading(true);
     const txb = new Transaction();
     txb.transferObjects([ticket.id], address);
     signAndExecuteTransaction(
@@ -24,6 +27,7 @@ const useTicketActions = (onSuccess?: () => void) => {
       },
       {
         onSuccess: (res) => {
+          setIsLoading(false);
           onSuccess && onSuccess();
           toast({
             title: "Success",
@@ -32,6 +36,7 @@ const useTicketActions = (onSuccess?: () => void) => {
           });
         },
         onError: () => {
+          setIsLoading(false);
           toast({
             variant: "destructive",
             title: "Error",
@@ -53,7 +58,7 @@ const useTicketActions = (onSuccess?: () => void) => {
       },
       {
         onSuccess: () => {
-         onSuccess && onSuccess();
+          onSuccess && onSuccess();
           toast({
             title: "Success",
             description: `Ticket burned successfully`,
@@ -109,12 +114,16 @@ const useTicketActions = (onSuccess?: () => void) => {
     );
   };
 
-  const splitTicket = async (ticket: ProjectReward, amount: number,address:string) => {
+  const splitTicket = async (
+    ticket: ProjectReward,
+    amount: number,
+    address: string
+  ) => {
     if (!isValidSuiAddress(ticket.id)) {
       throw new Error("Invalid address");
     }
-    if(!isValidSuiAddress(address)){
-        throw new Error("Invalid address");
+    if (!isValidSuiAddress(address)) {
+      throw new Error("Invalid address");
     }
     const txb = do_split(ticket.id, amount, address);
     await signAndExecuteTransaction(
@@ -138,7 +147,7 @@ const useTicketActions = (onSuccess?: () => void) => {
         },
       }
     );
-  }
+  };
 
   return {
     transferTicket,

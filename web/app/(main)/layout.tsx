@@ -11,6 +11,7 @@ import {
 import { getFullnodeUrl } from "@mysten/sui/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { LoadingProvider } from "@/contexts/LoadingContext";
 
 const { networkConfig } = createNetworkConfig({
   testnet: { url: getFullnodeUrl("testnet") },
@@ -25,17 +26,19 @@ const main = ({
 }>) => {
   return (
     <>
-      <QueryClientProvider client={queryClient}>
-        <SuiClientProvider networks={networkConfig} defaultNetwork="testnet" >
-          <WalletProvider theme={customTheme} autoConnect>
-            <Navbar></Navbar>
-            <ProjectProvider>
-              <div className="pt-24">{children}</div>
-              <Toaster></Toaster>
-            </ProjectProvider>
-          </WalletProvider>
-        </SuiClientProvider>
-      </QueryClientProvider>
+      <LoadingProvider>
+        <QueryClientProvider client={queryClient}>
+          <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
+            <WalletProvider theme={customTheme} autoConnect>
+              <Navbar></Navbar>
+              <ProjectProvider>
+                <div className="pt-24">{children}</div>
+                <Toaster></Toaster>
+              </ProjectProvider>
+            </WalletProvider>
+          </SuiClientProvider>
+        </QueryClientProvider>
+      </LoadingProvider>
     </>
   );
 };
