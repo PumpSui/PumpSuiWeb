@@ -152,7 +152,7 @@ const deploy = (params: IformatedDeployParams) => {
   if (!isValidSuiAddress(params.sender)) {
     throw new Error("Invalid tx sender");
   }
-  let deploy_fee = get_deploy_fee(params.totalDeposit, params.ratioToBuilders);
+  const deploy_fee = get_deploy_fee(params.totalDeposit, params.ratioToBuilders);
   const tx = new Transaction();
   const [coin] = tx.splitCoins(tx.gas, [deploy_fee]);
   tx.moveCall({
@@ -188,10 +188,11 @@ const deploy = (params: IformatedDeployParams) => {
 };
 
 const get_deploy_fee = (total_deposit_sui: bigint, ratio: number): bigint => {
+  console.log(total_deposit_sui, ratio);
   const base_fee: bigint = BigInt(20_000_000_000);
-  let deploy_fee: bigint = (total_deposit_sui * BigInt(ratio)) / BigInt(1000);
+  const deploy_fee: bigint = (total_deposit_sui * BigInt(ratio)) / BigInt(10000);
   if (deploy_fee <= base_fee) {
-    deploy_fee = base_fee;
+    return base_fee;
   }
   return deploy_fee;
 };
@@ -209,8 +210,9 @@ const editProject = (params: editProjectParam[],address:string) => {
     if (!isValidSuiObjectId(param.project_admin_cap)) {
       throw new Error("Invalid project admin cap id");
     }
+    const edit_fee = 100_000_000_000;
     if (EditEnum[param.type] === "edit_image_url") {
-      const coin = tx.splitCoins(tx.gas, [BigInt(1_000_000_00)]);
+      const coin = tx.splitCoins(tx.gas, [BigInt(edit_fee)]);
       tx.moveCall({
         package: process.env.NEXT_PUBLIC_PACKAGE!,
         module: "suifund",

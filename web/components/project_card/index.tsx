@@ -41,7 +41,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           src={project.image_url || "/images/DemoProject.png"}
           alt="Project"
           fill
-          style={{objectFit: "contain"}}
+          style={{ objectFit: "contain" }}
           sizes="100%"
           quality={75}
         />
@@ -63,20 +63,20 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
         />
       </div>
 
-      <div className="absolute inset-0 flex flex-col">
-        <div className={styles.createdBy}>
+      <div className="flex flex-col items-center">
+        <div className="absolute mt-[20%] max-w-48 lg:scale-50 mac:scale-75">
           <p className="truncate text-yellow-400 text-sm font-bold">
             Created by @{project.creator}
           </p>
         </div>
 
-        <div className={styles.name}>
+        <div className="absolute mt-[66%] max-w-48 lg:scale-50 lg:mt-[63%] mac:scale-100 mac:mt-[65%]">
           <p className="text-gray-800 text-2xl font-bold truncate mac:text-xl 2xl:text-2xl">
             {project.name}
           </p>
         </div>
 
-        <div className={styles.progress}>
+        <div className="absolute mt-[80%] 2xl:scale-100 mac:scale-75 lg:scale-50 lg:mt-[70%] mac:mt-[78%]">
           <div className={styles.progressBar}>
             <p className="mb-1">PROGRESS:</p>
             <Progress
