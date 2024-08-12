@@ -51,12 +51,25 @@ export const ProjectListView: React.FC<ProjectListViewProps> = ({
         ))}
       </div>
       {isLoading && <LoadingIndicator />}
-      <PaginationComponent
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-      />
-      {!isAutoLoad&&projects.length >= currentPage * itemsPerPage && (
+      {!isLoading && projects.length === 0 && (
+        <>
+          <div className="flex justify-center">
+            <div className="mt-[10%] space-y-20">
+              <h2 className="text-5xl">WHAT ARY YOU WAITING FOR?</h2>
+              <h2 className="text-7xl">CLICK CREATE ABOVE AND</h2>
+              <h2 className="text-8xl">LETS PUMP SUI TOGETHER !!!</h2>
+            </div>
+          </div>
+        </>
+      )}
+      {projects.length !== 0 && (
+        <PaginationComponent
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
+      )}
+      {!isAutoLoad && projects.length >= currentPage * itemsPerPage && (
         <button onClick={onLoadMore}>Load More</button>
       )}
     </>

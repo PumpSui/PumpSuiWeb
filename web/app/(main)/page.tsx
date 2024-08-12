@@ -58,21 +58,21 @@ const Page: React.FC = () => {
   );
 
   return (
-      <main>
-        <div className="py-8">
-          <ProjectListView
-            projects={filteredAndSortedProjects}
-            currentPage={currentPage}
-            itemsPerPage={ITEMS_PER_PAGE}
-            isLoading={isLoading}
-            onTabChange={handleTabChange}
-            onSearch={handleSearch}
-            onSort={handleSort}
-            onPageChange={setCurrentPage}
-            onLoadMore={loadMore}
-          />
-        </div>
-      </main>
+    <main>
+      <div className="py-8">
+        <ProjectListView
+          projects={filteredAndSortedProjects}
+          currentPage={currentPage}
+          itemsPerPage={ITEMS_PER_PAGE}
+          isLoading={isLoading}
+          onTabChange={handleTabChange}
+          onSearch={handleSearch}
+          onSort={handleSort}
+          onPageChange={setCurrentPage}
+          onLoadMore={loadMore}
+        />
+      </div>
+    </main>
   );
 };
 
