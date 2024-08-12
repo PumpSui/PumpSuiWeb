@@ -55,7 +55,7 @@ export const ProjectListView: React.FC<ProjectListViewProps> = ({
         <>
           <div className="flex justify-center">
             <div className="mt-[10%] space-y-20">
-              <h2 className="text-5xl">WHAT ARY YOU WAITING FOR?</h2>
+              <h2 className="text-5xl">WHAT ARE YOU WAITING FOR?</h2>
               <h2 className="text-7xl">CLICK CREATE ABOVE AND</h2>
               <h2 className="text-8xl">LETS PUMP SUI TOGETHER !!!</h2>
             </div>
