@@ -27,7 +27,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
         className={`${styles.background} group-hover:brightness-200 group-hover:contrast-125 group-hover:saturate-200`}
       >
         <Image
-          src="/images/card.svg"
+          src="/images/card.png"
           alt="Background"
           fill
           sizes="100%"
@@ -41,6 +41,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           src={project.image_url || "/images/DemoProject.png"}
           alt="Project"
           fill
+          style={{objectFit: "contain"}}
           sizes="100%"
           quality={75}
         />
@@ -70,7 +71,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
         </div>
 
         <div className={styles.name}>
-          <p className="text-gray-800 text-2xl font-bold truncate">
+          <p className="text-gray-800 text-2xl font-bold truncate mac:text-xl 2xl:text-2xl">
             {project.name}
           </p>
         </div>
