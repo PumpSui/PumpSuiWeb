@@ -187,8 +187,7 @@ const deploy = (params: IformatedDeployParams) => {
   return tx;
 };
 
-const get_deploy_fee = (total_deposit_sui: bigint, ratio: number): bigint => {
-  console.log(total_deposit_sui, ratio);
+const get_deploy_fee = (total_deposit_sui: bigint, ratio: number): bigint => { 
   const base_fee: bigint = BigInt(20_000_000_000);
   const deploy_fee: bigint = (total_deposit_sui * BigInt(ratio)) / BigInt(10000);
   if (deploy_fee <= base_fee) {
