@@ -73,7 +73,7 @@ const MintCard: React.FC<ProjectCardProps> = ({
                   </h1>
                   <div className="inline-block space-x-1">
                     <p className="inline-block text-orange-400 text-sm">
-                      {project.remain}
+                      {project.current_supply}
                     </p>
                     <p className="inline-block">/</p>
                     <p className="inline-block text-blue-400 text-sm">
