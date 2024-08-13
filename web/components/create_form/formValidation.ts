@@ -31,7 +31,7 @@ export const formSchema = z
     amount_per_sui: z.number().int().min(1).max(1844674407369).default(1),
     startTime: z.date().min(new Date()),
     projectDuration: z.number().gt(3),
-    description: z.string().min(10).max(500),
+    description: z.string().min(10).max(5000),
     imageUrl: z.string().url().or(z.literal("")).optional(),
     linktree: z.string().url().or(z.literal("")).optional(),
     xLink: z.string().url().or(z.literal("")).optional(),

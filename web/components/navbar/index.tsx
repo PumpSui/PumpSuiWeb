@@ -29,7 +29,7 @@ const Navbar = () => {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority
           />
-        </div>        
+        </div>
 
         <div className="hidden md:flex ml-auto items-center gap-10">
           <div className="bg-secondary flex items-center min-h-14 px-3 rounded-3xl">
@@ -41,6 +41,9 @@ const Navbar = () => {
             </Button>
             <Button variant="link" onClick={() => router.push("/assets")}>
               Assets
+            </Button>
+            <Button variant="link" onClick={() => router.push("/doc")}>
+              Doc
             </Button>
           </div>
           <div className="bg-secondary flex justify-end items-center min-h-14 pl-3 rounded-l-3xl">
