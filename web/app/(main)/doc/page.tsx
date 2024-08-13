@@ -1,5 +1,5 @@
 "use client";
-import Doc from "../markdown/doc.md";
+import Doc from "../markdown/doc.mdx";
 import "github-markdown-css/github-markdown.css";
 import { useEffect } from "react";
 
