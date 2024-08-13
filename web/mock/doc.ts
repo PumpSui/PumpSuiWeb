@@ -20,6 +20,6 @@ export const doc = `
 **Description**: Project description. It is recommended to include an introduction to the project, the project team, proof of previous work, and the returns that project supporters can get. This part can be edited again in the future.
 
 #
-
+## [Suifund](https://suifund.com) 
 ### It is a crowdfunding platform that unites a community of supporters, welcome to use it.
 `;

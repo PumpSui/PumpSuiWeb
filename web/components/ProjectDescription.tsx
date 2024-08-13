@@ -15,7 +15,9 @@ const ProjectDescription: React.FC<ProjectDescriptionProps> = ({ project }) => {
         <CardTitle className="text-2xl">Description</CardTitle>
       </CardHeader>
       <CardContent className="overflow-y-auto flex-grow prose-invert prose-sm max-w-none">
-        <ReactMarkdown>{project.description}</ReactMarkdown>
+        <ReactMarkdown className={"pointer-events-none"}>
+          {project.description}
+        </ReactMarkdown>
       </CardContent>
     </Card>
   );
