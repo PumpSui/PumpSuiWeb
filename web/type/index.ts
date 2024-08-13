@@ -108,6 +108,7 @@ export interface ProjectRecord {
     minted_per_user: Record<string, number>;
     thread: string;    
     linktree: string;
+    begin:boolean;
 }
 
 /*     public struct Comment has key, store {

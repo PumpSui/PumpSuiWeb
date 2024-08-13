@@ -87,6 +87,7 @@ const MintCard: React.FC<ProjectCardProps> = ({
                   indicatorColor={"bg-orange-400"}
                   threshhold={project.threshold_ratio}
                   showThreshholdText
+                  isBegin={project.begin}
                 />
               </div>
             </CardTitle>
@@ -147,11 +148,11 @@ const MintCard: React.FC<ProjectCardProps> = ({
                   value={inputValue}
                   onChange={handleInputChange}
                 />
-                <p className="text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                <div className="text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                   <p className="inline-block font-bold text-blue-400">Sui</p> ={" "}
                   {inputValue && inputValue * project.amount_per_sui}{" "}
                   {project.name}
-                </p>
+                </div>
               </div>
               <div className="flex items-center justify-between gap-5">
                 <Button

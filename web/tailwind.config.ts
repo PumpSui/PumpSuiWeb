@@ -85,6 +85,7 @@ const config: Config = {
   },
   plugins: [
     require("tailwindcss-animate"),
+    require('@tailwindcss/typography'),
     function ({ addUtilities }: { addUtilities: Function }) {
       const newUtilities = {
         ".preserve-3d": {

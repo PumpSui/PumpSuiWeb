@@ -10,6 +10,7 @@ interface CustomProgressProps
   indicatorColor: string;
   threshhold?: number;
   showThreshholdText?: boolean;
+  isBegin?: boolean;
 }
 
 const Progress = React.forwardRef<
@@ -23,10 +24,11 @@ const Progress = React.forwardRef<
       indicatorColor,
       threshhold,
       showThreshholdText,
+      isBegin,
       ...props
     },
     ref
-  ) => (    
+  ) => (
     <div className="relative w-full">
       <ProgressPrimitive.Root
         ref={ref}
@@ -41,17 +43,21 @@ const Progress = React.forwardRef<
           style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
         ></ProgressPrimitive.Indicator>
 
-        {threshhold && <div
-          className="absolute top-0 left-0 h-full bg-red-400 rounded-3xl"
-          style={{
-            width: "4px",
-            left: `${threshhold}%`,
-          }}
-        ></div>}
+        {threshhold && (
+          <div
+            className={`absolute top-0 left-0 h-full ${isBegin?'bg-green-400':'bg-red-400'} rounded-3xl`}
+            style={{
+              width: "4px",
+              left: `${threshhold}%`,
+            }}
+          ></div>
+        )}
       </ProgressPrimitive.Root>
       {showThreshholdText && (
         <p
-          className="absolute text-xs font-bold text-red-400"
+          className={`absolute text-xs font-bold ${
+            isBegin ? "text-green-400" : "text-red-400"
+          }`}
           style={{
             top: "100%",
             left: `${threshhold}%`,
@@ -59,7 +65,7 @@ const Progress = React.forwardRef<
             zIndex: 10,
           }}
         >
-          {threshhold}%
+          {isBegin ? "Begin!!!" : `${threshhold}%`}
         </p>
       )}
     </div>

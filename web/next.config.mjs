@@ -26,11 +26,6 @@ const nextConfig = {
             }
         ]
     },
-    compiler:{
-        removeConsole:{
-            exclude: ['error']
-        }
-    }
 };
 
 const withMDX = createMDX({

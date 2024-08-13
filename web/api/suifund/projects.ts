@@ -69,6 +69,7 @@ const getProjectRecord = async (projectId: string, client: SuiClient) => {
   });
 
   const data = response.data?.content as any;
+  console.log(data);
   const project: ProjectRecord = {
     object_id: projectId,
     id: data.fields.id.id,
@@ -99,6 +100,7 @@ const getProjectRecord = async (projectId: string, client: SuiClient) => {
     category: data.fields.category,
     threshold_ratio: data.fields.threshold_ratio,
     linktree: data.fields.linktree,
+    begin:data.fields.begin
   };
   return project;
 };

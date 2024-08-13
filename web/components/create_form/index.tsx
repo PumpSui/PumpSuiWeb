@@ -90,7 +90,7 @@ const ProjectForm: React.FC = () => {
             <FormField
               name="description"
               label="Description"
-              placeholder="Project description, team introduction, previous work, and supporter benefits"
+              placeholder=".MD Supported!!  Project description, team introduction, previous work, and supporter benefits"
               tooltip="This part can be edited in the future."
               isTextarea
             />
