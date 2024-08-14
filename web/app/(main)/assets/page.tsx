@@ -24,8 +24,6 @@ const Page: React.FC = () => {
 
   const {
     tickets,
-    allTickets,
-    isLoading,
     error,
     loadMore,
     refreshData,

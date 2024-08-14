@@ -33,7 +33,7 @@ export const useTicketsData = (
     fetchSupported,
     ticketsPerPage,
     true,
-    "deployRecords",
+    "tickets",
     false
   );
 
