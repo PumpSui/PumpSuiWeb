@@ -10,7 +10,7 @@ const parseValue = (value:any) => {
 
 export const formSchema = z
   .object({
-    name: z.string().min(3).max(50),
+    name: z.string().min(3).max(15),
     totalDeposit: z
       .number()
       .int()
