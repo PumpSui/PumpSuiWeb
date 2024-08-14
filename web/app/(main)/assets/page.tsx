@@ -87,6 +87,10 @@ const Page: React.FC = () => {
   );
 
   const handleMergeConfirm = async () => {
+    if(selectedCards.length < 2) {
+      handleMergeCancel();
+      return;
+    }
     await mergeTickets(selectedCards);
     setIsMultiSelectMode(false);
     setSelectedCards([]);
