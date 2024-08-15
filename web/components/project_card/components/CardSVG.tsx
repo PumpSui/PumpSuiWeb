@@ -84,11 +84,11 @@ const CardSVG: React.FC<CardSVGProps> = ({
   project,
   getRealDate,
 }) => (
-  <div className={`relative w-[480px] h-[540px]`}>
+  <div className={`relative w-[400px] h-[540px]`}>
     <svg
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      width="480"
+      width="400"
       height="540"
       viewBox="0 0 570 640"
     >
@@ -173,10 +173,10 @@ const CardSVG: React.FC<CardSVGProps> = ({
         fill="#413103"
       />
     </svg>
-    <div className="absolute bottom-[15%] left-[5%] right-0 px-16">
-      <div className="flex flex-col gap-y-2 items-center">
-        <div className={"flex w-3/4 gap-x-5 justify-between items-center"}>
-          <p className="font-bold text-orange-400">PROGRESS:</p>
+    <div className="absolute bottom-[20%] left-[5%] right-0 px-16">
+      <div className="flex flex-col gap-y-1 items-center">
+        <div className={"flex w-4/5 gap-x-5 justify-between items-center"}>
+          <p className="font-bold text-orange-400 text-sm">PROGRESS:</p>
           <Progress
             value={(1 - project.remain / project.total_supply) * 100}
             className="w-full self-center min-h-4"
@@ -184,12 +184,12 @@ const CardSVG: React.FC<CardSVGProps> = ({
             threshhold={project.threshold_ratio}
           />
         </div>
-        <div className="flex justify-between w-3/4">
-          <p className="font-bold text-orange-400">START:</p>
+        <div className="flex justify-between w-4/5">
+          <p className="font-bold text-orange-400 text-sm">START:</p>
           <p className="text-sm">{getRealDate(project.start_time_ms)}</p>
         </div>
-        <div className="flex justify-between items-center w-3/4">
-          <p className="font-bold text-orange-400">END:</p>
+        <div className="flex justify-between items-center w-4/5">
+          <p className="font-bold text-orange-400 text-sm">END:</p>
           <p className="text-sm">{getRealDate(project.end_time_ms)}</p>
         </div>
       </div>

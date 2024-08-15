@@ -5,7 +5,7 @@ import { ProjectListView } from "@/components/ProjectListView";
 import { useProjectsData } from "@/hooks/useProjectsData";
 import { useProjectFilters } from "@/hooks/useProjectFilters";
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 4;
 
 const Page: React.FC = () => {
   const client = useSuiClient();
