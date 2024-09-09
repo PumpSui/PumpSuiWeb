@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} ${Jaro.variable} bg-[url('/bgblur.png')] bg-cover`} suppressHydrationWarning>
+      <body className={`${inter.className} ${Jaro.variable}`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
         </ThemeProvider>

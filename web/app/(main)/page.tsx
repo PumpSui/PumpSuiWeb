@@ -58,7 +58,7 @@ const Page: React.FC = () => {
   );
 
   return (
-    <main>
+    <main className="bg-[url('/bgblur.png')] bg-cover bg-center h-[calc(100vh-13rem)]">
       <div className="mt-52 px-24 w-full">
         
           <ProjectListView

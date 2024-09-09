@@ -120,8 +120,8 @@ const Page: React.FC = () => {
   if (error) return <div>Error loading tickets: {error.message}</div>;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-13rem)] mt-52">
-      <div className="flex flex-1 gap-x-16 overflow-hidden p-5">
+    <div className="flex flex-col bg-[url('/assetsbg.png')] bg-cover bg-center h-[calc(100vh-10rem)] mt-40">
+      <div className="flex flex-1 gap-x-16 overflow-hidden p-20">
         <div className="max-w-lg overflow-y-auto">
           <MarketNav
             tickets={tickets}
@@ -151,11 +151,13 @@ const Page: React.FC = () => {
         </div>
       </div>
       {isMultiSelectMode && (
-        <MergeActionBar
-          selectedCardsCount={selectedCards.length}
+        <div className="fixed bottom-0 left-0 right-0 z-50">
+          <MergeActionBar
+            selectedCardsCount={selectedCards.length}
           onCancel={handleMergeCancel}
           onMerge={handleMergeConfirm}
-        />
+          />
+        </div>
       )}
       <SupportCardActionDialog
         isOpen={isDialogOpen}

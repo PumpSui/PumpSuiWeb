@@ -48,7 +48,7 @@ const Page: NextPage<{ params: { projectId: string } }> = ({ params }) => {
   if (!selectedProject) return <div>No project found</div>;
 
   return (
-    <div className="mt-52">
+    <div className="mt-52 bg-[url('/projectbg.png')] bg-cover bg-center">
       <Head>
         <title>{selectedProject.name} | Project Details</title>
         <meta name="description" content={selectedProject.description} />
