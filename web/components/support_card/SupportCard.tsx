@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import SupportButton from "./components/SupportButton";
+import { Button } from "../ui/button";
 
 export type ButtonAction = "transfer" | "split" | "merge" | "burn" | "stake";
 
@@ -45,108 +46,44 @@ const SupportCard: React.FC<SupportCardProps> = React.memo(
 
     const cardStyle = useMemo(
       () =>
-        ({
-          "--rotation": isFlipped && !isMultiSelectMode ? "180deg" : "0deg",
-        } as React.CSSProperties),
+      ({
+        "--rotation": isFlipped && !isMultiSelectMode ? "180deg" : "0deg",
+      } as React.CSSProperties),
       [isFlipped, isMultiSelectMode]
     );
 
     const frontSide = useMemo(
       () => (
         <div
-          className="absolute w-full h-full backface-hidden"
-          style={{ backfaceVisibility: "hidden" }}
+          className={`group-hover:brightness-125 group-hover:contrast-125 group-hover:saturate-125`}
         >
-          <svg
-            className="w-full h-full"
-            viewBox="0 0 2492 2492"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <filter id="golden-outline">
-                <feFlood floodColor="#FFD700" floodOpacity="1" result="gold" />
-                <feComposite
-                  in="gold"
-                  in2="SourceAlpha"
-                  operator="in"
-                  result="goldOutline"
-                />
-                <feGaussianBlur
-                  in="goldOutline"
-                  stdDeviation="2"
-                  result="blur"
-                />
-                <feMorphology
-                  in="SourceAlpha"
-                  radius="2"
-                  operator="dilate"
-                  result="thickOutline"
-                />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="thickOutline" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
-            <image
-              href={base64Image}
-              x="682"
-              y="548"
-              height="978"
-              width="1128"
-              preserveAspectRatio="none"
-            />
-            <image
-              href="/images/Supporter_Ticket_Bg.svg"
-              x="0"
-              y="0"
-              width="2492"
-              height="2492"
-            />
-            <image
-              href="/images/Supporter_Ticket_Title.svg"
-              x="0"
-              y="0"
-              width="2492"
-              height="2492"
-            />
-            <image
-              href="/images/Supporter_Ticket_Name.svg"
-              x="0"
-              y="0"
-              width="2492"
-              height="2492"
-            />
-            <text
-              x="50%"
-              y="1570"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fontFamily="Arial, sans-serif"
-              fontSize="100"
-              fontWeight="bold"
-              fill="#352f18"
-              filter="url(#golden-outline)"
-            >
-              {name}
-            </text>
-            <text
-              x="1022"
-              y="1836"
-              textAnchor="left"
-              dominantBaseline="central"
-              fontFamily="Arial, sans-serif"
-              fontSize="72"
-              fontWeight="bold"
-              fill="black"
-            >
-              {amount}
-            </text>
-          </svg>
+          <div className="relative w-[261px] h-[408px] bg-[url('/supportbg.png')] bg-cover rounded-xl p-2 flex flex-col items-center gap-y-3">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150px] h-[26px] bg-[#F1F4EE] rounded-b-lg flex items-end justify-center z-50">
+              <p className="text-black text-[10px] truncate p-1">@{id}</p>
+            </div>
+            <div className="relative w-[245px] h-[245px]">
+              <Image
+                src={"/images/DemoProject.png"}
+                alt="Project Image"
+                fill
+                style={{
+                  objectFit: "cover",
+                }}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="flex flex-col items-start gap-y-3 self-start p-2">
+              <p className="text-black text-xl font-bold truncate self-start">{name}</p>
+              <div>
+                <p className="text-black text-sm truncate">Amount</p>
+                <p className="text-black text-2xl truncate font-bold">{amount}</p>
+              </div>
+            </div>
+          </div>
+
         </div>
       ),
-      [base64Image, name, amount]
+      [base64Image, name, amount, id]
     );
 
     const backSide = useMemo(
@@ -158,49 +95,56 @@ const SupportCard: React.FC<SupportCardProps> = React.memo(
             transform: "rotateY(180deg)",
           }}
         >
-          <div className="relative w-full h-full">
-            <Image
-              src="/images/Supporter_Ticket_Back.svg"
-              alt="Ticket Background"
-              fill
-              sizes="(max-width: 500px) 100vw, 500px"
-              priority
-              style={{ objectFit: "fill" }}
-            />
-
-            <div className="absolute inset-0 flex flex-col justify-center items-center">
-              <div className="flex flex-col bg-opacity-80 rounded-lg p-8 lg:p-12 w-4/5 max-w-[300px] h-full">
-                <SupportButton onClick={() => handleButtonClick("transfer")}>
-                  Transfer
-                </SupportButton>
-                <SupportButton onClick={() => handleButtonClick("merge")}>
-                  Merge
-                </SupportButton>
-                <SupportButton onClick={() => handleButtonClick("split")}>
-                  Split
-                </SupportButton>
-                <SupportButton onClick={() => handleButtonClick("burn")}>
-                  <p className="text-destructive">Burn</p>
-                </SupportButton>
-                <SupportButton
-                  disabled
-                  onClick={() => handleButtonClick("stake")}
-                >
-                  Stake
-                </SupportButton>
+          <div className="relative w-[261px] h-[408px] bg-[url('/supportbgflip.png')] bg-cover rounded-xl p-2 flex flex-col justify-between">
+            <div className="w-full h-[126px] relative mb-3">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150px] h-[26px] bg-[#F1F4EE] rounded-b-lg flex items-end justify-center z-50">
+                <p className="text-black text-[10px] truncate p-1">@{id}</p>
               </div>
+              <Image
+                src={"/images/DemoProject.png"}
+                alt="Project Image"
+                fill
+                style={{
+                  objectFit: "cover",
+                }}
+                className="rounded-xl saturate-0 contrast-100"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl flex flex-col justify-end p-2">
+                <p className="text-white text-xl font-bold truncate">{name}</p>
+                <p className="text-white text-sm truncate">Amount</p>
+                <p className="text-white text-2xl truncate font-bold">{amount}</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-y-2 w-full justify-between h-[408px-126px] pb-2">
+              <Button className="w-full bg-gray-800 hover:bg-gray-800 hover:text-lime-400 text-white py-5" onClick={() => handleButtonClick("transfer")}>
+                Transfer
+              </Button>
+              <Button className="w-full bg-gray-800 hover:bg-gray-800 hover:text-lime-400 text-white py-5" onClick={() => handleButtonClick("merge")}>
+                Merge
+              </Button>
+              <Button className="w-full bg-gray-800 hover:bg-gray-800 hover:text-lime-400 text-white py-5" onClick={() => handleButtonClick("split")}>
+                Split
+              </Button>
+              <Button className="w-full bg-gray-800 hover:bg-gray-800 hover:text-red-500 text-white py-5" onClick={() => handleButtonClick("burn")}>
+                <p>Burn</p>
+              </Button>
+              <Button
+                disabled
+                className="w-full bg-gray-800 hover:bg-gray-800 hover:text-lime-400 text-white py-5"
+                onClick={() => handleButtonClick("stake")}
+              >
+                Stake
+              </Button>
             </div>
           </div>
         </div>
       ),
-      [handleButtonClick]
+      [handleButtonClick, name, amount, id]
     );
 
     return (
       <div
-        className={`relative w-full max-w-[500px] aspect-square ${className} ${
-          isSelected ? "ring-4 ring-blue-500" : ""
-        }`}
+        className={`relative w-[261px] h-[408px] ${className} ${isSelected ? "ring-4 ring-blue-500" : ""}`}
         onMouseEnter={useCallback(
           () => !isMultiSelectMode && setIsFlipped(true),
           [isMultiSelectMode]
@@ -212,14 +156,15 @@ const SupportCard: React.FC<SupportCardProps> = React.memo(
         onClick={handleCardClick}
       >
         <div
-          className={`w-full h-full transition-all duration-700 [perspective:1000px]`}
+          className={`w-full h-full transition-all duration-700 [transform-style:preserve-3d]`}
           style={{
-            transformStyle: "preserve-3d",
             transform: `rotateY(var(--rotation))`,
             ...cardStyle,
           }}
         >
-          {frontSide}
+          <div className="absolute w-full h-full backface-hidden">
+            {frontSide}
+          </div>
           {backSide}
         </div>
         {isMultiSelectMode && isSelected && (

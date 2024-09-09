@@ -43,7 +43,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
               className="rounded-xl"
             />
           </div>
-          <div className="flex flex-col items-center w-full gap-y-1">
+          <div className="flex flex-col items-center w-full gap-y-3">
             <p className="text-black text-xl font-bold truncate self-start pl-2">{project.name}</p>
             <div className="flex justify-between w-full px-2">
               <p className="text-black text-sm truncate">Start: </p>
@@ -57,7 +57,7 @@ const ProjectCard: React.FC<ProjectCardProps> = (project) => {
           <div className="self-end w-full mt-auto">
             <Progress
               value={(1 - project.remain / project.total_supply) * 100}
-              className="w-full self-center min-h-4"
+              className="w-full self-center h-5"
               indicatorColor="bg-green-500 rounded-lg shadow-2xl transform"
               threshhold={project.threshold_ratio}
             />

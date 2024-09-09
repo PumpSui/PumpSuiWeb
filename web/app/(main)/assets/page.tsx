@@ -9,7 +9,6 @@ import {
   SupportCardActionDialogData,
 } from "@/components/support_card/components/SupportCardActionDialog";
 import useTicketActions from "@/hooks/useTicketActions";
-import { Button } from "@/components/ui/button";
 import { useTicketsData } from "@/hooks/useTicketsData";
 import { PaginationComponent } from "@/components/PaginationComponent";
 import TicketList from "@/components/TicketList";
@@ -121,23 +120,26 @@ const Page: React.FC = () => {
   if (error) return <div>Error loading tickets: {error.message}</div>;
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="flex flex-1">
-        <div className="max-w-lg">
+    <div className="flex flex-col h-[calc(100vh-13rem)] mt-52">
+      <div className="flex flex-1 gap-x-16 overflow-hidden p-5">
+        <div className="max-w-lg overflow-y-auto">
           <MarketNav
             tickets={tickets}
             onProjectSelect={handleCategorySelect}
             selectedProject={selectedProject}
           />
         </div>
-        <div className="w-full">
-          <TicketList
-            filteredData={tickets}
-            selectedCards={selectedCards}
-            isMultiSelectMode={isMultiSelectMode}
-            onButtonClick={handleSupportButtonClick}
-            onCardClick={handleCardClick}
-          />
+        <div className="w-full flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto">
+            <TicketList
+              filteredData={tickets}
+              selectedCards={selectedCards}
+              isMultiSelectMode={isMultiSelectMode}
+              onButtonClick={handleSupportButtonClick}
+              onCardClick={handleCardClick}
+            />
+          </div>
+          {tickets.length > 4 && (
           <PaginationComponent
             currentPage={currentPage}
             totalPages={totalPages}
@@ -145,6 +147,7 @@ const Page: React.FC = () => {
             onLoadMore={loadMore}
             hasNextPage={hasNextPage}
           />
+          )}
         </div>
       </div>
       {isMultiSelectMode && (
