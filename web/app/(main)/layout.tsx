@@ -32,7 +32,9 @@ const main = ({
             <WalletProvider theme={customTheme} autoConnect>
               <Navbar></Navbar>
               <ProjectProvider>
-                <div className="pt-24">{children}</div>
+                <div>
+                  {children}
+                </div>
                 <Toaster></Toaster>
               </ProjectProvider>
             </WalletProvider>

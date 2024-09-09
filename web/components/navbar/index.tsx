@@ -6,47 +6,62 @@ import { Search, Menu, X } from "lucide-react";
 import Image from "next/image";
 import { Input } from "../ui/input";
 import { ConnectButton } from "@mysten/dapp-kit";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 import "@mysten/dapp-kit/dist/index.css";
 
 const Navbar = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  const isActive = (path: string) => pathname === path;
+
   return (
-    <nav className="fixed bg-background top-0 left-0 right-0 z-50 shadow-md">
-      <div className="flex pl-4 py-6 justify-between items-center gap-10">
-        <div className="flex-shrink-0 w-56 h-14 relative scale-125">
-          <Image
-            onClick={() => router.push("/")}
-            className="hover:cursor-pointer object-contain"
-            src="/images/pumpSuiLogo.png"
-            alt="logo"
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority
-          />
+    <nav className="fixed bg-background top-0 left-0 right-0 z-50 shadow-md border-b-2 border-gray-800 px-24 py-14">
+      <div className="flex justify-between items-center gap-10">
+        <div>
+          <p className="text-5xl text-[#CFFF0A] font-bold font-jaro">B o m e n t</p>
         </div>
 
         <div className="hidden md:flex ml-auto items-center gap-10">
-          <div className="bg-secondary flex items-center min-h-14 px-3 rounded-3xl">
-            <Button variant="link" onClick={() => router.push("/")}>
+          <div className="bg-secondary flex items-center p-1 rounded-lg">
+            <Button 
+              variant="ghost" 
+              size={"lg"}
+              onClick={() => router.push("/")}
+              className={isActive("/") ? "bg-black text-primary" : ""}
+            >
               Home
             </Button>
-            <Button variant="link" onClick={() => router.push("/create")}>
+            <Button 
+              variant="ghost" 
+              size={"lg"}
+              onClick={() => router.push("/create")}
+              className={isActive("/create") ? "bg-black text-primary" : ""}
+            >
               Create
             </Button>
-            <Button variant="link" onClick={() => router.push("/assets")}>
+            <Button 
+              variant="ghost" 
+              size={"lg"}
+              onClick={() => router.push("/assets")}
+              className={isActive("/assets") ? "bg-black text-primary" : ""}
+            >
               Assets
             </Button>
-            <Button variant="link" onClick={() => router.push("/doc")}>
+            <Button 
+              variant="ghost" 
+              size={"lg"}
+              onClick={() => router.push("/doc")}
+              className={isActive("/doc") ? "bg-black text-primary" : ""}
+            >
               Doc
             </Button>
           </div>
-          <div className="bg-secondary flex justify-end items-center min-h-14 pl-3 rounded-l-3xl">
+          <div className="outline outline-1 outline-secondary flex justify-end items-center min-h-14 rounded-xl">
             <ConnectButton />
           </div>
         </div>

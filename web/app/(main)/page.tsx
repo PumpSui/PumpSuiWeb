@@ -59,7 +59,7 @@ const Page: React.FC = () => {
 
   return (
     <main>
-      <div className="py-8">
+      <div className="mt-52 px-24">
         <ProjectListView
           projects={filteredAndSortedProjects}
           currentPage={currentPage}

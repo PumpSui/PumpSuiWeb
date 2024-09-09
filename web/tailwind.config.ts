@@ -21,6 +21,9 @@ const config: Config = {
       screens:{
         'mac':'1440px',
       },
+      fontFamily: {
+        jaro: ['var(--font-jaro-regular)'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
