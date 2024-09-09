@@ -73,7 +73,7 @@ const FormField: React.FC<FormFieldProps> = ({
             })}
             placeholder={placeholder}
             onBlur={() => trigger(name)}
-            className="w-full"
+            className="w-full text-black"
           />
         ) : (
           <Input
@@ -85,7 +85,7 @@ const FormField: React.FC<FormFieldProps> = ({
             type={type}
             placeholder={placeholder}
             onBlur={() => trigger(name)}
-            className="w-full"
+            className="w-full text-black"
           />
         )}
         {errorText && <p className="text-red-500 text-sm mt-1">{errorText}</p>}

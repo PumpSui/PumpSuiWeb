@@ -38,7 +38,7 @@ const FormSelect: React.FC<FormSelectProps> = ({
   const errorText = typeof errorMessage === "string" ? errorMessage : undefined;
 
   return (
-    <div className={`flex items-center ${className}`}>
+    <div className={`flex  items-center ${className}`}>
       <span className="mr-2 w-1/3 text-nowrap">{label}:</span>
       <div className="w-2/3">
         <Controller

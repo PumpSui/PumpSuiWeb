@@ -27,7 +27,7 @@ const FormImage: React.FC<FormImageProps> = ({
   };
 
   return (
-    <div className={`flex items-center justify-between my-5`}>
+    <div className={`flex items-center justify-between my-5 text-black`}>
       <span className="mr-2 w-1/3 text-nowrap flex items-center">{label}:</span>
       <div className="w-2/3">
         <Controller

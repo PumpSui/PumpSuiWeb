@@ -75,17 +75,18 @@ const ProjectForm: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 max-w-6xl mx-auto">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 w-full">
         {/* 基本信息部分 */}
-        <div className="p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="rounded-lg bg-gradient-to-b from-blue-100 to-blue-500 from-50% px-10 py-4">
+          <h2 className="text-xl font-semibold mb-4 text-black">Basic Information</h2>
+          <div className="grid grid-cols-2 gap-6">
             <FormField name="name" label="Project Name" placeholder="Enter project name" />
             <FormSelect
               name="category"
               label="Category"
               options={projectTypeOptions}
               placeholder="Select project category"
+              className="text-black"
             />
             <FormField
               name="description"
@@ -93,14 +94,15 @@ const ProjectForm: React.FC = () => {
               placeholder=".MD Supported!!  Project description, team introduction, previous work, and supporter benefits"
               tooltip="This part can be edited in the future."
               isTextarea
+              className="text-black"
             />
             <FormImage name="imageUrl" label="Project Image" />
           </div>
         </div>
 
         {/* 财务设置部分 */}
-        <div className="p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Financial Settings</h2>
+        <div className="p-6 rounded-lg shadow-md bg-white">
+          <h2 className="text-xl font-semibold mb-4 text-black">Financial Settings</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <FormField
               name="totalDeposit"
@@ -148,11 +150,11 @@ const ProjectForm: React.FC = () => {
         </div>
 
         {/* 时间设置部分 */}
-        <div className="p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Time Settings</h2>
+        <div className="p-6 rounded-lg shadow-md bg-gradient-to-b from-blue-100 to-blue-500 from-50%">
+          <h2 className="text-xl font-semibold mb-4 text-black">Time Settings</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="block text-sm font-medium">Start Time</label>
+              <label className="block text-sm font-medium text-black">Start Time</label>
               <Controller
                 control={control}
                 name="startTime"
@@ -165,7 +167,7 @@ const ProjectForm: React.FC = () => {
                     }}
                     showTimeSelect
                     dateFormat="Pp"
-                    className="w-full bg-primary-foreground border rounded px-3 py-2"
+                    className="w-full bg-white text-black border rounded px-3 py-2"
                   />
                 )}
               />
@@ -184,7 +186,7 @@ const ProjectForm: React.FC = () => {
         </div>
 
         {/* 社交链接部分 */}
-        <div className="p-6 rounded-lg shadow-md">
+        <div className="p-6 rounded-lg shadow-md bg-white text-black">
           <h2 className="text-xl font-semibold mb-4">Social Links</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <FormField
@@ -229,13 +231,13 @@ const ProjectForm: React.FC = () => {
         {/* 提交按钮部分 */}
         <div className="flex flex-col items-center space-y-4">
           <Button
-            className="w-full max-w-md text-lg py-3"
+            className="max-w-md text-md py-6 px-10 bg-lime-400 font-jaro"
             type="submit"
             disabled={isSubmitting}
           >
             Create Project
           </Button>
-          <p className="text-cyan-600 font-semibold">Deploy Fee: {getDeployFee()} SUI</p>
+          <p className="text-white text-sm">Deploy Fee: {getDeployFee()} SUI</p>
         </div>
       </form>
     </FormProvider>
