@@ -38,9 +38,9 @@ const Comment: React.FC<CommentProps> = ({
   }
 
   return (
-    <div className="bg-secondary border px-4 py-2 rounded-lg mb-2">
+    <div className="bg-transparent text-black  px-4 py-2 rounded-lg mb-2">
       <div className="flex items-center">
-        <p className="truncate max-w-36 font-bold text-cyan-300">@{author}</p>
+        <p className="truncate max-w-36 text-black">@{author}</p>
         <span className="ml-2 text-gray-500">{date}</span>
         {!islike ? (
           <FaRegHeart
@@ -57,7 +57,7 @@ const Comment: React.FC<CommentProps> = ({
         {!isReply && (
           <Button
             onClick={handleReplyClick}
-            className="text-cyan-300"
+            className="text-green-600"
             variant={"link"}
           >
             [ Reply ]

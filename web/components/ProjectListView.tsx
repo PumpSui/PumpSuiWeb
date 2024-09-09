@@ -45,7 +45,7 @@ export const ProjectListView: React.FC<ProjectListViewProps> = ({
         onSort={onSort}
       />
       <div className="w-full flex justify-center">
-        <div className="flex justify-between w-full p-2 mt-10">
+        <div className="flex justify-between w-full p-2 my-10">
           {pageDisplayedProjects.map((project) => (
             <ProjectCard key={project.id} {...project}  />
           ))}

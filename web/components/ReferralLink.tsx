@@ -39,12 +39,8 @@ const ReferralLink: React.FC<ReferralLinkProps> = ({ projectId }) => {
   return (
     <SlShareAlt
       onClick={handleCopy}
-      size={30}
-      className={
-        isCopied
-          ? "bg-blue-500 text-white"
-          : "hover:cursor-pointer bg-black"
-      }
+      size={25}
+      className="hover:cursor-pointer bg-transparent"
     />
   );
 };

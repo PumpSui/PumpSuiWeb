@@ -144,7 +144,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
 
 
    return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-gradient-to-b from-blue-100 to-blue-300 from-50% rounded-2xl p-4">
       {comments.map((comment, index) => (
         <Comment
           key={index}

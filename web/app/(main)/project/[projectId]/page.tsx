@@ -25,16 +25,16 @@ const Page: NextPage<{ params: { projectId: string } }> = ({ params }) => {
   const refId = searchParams.get("ref");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const { data, error, isLoading, refreshProjectData} = useProjectData(
+  const { data, error, isLoading, refreshProjectData } = useProjectData(
     params.projectId
   );
-  const { handleEditSubmit, handleBurnProject,handleClaimSubmit } =
+  const { handleEditSubmit, handleBurnProject, handleClaimSubmit } =
     useProjectActions(selectedProject);
   const { handleMintSubmit, isStartMint, isCreator } = useMintActions(
     selectedProject,
     refId,
     refreshProjectData
-  );  
+  );
 
   useEffect(() => {
     if (data) {
@@ -48,20 +48,23 @@ const Page: NextPage<{ params: { projectId: string } }> = ({ params }) => {
   if (!selectedProject) return <div>No project found</div>;
 
   return (
-    <>
+    <div className="mt-52">
       <Head>
         <title>{selectedProject.name} | Project Details</title>
         <meta name="description" content={selectedProject.description} />
       </Head>
       <div className="container mx-auto p-4 space-y-6">
         <ProjectHeader project={selectedProject} />
-        <div className="flex flex-col md:flex-row gap-6">
-          <ProjectDescription project={selectedProject} />
-          <div>
-            <ProjectSocial
-              project={selectedProject}
-              projectId={params.projectId}
+        <div className="flex gap-6 w-full">
+          <div className="flex flex-col gap-6 w-1/2">
+            <ProjectDescription project={selectedProject} />
+            <CommentSection
+              threadID={selectedProject.thread}
+              selectedProjectId={selectedProject.id}
             />
+          </div>
+
+          <div className="flex flex-col gap-6 w-1/2">            
             <MintCard
               project={selectedProject}
               isCreator={isCreator}
@@ -70,22 +73,22 @@ const Page: NextPage<{ params: { projectId: string } }> = ({ params }) => {
               onSubmitEdit={() => setIsEditModalOpen(true)}
               onSubmitClaim={handleClaimSubmit}
             />
+            <ProjectSocial
+              project={selectedProject}
+              projectId={params.projectId}
+            />
           </div>
         </div>
+      </div>
 
-        <CommentSection
-          threadID={selectedProject.thread}
-          selectedProjectId={selectedProject.id}
-        />
-        <EditProjectModal
+      <EditProjectModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           onSubmit={handleEditSubmit}
           onBurn={handleBurnProject}
           project={selectedProject}
         />
-      </div>
-    </>
+    </div>
   );
 };
 

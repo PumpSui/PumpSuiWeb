@@ -49,7 +49,7 @@ export const PaginationComponent: React.FC<PaginationComponentProps> = ({
               isActive={currentPage === i + 1}
               href={"#"}
             >
-              {i + 1}
+             <p className="text-sm">{i + 1}</p>
             </PaginationLink>
           </PaginationItem>
         ))}
