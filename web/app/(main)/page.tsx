@@ -27,7 +27,7 @@ const Page: React.FC = () => {
     setTab,
     setSearchQuery,
     setSortBy,
-  } = useProjectFilters(projects, supportedProjects,currentAccount?.address);
+  } = useProjectFilters(projects, supportedProjects, currentAccount?.address);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -59,18 +59,20 @@ const Page: React.FC = () => {
 
   return (
     <main>
-      <div className="mt-52 px-24">
-        <ProjectListView
-          projects={filteredAndSortedProjects}
-          currentPage={currentPage}
-          itemsPerPage={ITEMS_PER_PAGE}
-          isLoading={isLoading}
-          onTabChange={handleTabChange}
-          onSearch={handleSearch}
-          onSort={handleSort}
-          onPageChange={setCurrentPage}
-          onLoadMore={loadMore}
-        />
+      <div className="mt-52 px-24 w-full">
+        
+          <ProjectListView
+            projects={filteredAndSortedProjects}
+            currentPage={currentPage}
+            itemsPerPage={ITEMS_PER_PAGE}
+            isLoading={isLoading}
+            onTabChange={handleTabChange}
+            onSearch={handleSearch}
+            onSort={handleSort}
+            onPageChange={setCurrentPage}
+            onLoadMore={loadMore}
+          />
+        
       </div>
     </main>
   );

@@ -37,18 +37,19 @@ export const ProjectListView: React.FC<ProjectListViewProps> = ({
     startIndex + itemsPerPage
   );
   const totalPages = Math.ceil(projects.length / itemsPerPage);
-
   return (
-    <>
+    <div className="w-full">
       <ProjectNavbar
         onTabChange={onTabChange}
         onSearch={onSearch}
         onSort={onSort}
       />
-      <div className="w-full grid grid-cols-1 mac:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-4 p-2">
-        {pageDisplayedProjects.map((project) => (
-          <ProjectCard key={project.id} {...project} />
-        ))}
+      <div className="w-full flex justify-center">
+        <div className="flex justify-between w-full p-2 mt-10">
+          {pageDisplayedProjects.map((project) => (
+            <ProjectCard key={project.id} {...project}  />
+          ))}
+        </div>
       </div>
       {isLoading && <LoadingIndicator />}
       {!isLoading && projects.length === 0 && (
@@ -72,6 +73,6 @@ export const ProjectListView: React.FC<ProjectListViewProps> = ({
       {!isAutoLoad && projects.length >= currentPage * itemsPerPage && (
         <button onClick={onLoadMore}>Load More</button>
       )}
-    </>
+    </div>
   );
 };
