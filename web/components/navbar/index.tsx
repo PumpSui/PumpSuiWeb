@@ -22,7 +22,7 @@ const Navbar = () => {
   return (
     <nav className="fixed bg-background top-0 left-0 right-0 z-50 shadow-md border-b-2 border-gray-800 px-24 py-14">
       <div className="flex justify-between items-center gap-10">
-        <div>
+        <div onClick={() => router.push("/")} className="cursor-pointer">
           <p className="text-5xl text-[#CFFF0A] font-bold font-jaro">B o m e n t</p>
         </div>
 

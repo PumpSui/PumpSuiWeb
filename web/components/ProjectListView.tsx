@@ -55,10 +55,10 @@ export const ProjectListView: React.FC<ProjectListViewProps> = ({
       {!isLoading && projects.length === 0 && (
         <>
           <div className="flex justify-center">
-            <div className="mt-[10%] space-y-20">
+            <div className="space-y-20">
               <h2 className="text-5xl">WHAT ARE YOU WAITING FOR?</h2>
-              <h2 className="text-7xl">CLICK CREATE ABOVE AND</h2>
-              <h2 className="text-8xl">LETS PUMP SUI TOGETHER !!!</h2>
+              <h2 className="text-6xl">CLICK CREATE ABOVE AND</h2>
+              <h2 className="text-7xl">LETS Boom Movement TOGETHER !!!</h2>
             </div>
           </div>
         </>
