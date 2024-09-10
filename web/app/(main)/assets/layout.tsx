@@ -1,5 +1,5 @@
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  return <section className="pt-24">{children}</section>;
+  return <section>{children}</section>;
 };
 
 export default Layout;

@@ -33,19 +33,19 @@ const Progress = React.forwardRef<
       <ProgressPrimitive.Root
         ref={ref}
         className={cn(
-          "relative h-2 w-full overflow-hidden rounded-full bg-primary/20 ",
+          "relative h-4 w-full overflow-hidden rounded-full bg-gray-800",
           className
         )}
         {...props}
       >
         <ProgressPrimitive.Indicator
-          className={`h-full w-full flex-1 transition-all ${indicatorColor}`}
+          className={`h-full w-full flex-1 transition-all ${indicatorColor} rounded-r-full`}
           style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
         ></ProgressPrimitive.Indicator>
 
         {threshhold && (
           <div
-            className={`absolute top-0 left-0 h-full ${isBegin?'bg-green-400':'bg-red-400'} rounded-3xl`}
+            className={`absolute top-0 left-0 h-full ${isBegin?'bg-green-400':'bg-gray-400'} rounded-3xl`}
             style={{
               width: "4px",
               left: `${threshhold}%`,
@@ -55,13 +55,13 @@ const Progress = React.forwardRef<
       </ProgressPrimitive.Root>
       {showThreshholdText && (
         <p
-          className={`absolute text-xs font-bold ${
-            isBegin ? "text-green-400" : "text-red-400"
+          className={`absolute text-xs font-bold pt-1 ${
+            isBegin ? "text-green-500" : "text-black"
           }`}
           style={{
             top: "100%",
             left: `${threshhold}%`,
-            transform: "translateX(-50%)",
+            transform: "translateX(-30%)",
             zIndex: 10,
           }}
         >

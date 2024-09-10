@@ -10,7 +10,7 @@ interface ProjectDescriptionProps {
 
 const ProjectDescription: React.FC<ProjectDescriptionProps> = ({ project }) => {
   return (
-    <Card className="p-4 flex-grow shadow-md max-w-5xl max-h-[550px] flex flex-col">
+    <Card className="p-4 flex-grow shadow-md bg-white max-h-[550px] flex flex-col text-black">
       <CardHeader>
         <CardTitle className="text-2xl">Description</CardTitle>
       </CardHeader>

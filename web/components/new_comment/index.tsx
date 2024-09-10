@@ -17,7 +17,7 @@ const NewComment: React.FC<{ onSubmit: (content: string) => void }> = ({
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className="w-full p-2 border rounded-md"
+        className="w-full p-2 border rounded-md bg-white text-black"
         placeholder="Add a new comment..."
         style={{ minHeight: "80px" }} // Optional: to ensure sufficient height for textarea
       />

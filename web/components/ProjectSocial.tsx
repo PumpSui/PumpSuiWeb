@@ -24,7 +24,7 @@ const ProjectSocial: React.FC<ProjectSocialProps> = ({
   }, [project]);
 
   return (
-    <div className="flex justify-end gap-5">
+    <div className="flex justify-between border border-gray-500 rounded-2xl px-4 py-2">
       <SocialIcons socialLinks={socialLinks} />
       <ReferralLink projectId={projectId} />
     </div>
